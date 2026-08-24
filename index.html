@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<title>Cotação BJ EUB</title>
+<title>YZYNOAH · Cotação de importação</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
@@ -371,6 +371,56 @@ body.modal-open{overflow:hidden}
 
 footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px solid var(--line);padding-top:18px}
 
+/* ---- identidade, progresso e confiança ---- */
+.brand-line{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.brand-mark{
+  width:42px;height:42px;flex:0 0 auto;display:grid;place-items:center;border:1px solid rgba(98,216,255,.42);
+  border-radius:12px;background:linear-gradient(145deg,#10242C,#11131B);color:var(--ship);
+  font:700 13px/1 "JetBrains Mono",monospace;letter-spacing:-.08em;box-shadow:0 0 28px rgba(98,216,255,.1)
+}
+.brand-line .eyebrow{margin:0}.brand-tagline{margin:9px 0 0;color:var(--ink-2);font-size:15px;font-weight:600}
+.quote-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.quote-chip{padding:6px 9px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.02);color:var(--muted);font:600 9px/1.3 "JetBrains Mono",monospace;letter-spacing:.05em;text-transform:uppercase}
+.quote-chip.live{border-color:#294C38;background:var(--action-soft);color:var(--action)}.quote-chip.expired{border-color:var(--warn-line);background:var(--warn-soft);color:var(--warn)}
+.journey{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:9px;border:1px solid var(--line);border-radius:14px;background:rgba(9,11,14,.88);box-shadow:var(--shadow)}
+.journey button{position:relative;min-width:0;padding:11px 12px;border:0;border-radius:9px;background:transparent;color:var(--muted);cursor:pointer;text-align:left;font:600 10px/1.35 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.06em;transition:background .18s ease,color .18s ease,transform .18s ease}
+.journey button::before{content:attr(data-step);display:inline-grid;place-items:center;width:20px;height:20px;margin-right:8px;border:1px solid var(--line);border-radius:50%;font-size:8px;vertical-align:middle}
+.journey button.done{color:var(--ink-2)}.journey button.done::before{content:"✓";border-color:#315E42;background:var(--action-soft);color:var(--action)}
+.journey button.current{background:var(--accent-soft);color:var(--accent-ink)}.journey button.current::before{border-color:var(--accent);color:var(--accent-ink)}
+.journey button:hover{background:var(--surface-2);transform:translateY(-1px)}
+.freight-status{display:flex;align-items:flex-start;gap:10px;margin-top:14px;padding:12px 14px;border:1px solid #28444E;border-radius:10px;background:#0A171C;color:var(--ink-2);font-size:13px}
+.freight-status::before{content:"↳";color:var(--ship);font:700 14px/1.5 "JetBrains Mono",monospace}.freight-status strong{color:var(--ship)}
+.line.recommended{box-shadow:0 0 0 1px rgba(98,216,255,.16) inset}.line.locked:not(.on){filter:saturate(.68)}
+.pair-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border-bottom:1px solid var(--line-soft);background:rgba(255,255,255,.01)}
+.selection-summary{color:var(--ink-2);font:600 10px/1.45 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.06em}
+.toolbar-actions{display:flex;gap:8px}.mini-btn{padding:8px 10px;border:1px solid #4E416B;border-radius:8px;background:#171321;color:#CDBDF0;cursor:pointer;font:600 9px/1 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.06em;transition:border-color .18s ease,background .18s ease,transform .18s ease}.mini-btn:hover{border-color:var(--pair-accent);background:#241B39;transform:translateY(-1px)}
+.pair-name-prefix{display:block;margin-bottom:4px;color:#A999CF;font:600 9px/1.3 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.1em}
+.pair-name{font-size:21px}.pair-actions{display:flex;flex:0 0 auto;align-items:center;gap:8px}
+.qty-control{display:flex;align-items:center;border:1px solid #654F91;border-radius:10px;overflow:hidden;background:#171220}
+.qty-control button{width:36px;height:46px;border:0;background:transparent;color:#D9CBF5;cursor:pointer;font-size:18px;transition:background .16s ease,color .16s ease}.qty-control button:hover{background:#2B2043;color:#fff}
+.qty-value{min-width:34px;text-align:center;color:var(--ink);font:700 12px/1 "JetBrains Mono",monospace}
+.pair.off .qty-control,.pair.off .pair-figs{display:none}.pair.on .card-hint{display:none}
+.card-hint{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line-soft);color:var(--muted);font-size:12.5px}
+.pair.on{animation:selectedPulse .3s ease}.pair.on .pair-figs{animation:pixIn .24s ease both}
+@keyframes selectedPulse{50%{transform:scale(1.008)}}
+.gallery-preview{aspect-ratio:4/3}.gallery-preview img{height:100%;object-fit:contain;background:#090A0D}
+.strip img{object-fit:contain;background:#090A0D}
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.how-step{padding:18px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(150deg,var(--surface-2),#0A0C10)}
+.how-n{display:grid;place-items:center;width:28px;height:28px;margin-bottom:13px;border:1px solid rgba(125,157,255,.34);border-radius:9px;background:var(--accent-soft);color:var(--accent-ink);font:700 10px/1 "JetBrains Mono",monospace}
+.how-step h3{margin:0 0 6px;font-size:15px}.how-step p{margin:0;color:var(--muted);font-size:13px}.trust-note{margin:14px 0 0;padding:13px 15px;border-left:3px solid var(--pair-accent);background:var(--pair-soft);color:var(--ink-2);font-size:13px}
+.quote-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:17px}.quote-actions .btn{background:transparent;color:var(--ink-2);border-color:var(--line);padding:10px 14px}.quote-actions .btn.whatsapp{border-color:#315D43;color:var(--action);background:var(--action-soft)}.quote-actions .btn:disabled{color:var(--muted);border-color:var(--line);background:var(--surface-2);cursor:not-allowed;opacity:.55}
+.saving{display:block;margin-top:5px}.saving-label{display:block;color:var(--pos);font:600 9px/1.3 "JetBrains Mono",monospace}.saving-track{display:block;width:74px;height:3px;margin:4px 0 0 auto;border-radius:99px;background:var(--line)}.saving-bar{display:block;height:100%;border-radius:inherit;background:var(--pos)}
+.confirm-rate{margin:12px 0 0;color:var(--ship);font-size:12.5px;text-align:right}
+
+/* ---- edição assistida ---- */
+.settings-validation{margin:0 22px 17px;padding:11px 13px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);color:var(--muted);font-size:12.5px}.settings-validation.ok{border-color:#294C38;color:var(--action);background:var(--action-soft)}.settings-validation.error{border-color:var(--warn-line);color:var(--warn);background:var(--warn-soft)}
+.field.changed input,input.cny.changed{border-color:rgba(125,157,255,.66);box-shadow:0 0 0 2px rgba(125,157,255,.08)}.field.changed label::after{content:" · alterado";color:var(--accent-ink)}
+.field.invalid input,input.cny.invalid{border-color:#D56C6C;background:#241111}.field.invalid label{color:#F49A9A}
+.settings-history{padding:0 22px 22px}.settings-history h3{margin:0 0 9px;color:var(--muted);font:700 9.5px/1.4 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.08em}.history-list{display:grid;gap:7px}.history-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 11px;border:1px solid var(--line-soft);border-radius:8px;background:#080A0D;color:var(--muted);font-size:11px}.history-item button{border:0;background:transparent;color:var(--accent-ink);cursor:pointer;font:600 9px/1 "JetBrains Mono",monospace;text-transform:uppercase}
+.import-dialog textarea{display:block;width:100%;min-height:210px;resize:vertical;margin:0;background:#07090C;color:var(--ink-2);border:1px solid var(--line);border-radius:9px;padding:12px;font:11px/1.55 "JetBrains Mono",monospace}.import-error{min-height:20px;margin:8px 0 0;color:#F49A9A;font-size:12px}
+.toast{position:fixed;z-index:80;left:50%;bottom:24px;max-width:min(430px,calc(100% - 24px));transform:translate(-50%,12px);padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:#151922;color:var(--ink);box-shadow:0 18px 54px #000;opacity:0;pointer-events:none;font-size:13px;transition:opacity .2s ease,transform .2s ease}.toast.show{opacity:1;transform:translate(-50%,0)}
+
 @media (max-width:760px){
   body{padding:18px 14px 56px}
   .wrap{gap:16px}
@@ -381,6 +431,8 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   #pairs{grid-template-columns:1fr}
   .qrarea{grid-template-columns:1fr}
   .qrpanel{width:236px;max-width:100%;margin:0 auto}
+  .journey{grid-template-columns:repeat(2,1fr)}
+  .how-grid{grid-template-columns:1fr}
 }
 
 @media (max-width:640px){
@@ -418,6 +470,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   .mobile-count{color:var(--muted);font:600 9px/1.4 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.08em}
   .mobile-total{color:var(--action);font-size:19px;font-weight:700;white-space:nowrap}
   .mobile-checkout .btn{flex:0 0 auto;padding:13px 15px;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  .pair-toolbar{align-items:flex-start;flex-direction:column}.toolbar-actions{width:100%}.toolbar-actions .mini-btn{flex:1}
 }
 
 @media (max-width:430px){
@@ -434,7 +487,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   .pair{padding:16px}
   .pair-top{flex-wrap:wrap}
   .pair-top>div{flex:1 1 100%}
-  .selbtn{width:100%;min-height:46px}
+  .pair-actions{width:100%}.pair-actions .selbtn{width:auto;flex:1;min-height:46px}.qty-control{flex:1}.qty-control button{flex:1}.qty-value{min-width:44px}
   .pair-figs{grid-template-columns:1fr 1fr;gap:11px}
   .fig:nth-child(2){border-right:0;padding-right:0}
   .fig:last-child{grid-column:1/-1;border-top:1px solid var(--line-soft);padding-top:10px}
@@ -453,6 +506,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   .settings-actions{padding-left:16px;padding-right:16px}.settings-actions .btn{width:100%}
   .lb{padding:10px}.lb-head{margin-bottom:8px}.lb-nav{width:40px;height:52px}.lb-prev{left:2px}.lb-next{right:2px}
   .confirm-actions{flex-direction:column-reverse}.confirm-actions .btn{width:100%}
+  .journey{gap:5px;padding:6px}.journey button{padding:9px 8px;font-size:8.5px}.journey button::before{display:block;margin:0 0 5px}
 }
 
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
@@ -469,9 +523,18 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
 
   <header class="masthead">
     <div>
-      <p class="eyebrow">CSSBUY · seguro 3%</p>
+      <div class="brand-line">
+        <span class="brand-mark" aria-hidden="true">YN</span>
+        <p class="eyebrow">Curadoria YZY · via CSSBUY</p>
+      </div>
       <h1>YZYNOAH</h1>
-      <p class="sub">Escolha o frete, depois os pares. O preço de cada tênis já sai com o frete dividido dentro. Os totais são <strong>aproximados</strong>: dependem do câmbio do dia e do peso real na pesagem.</p>
+      <p class="brand-tagline">Cotação transparente. QC real. Compra acompanhada.</p>
+      <p class="sub">Monte seu pedido e veja o custo completo antes de pagar. O frete internacional é <strong>rateado igualmente</strong> entre todos os pares do envio.</p>
+      <div class="quote-meta">
+        <span class="quote-chip live" id="quoteStatus">Atualização manual</span>
+        <span class="quote-chip" id="quoteValidity">Validade de 24 horas</span>
+        <span class="quote-chip">Valores aproximados</span>
+      </div>
       <p class="stamp" id="stamp">—</p>
     </div>
     <div class="headline" aria-live="polite">
@@ -481,24 +544,32 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     </div>
   </header>
 
+  <nav class="journey" aria-label="Progresso da cotação">
+    <button type="button" data-step="01" data-target="lineBJ" class="current">Frete</button>
+    <button type="button" data-step="02" data-target="secPares">Pares</button>
+    <button type="button" data-step="03" data-target="secConta">Revisão</button>
+    <button type="button" data-step="04" data-target="secPagar">Pagamento</button>
+  </nav>
+
   <section class="panel">
     <div class="panel-head">
-      <h2><span class="step">1</span>Escolha o frete</h2>
-      <span class="note">A linha muda o preço de tudo</span>
+      <h2><span class="step">1</span>Frete do pedido</h2>
+      <span class="note">A quantidade confirma a linha automaticamente</span>
     </div>
     <div class="panel-body">
       <div class="lines">
         <button class="line" type="button" data-linha="BJ" id="lineBJ" aria-pressed="false">
           <span class="nome">BJ EUB</span>
-          <span class="regra">Paga por peso: quanto mais leve, mais barato. Melhor para <strong>1 ou 2 pares</strong>.</span>
+          <span class="regra">Paga por peso e é a linha usada exclusivamente para pedidos de <strong>1 ou 2 pares</strong>.</span>
           <span class="tag" id="tagBJ">—</span>
         </button>
         <button class="line" type="button" data-linha="SH" id="lineSH" aria-pressed="false">
           <span class="nome">SH SAL</span>
-          <span class="regra">Preço fixo por faixa de peso. Só compensa a partir de <strong>3 pares</strong>.</span>
+          <span class="regra">Preço fixo por faixa de peso e linha obrigatória a partir de <strong>3 pares</strong>.</span>
           <span class="tag" id="tagSH">—</span>
         </button>
       </div>
+      <div class="freight-status" id="freightStatus" aria-live="polite">Escolha a linha para começar. Com o pedido montado, a regra é aplicada automaticamente.</div>
     </div>
   </section>
 
@@ -506,6 +577,13 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     <div class="panel-head">
       <h2><span class="step">2</span>Escolha os pares</h2>
       <span class="note">Clique nas fotos pra ampliar — são as fotos do QC</span>
+    </div>
+    <div class="pair-toolbar">
+      <span class="selection-summary" id="selectedSummary">Nenhum par no pedido</span>
+      <div class="toolbar-actions">
+        <button class="mini-btn" id="selectAll" type="button">1 de cada</button>
+        <button class="mini-btn" id="clearAll" type="button">Limpar</button>
+      </div>
     </div>
     <div id="pairs"></div>
   </section>
@@ -533,6 +611,21 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
         </thead>
         <tbody id="scenarios"></tbody>
       </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Como funciona</h2>
+      <span class="note">Do QC ao acompanhamento da entrega</span>
+    </div>
+    <div class="panel-body">
+      <div class="how-grid">
+        <article class="how-step"><span class="how-n">01</span><h3>Você monta</h3><p>Escolhe os modelos e a quantidade. O site aplica BJ‑EUB até 2 pares e SH‑SAL a partir de 3.</p></article>
+        <article class="how-step"><span class="how-n">02</span><h3>Eu confiro</h3><p>Valido vendedor, medidas e fotos reais de QC antes do envio internacional.</p></article>
+        <article class="how-step"><span class="how-n">03</span><h3>A gente acompanha</h3><p>Pedido, declaração e rastreio ficam acompanhados até a chegada.</p></article>
+      </div>
+      <p class="trust-note"><strong>Por que o total é aproximado?</strong> Câmbio e peso real podem variar na pesagem do armazém. Se houver diferença, o ajuste é demonstrado com o comprovante do CSSBUY.</p>
     </div>
   </section>
 
@@ -568,6 +661,11 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
         </div>
         <button class="btn big" id="buyBtn" type="button" disabled>Selecione um par</button>
       </div>
+      <div class="quote-actions">
+        <button class="btn" id="shareQuote" type="button">Compartilhar resumo</button>
+        <button class="btn" id="copySummary" type="button">Copiar resumo</button>
+        <button class="btn whatsapp" id="whatsappQuote" type="button">Enviar pelo WhatsApp</button>
+      </div>
       <div class="pixbox" id="pixbox" hidden>
         <p class="pixwarn" id="pixwarn" hidden>Você mudou o pedido depois de copiar. O código abaixo é novo — copie de novo antes de pagar.</p>
         <p class="pixhead">
@@ -593,27 +691,35 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     <summary>Ajustar valores</summary>
     <div class="fields">
       <div class="field"><label for="data">Cotado em</label><input id="data" type="text" value="21/08/2026"></div>
-      <div class="field"><label for="cotacao">Cotação (¥ por R$1)</label><input id="cotacao" type="number" step="0.01" value="1.20"></div>
-      <div class="field"><label for="seguro">Seguro (%)</label><input id="seguro" type="number" step="0.1" value="3"></div>
-      <div class="field"><label for="peso">Peso por par (g)</label><input id="peso" type="number" step="1" value="704"></div>
-      <div class="field"><label for="bjBase">BJ · base (¥)</label><input id="bjBase" type="number" step="0.01" value="33.46"></div>
-      <div class="field"><label for="bjKg">BJ · por kg (¥)</label><input id="bjKg" type="number" step="0.01" value="142.75"></div>
-      <div class="field"><label for="bjLim">BJ · limite (g)</label><input id="bjLim" type="number" step="100" value="2000"></div>
-      <div class="field"><label for="sh3">SH · até 3000 g (¥)</label><input id="sh3" type="number" step="1" value="328"></div>
-      <div class="field"><label for="sh4">SH · até 4000 g (¥)</label><input id="sh4" type="number" step="1" value="392"></div>
-      <div class="field"><label for="sh5">SH · até 5000 g (¥)</label><input id="sh5" type="number" step="1" value="456"></div>
-      <div class="field"><label for="sh6">SH · até 6000 g (¥)</label><input id="sh6" type="number" step="1" value="520"></div>
-      <div class="field"><label for="sh7">SH · até 7000 g (¥)</label><input id="sh7" type="number" step="1" value="584"></div>
-      <div class="field"><label for="x1">Serviço · 1 par (R$)</label><input id="x1" type="number" step="1" value="20"></div>
-      <div class="field"><label for="x2">Serviço · 2 (R$)</label><input id="x2" type="number" step="1" value="35"></div>
-      <div class="field"><label for="x3">Serviço · 3 (R$)</label><input id="x3" type="number" step="1" value="45"></div>
-      <div class="field"><label for="xExtra">Serviço · par extra (R$)</label><input id="xExtra" type="number" step="1" value="10"></div>
-      <div class="field"><label for="iof">IOF (%)</label><input id="iof" type="number" step="0.01" value="0"></div>
-      <div class="field"><label for="imposto">Imposto na entrega (R$)</label><input id="imposto" type="number" step="1" value="0"></div>
+      <div class="field"><label for="cotacao">Cotação (¥ por R$1)</label><input id="cotacao" type="number" min="0.01" step="0.01" value="1.20"></div>
+      <div class="field"><label for="seguro">Seguro (%)</label><input id="seguro" type="number" min="0" step="0.1" value="3"></div>
+      <div class="field"><label for="peso">Peso por par (g)</label><input id="peso" type="number" min="1" step="1" value="704"></div>
+      <div class="field"><label for="bjBase">BJ · base (¥)</label><input id="bjBase" type="number" min="0" step="0.01" value="33.46"></div>
+      <div class="field"><label for="bjKg">BJ · por kg (¥)</label><input id="bjKg" type="number" min="0" step="0.01" value="142.75"></div>
+      <div class="field"><label for="bjLim">BJ · limite (g)</label><input id="bjLim" type="number" min="1" step="100" value="2000"></div>
+      <div class="field"><label for="sh3">SH · até 3000 g (¥)</label><input id="sh3" type="number" min="0" step="1" value="328"></div>
+      <div class="field"><label for="sh4">SH · até 4000 g (¥)</label><input id="sh4" type="number" min="0" step="1" value="392"></div>
+      <div class="field"><label for="sh5">SH · até 5000 g (¥)</label><input id="sh5" type="number" min="0" step="1" value="456"></div>
+      <div class="field"><label for="sh6">SH · até 6000 g (¥)</label><input id="sh6" type="number" min="0" step="1" value="520"></div>
+      <div class="field"><label for="sh7">SH · até 7000 g (¥)</label><input id="sh7" type="number" min="0" step="1" value="584"></div>
+      <div class="field"><label for="x1">Serviço · 1 par (R$)</label><input id="x1" type="number" min="0" step="1" value="20"></div>
+      <div class="field"><label for="x2">Serviço · 2 (R$)</label><input id="x2" type="number" min="0" step="1" value="35"></div>
+      <div class="field"><label for="x3">Serviço · 3 (R$)</label><input id="x3" type="number" min="0" step="1" value="45"></div>
+      <div class="field"><label for="xExtra">Serviço · par extra (R$)</label><input id="xExtra" type="number" min="0" step="1" value="10"></div>
+      <div class="field"><label for="iof">IOF (%)</label><input id="iof" type="number" min="0" step="0.01" value="0"></div>
+      <div class="field"><label for="imposto">Imposto na entrega (R$)</label><input id="imposto" type="number" min="0" step="1" value="0"></div>
     </div>
+    <p class="settings-validation" id="settingsValidation" aria-live="polite">Conferindo valores…</p>
     <div class="settings-actions">
       <button class="btn" id="exportSettings" type="button">Copiar configurações</button>
+      <button class="btn" id="importSettings" type="button">Importar configurações</button>
+      <button class="btn" id="saveVersion" type="button">Salvar versão</button>
+      <button class="btn" id="customerPreview" type="button">Ver como cliente</button>
       <button class="btn danger" id="restoreDefaults" type="button">Restaurar valores padrão</button>
+    </div>
+    <div class="settings-history">
+      <h3>Histórico local</h3>
+      <div class="history-list" id="settingsHistory"><span class="history-item">Nenhuma versão salva ainda</span></div>
     </div>
   </details>
 
@@ -647,11 +753,24 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
       <li><span>Frete</span><strong id="confirmShipping">—</strong></li>
     </ul>
     <p class="confirm-products" id="confirmProducts">—</p>
+    <p class="confirm-rate" id="confirmRate">—</p>
     <div class="confirm-total"><span>Total aproximado</span><strong id="confirmTotal">—</strong></div>
   </div>
   <div class="confirm-actions">
     <button class="btn secondary" id="cancelOrder" type="button">Voltar e revisar</button>
     <button class="btn" id="confirmOrder" type="button">Confirmar e gerar Pix</button>
+  </div>
+</dialog>
+
+<dialog class="confirm-dialog import-dialog" id="importDialog">
+  <div class="confirm-head"><h2>Importar configurações</h2><p>Cole o JSON gerado pelo botão “Copiar configurações”.</p></div>
+  <div class="confirm-body">
+    <textarea id="importPayload" spellcheck="false" placeholder="{ ... }"></textarea>
+    <p class="import-error" id="importError" aria-live="polite"></p>
+  </div>
+  <div class="confirm-actions">
+    <button class="btn secondary" id="cancelImport" type="button">Cancelar</button>
+    <button class="btn" id="applyImport" type="button">Validar e importar</button>
   </div>
 </dialog>
 
@@ -662,6 +781,8 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   </div>
   <button class="btn" id="mobileBuyBtn" type="button">Fechar pedido</button>
 </div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="vendor/qrcode.min.js"></script>
 <script>
@@ -684,6 +805,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   var ids = ["data","cotacao","seguro","peso","bjBase","bjKg","bjLim",
              "sh3","sh4","sh5","sh6","sh7","x1","x2","x3","xExtra","iof","imposto"];
   var sel = PAIRS.map(function(){ return false; });
+  var quantities = PAIRS.map(function(){ return 0; });
   var linha = null;          // "BJ" | "SH"
   var EDIT = false;
   var pixOpen = false;
@@ -694,6 +816,10 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   var galleryTrigger = null;
   var DEFAULT_PAIR_PRICES = PAIRS.map(function(p){ return p.cny; });
   var DEFAULT_VALUES = {};
+  var HISTORY_KEY = KEY + "-history";
+  var toastTimer = null;
+  var allowLeave = false;
+  var lastSettingsValid = true;
 
   function $(id){ return document.getElementById(id); }
   function n(id){ var el=$(id); if(!el) return 0; var v=parseFloat(el.value); return isFinite(v)?v:0; }
@@ -702,6 +828,22 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   function cny(v){ return "¥ " + v.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}); }
   function g(v){ return v.toLocaleString("pt-BR") + " g"; }
   function priceOf(i){ return EDIT ? n("p"+i) : PAIRS[i].cny; }
+  function pairLabel(name){ return name.replace("Yeezy Boost 350 V2 ",""); }
+  function selectedCount(){ return quantities.reduce(function(total,q){ return total + q; },0); }
+  function syncSelection(){ quantities.forEach(function(q,i){ sel[i] = q > 0; }); }
+  function requiredLine(k){ return k > 2 ? "SH" : "BJ"; }
+  function maxPairCount(){ return Math.max(1,Math.floor(7000/Math.max(1,n("peso")))); }
+  function notify(message){
+    var el = $("toast");
+    el.textContent = message; el.classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(function(){ el.classList.remove("show"); },2800);
+  }
+  function quoteValidityText(){
+    var match = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(txt("data").trim());
+    if (!match) return "Validade a confirmar";
+    var now = new Date(), sameDay = now.getFullYear() === +match[3] && now.getMonth()+1 === +match[2] && now.getDate() === +match[1];
+    return sameDay ? "Válida por 24 horas" : "Confirme a cotação atual";
+  }
 
   /* ---------- frete ---------- */
   function freteBJ(gramas){
@@ -829,14 +971,22 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   }
   function selecionado(){
     var precos = [];
-    sel.forEach(function(on,i){ if (on) precos.push(priceOf(i)); });
+    quantities.forEach(function(q,i){ for (var j=0;j<q;j++) precos.push(priceOf(i)); });
     return calcular(precos.length, precos);
+  }
+
+  function calcularPelaRegra(k,precos){
+    var anterior = linha;
+    linha = requiredLine(k);
+    var resultado = calcular(k,precos);
+    linha = anterior;
+    return resultado;
   }
 
   function nomesSelecionados(){
     var nomes = [];
     PAIRS.forEach(function(p,i){
-      if (sel[i]) nomes.push(p.name.replace("Yeezy Boost 350 V2 ",""));
+      if (quantities[i]) nomes.push((quantities[i] > 1 ? quantities[i] + "× " : "") + pairLabel(p.name));
     });
     return nomes;
   }
@@ -855,6 +1005,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     $("confirmCount").textContent = s.k === 1 ? "1 par" : s.k + " pares";
     $("confirmShipping").textContent = nomeLinha();
     $("confirmProducts").textContent = nomes.join(" · ");
+    $("confirmRate").textContent = "Frete rateado: " + cny(s.freteCny/s.k) + " · " + brl(s.frete/s.k) + " por par";
     $("confirmTotal").textContent = "≈ " + brl(s.total);
     var dialog = $("confirmDialog");
     document.body.classList.add("modal-open");
@@ -880,6 +1031,46 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
       return;
     }
     openConfirmation();
+  }
+
+  function quoteSummary(){
+    var s = selecionado();
+    if (!s.k || s.indisponivel) return "";
+    var linhas = [
+      "Cotação YZYNOAH",
+      "Pedido: " + nomesSelecionados().join(", "),
+      "Quantidade: " + (s.k === 1 ? "1 par" : s.k + " pares"),
+      "Frete: " + nomeLinha() + " (" + brl(s.frete) + " no total)",
+      "Frete rateado: " + brl(s.frete/s.k) + " por par",
+      "Total aproximado: " + brl(s.total),
+      "Média aproximada: " + brl(s.per) + " por par",
+      "Referência: " + txt("data") + " · " + quoteValidityText().toLowerCase(),
+      "Câmbio e peso real podem gerar ajuste comprovado pelo CSSBUY."
+    ];
+    return linhas.join("\n");
+  }
+
+  function copyText(value,success){
+    function done(ok){ notify(ok ? success : "Não foi possível copiar automaticamente"); }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(value).then(function(){ done(true); },function(){ done(copiaLegada(value)); });
+    } else done(copiaLegada(value));
+  }
+
+  function shareQuote(){
+    var text = quoteSummary();
+    if (!text) return;
+    if (navigator.share){
+      navigator.share({title:"Cotação YZYNOAH",text:text}).catch(function(e){ if (e && e.name !== "AbortError") copyText(text,"Resumo copiado ✓"); });
+    } else copyText(text,"Resumo copiado ✓");
+  }
+
+  function whatsappQuote(){
+    var text = quoteSummary();
+    if (!text) return;
+    allowLeave = true;
+    window.open("https://wa.me/?text=" + encodeURIComponent(text),"_blank","noopener");
+    setTimeout(function(){ allowLeave = false; },1000);
   }
 
   function pairByCode(code){
@@ -928,7 +1119,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
       var row = document.createElement("div");
       row.className = "pair off";
       var priceCell = EDIT
-        ? '<input class="cny" id="p'+i+'" type="number" step="1" value="'+p.cny+'">'
+        ? '<input class="cny" id="p'+i+'" type="number" min="0.01" step="1" value="'+p.cny+'">'
         : '<span class="sm" id="pc'+i+'">—</span>';
       var photos = PHOTOS[p.code] || [];
       var preview = photos.length
@@ -941,14 +1132,22 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
       }).join("");
       row.innerHTML =
         '<div class="pair-top">' +
-          '<div><p class="pair-name">'+p.name+'</p><p class="pair-code">'+p.code+'</p></div>' +
-          '<button class="selbtn" type="button" data-pair="'+i+'" aria-pressed="false">Selecionar</button>' +
+          '<div><span class="pair-name-prefix">Yeezy 350 V2</span><p class="pair-name">'+pairLabel(p.name)+'</p><p class="pair-code">'+p.code+'</p></div>' +
+          '<div class="pair-actions">' +
+            '<button class="selbtn" type="button" data-pair="'+i+'" aria-pressed="false">Adicionar</button>' +
+            '<div class="qty-control" aria-label="Quantidade de '+pairLabel(p.name)+'">' +
+              '<button type="button" data-qty="-1" data-pair="'+i+'" aria-label="Diminuir quantidade">−</button>' +
+              '<span class="qty-value" id="qty'+i+'">0</span>' +
+              '<button type="button" data-qty="1" data-pair="'+i+'" aria-label="Aumentar quantidade">+</button>' +
+            '</div>' +
+          '</div>' +
         '</div>' +
         '<div class="pair-figs">' +
           '<span class="fig"><span class="k">Tênis</span>'+priceCell+'<span class="v brl" id="pb'+i+'">—</span></span>' +
           '<span class="fig"><span class="k">Frete rateado</span><span class="sm" id="pfc'+i+'">—</span><span class="v" id="pf'+i+'">—</span></span>' +
           '<span class="fig"><span class="k">Sai por aprox.</span><span class="v brl" id="pt'+i+'">—</span></span>' +
         '</div>' +
+        '<p class="card-hint">Adicione ao pedido para ver frete rateado e valor aproximado por par.</p>' +
         '<div class="product-gallery">'+preview+'<div class="strip">'+thumbs+'</div></div>';
       host.appendChild(row);
     });
@@ -963,10 +1162,64 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
       '</span></div>';
   }
 
+  function validateSettings(){
+    var invalid = [];
+    var positive = ["cotacao","peso","bjLim"];
+    var nonNegative = ["seguro","bjBase","bjKg","sh3","sh4","sh5","sh6","sh7","x1","x2","x3","xExtra","iof","imposto"];
+    ids.forEach(function(id){
+      var el = $(id), value = el ? parseFloat(el.value) : NaN;
+      var bad = id === "data" ? !txt(id).trim()
+        : (!isFinite(value) || (positive.indexOf(id) >= 0 ? value <= 0 : (nonNegative.indexOf(id) >= 0 && value < 0)));
+      if (el && el.closest(".field")) el.closest(".field").classList.toggle("invalid",bad);
+      if (bad) invalid.push(id);
+    });
+    PAIRS.forEach(function(p,i){
+      var input = $("p"+i), value = input ? parseFloat(input.value) : p.cny;
+      var bad = !isFinite(value) || value <= 0;
+      if (input) input.classList.toggle("invalid",bad);
+      if (bad) invalid.push(p.code);
+    });
+    lastSettingsValid = invalid.length === 0;
+    var status = $("settingsValidation");
+    status.className = "settings-validation " + (lastSettingsValid ? "ok" : "error");
+    status.textContent = lastSettingsValid
+      ? "Tudo certo: os campos estão válidos e podem ser mostrados ao cliente."
+      : "Corrija " + invalid.length + (invalid.length === 1 ? " campo inválido" : " campos inválidos") + ". Valores vazios ou negativos não são publicados no cálculo.";
+    return lastSettingsValid;
+  }
+
+  function updateChangedFields(){
+    ids.forEach(function(id){
+      var el = $(id), wrap = el && el.closest(".field");
+      if (!el || !wrap || DEFAULT_VALUES[id] === undefined) return;
+      var changed = el.type === "number"
+        ? Number(el.value) !== Number(DEFAULT_VALUES[id])
+        : el.value !== DEFAULT_VALUES[id];
+      wrap.classList.toggle("changed",changed);
+    });
+    PAIRS.forEach(function(p,i){
+      var input = $("p"+i);
+      if (input) input.classList.toggle("changed",Number(input.value) !== Number(DEFAULT_PAIR_PRICES[i]));
+    });
+  }
+
+  function updateJourney(k,podePagar){
+    var current = linha === null ? 0 : (k === 0 ? 1 : (pixOpen ? 4 : (podePagar ? 3 : 2)));
+    document.querySelectorAll(".journey button").forEach(function(button,index){
+      var step = index + 1;
+      button.classList.toggle("done",step < current);
+      button.classList.toggle("current",step === current || (current === 0 && step === 1));
+    });
+  }
+
   function render(){
+    syncSelection();
+    var pedidoCount = selectedCount();
+    if (pedidoCount > 0) linha = requiredLine(pedidoCount);
     var cot = n("cotacao") || 1;
     var s = selecionado();
     var k = s.k;
+    var settingsOk = validateSettings();
 
     // etiquetas das duas linhas
     var pesoUm = n("peso");
@@ -974,10 +1227,18 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     $("lineSH").classList.toggle("on", linha === "SH");
     $("lineBJ").setAttribute("aria-pressed", linha === "BJ" ? "true" : "false");
     $("lineSH").setAttribute("aria-pressed", linha === "SH" ? "true" : "false");
+    $("lineBJ").classList.toggle("recommended", k > 0 && k <= 2);
+    $("lineSH").classList.toggle("recommended", k > 2);
+    $("lineBJ").classList.toggle("locked", k > 2);
+    $("lineSH").classList.toggle("locked", k > 0 && k <= 2);
     var bj1 = freteBJ(pesoUm), sh1 = freteSH(pesoUm);
-    $("tagBJ").textContent = "1 par: " + (bj1 === null ? "acima do limite" : cny(bj1)) +
-                             " · limite " + g(n("bjLim"));
-    $("tagSH").textContent = "até " + g(3000) + ": " + cny(n("sh3")) + " fixo";
+    $("tagBJ").textContent = "Obrigatória para 1–2 pares · 1 par: " + (bj1 === null ? "acima do limite" : cny(bj1));
+    $("tagSH").textContent = "Obrigatória para 3+ pares · até " + g(3000) + ": " + cny(n("sh3"));
+    $("freightStatus").innerHTML = k === 0
+      ? "Escolha a linha para começar. Ao adicionar os pares, a regra é aplicada automaticamente."
+      : (k <= 2
+        ? "<strong>BJ‑EUB aplicada automaticamente.</strong> Esta é a linha usada para pedidos de até 2 pares."
+        : "<strong>SH‑SAL aplicada automaticamente.</strong> Pedidos acima de 2 pares sempre seguem por esta linha.");
 
     var escolhido = linha !== null;
     $("secPares").hidden = !escolhido;
@@ -990,6 +1251,8 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
       $("hlTotal").textContent = "—";
       $("hlPer").textContent = "Escolha a linha acima";
       carimbo();
+      updateJourney(0,false);
+      updateChangedFields();
       return;
     }
 
@@ -999,10 +1262,13 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
       el.classList.toggle("on", !!sel[i]);
       var b = el.querySelector(".selbtn");
       if (b){
-        b.textContent = sel[i] ? "Selecionado ✓" : "Selecionar";
+        b.textContent = sel[i] ? "Remover" : "Adicionar";
         b.setAttribute("aria-pressed", sel[i] ? "true" : "false");
       }
+      if ($("qty"+i)) $("qty"+i).textContent = quantities[i];
     });
+    $("selectedSummary").textContent = k === 0 ? "Nenhum par no pedido"
+      : (k === 1 ? "1 par no pedido" : k + " pares no pedido") + " · " + nomeLinha();
 
     var freteEach    = (!s.indisponivel && k>0) ? s.frete/k : 0;
     var freteEachCny = (!s.indisponivel && k>0) ? s.freteCny/k : 0;
@@ -1012,7 +1278,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
       var pc = priceOf(i), pb = pc/cot;
       if (!EDIT && $("pc"+i)) $("pc"+i).textContent = cny(pc);
       $("pb"+i).textContent  = brl(pb);
-      var vivo = sel[i] && !s.indisponivel;
+      var vivo = quantities[i] > 0 && !s.indisponivel && settingsOk;
       $("pfc"+i).textContent = vivo ? cny(freteEachCny) : "—";
       $("pf"+i).textContent  = vivo ? brl(freteEach) : "—";
       $("pt"+i).textContent  = vivo ? "≈ " + brl(pb + freteEach + segEachCny/cot + taxaEach)
@@ -1025,6 +1291,12 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     if (k === 0){
       aviso.hidden = true;
       $("conta").innerHTML = '<div class="linha"><span class="o-que">Nenhum par selecionado</span>' +
+                             '<span class="quanto">—</span></div>';
+    } else if (!settingsOk){
+      aviso.hidden = false;
+      aviso.innerHTML = "Existem valores inválidos no painel de edição." +
+        "<span>Corrija os campos destacados antes de compartilhar ou gerar o Pix.</span>";
+      $("conta").innerHTML = '<div class="linha"><span class="o-que">Cotação pausada para revisão</span>' +
                              '<span class="quanto">—</span></div>';
     } else if (s.indisponivel){
       aviso.hidden = false;
@@ -1051,12 +1323,14 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     }
 
     // comparativo
-    $("compNota").textContent = "Pela " + nomeLinha();
+    $("compNota").textContent = "BJ‑EUB até 2 · SH‑SAL a partir de 3";
     var tb = $("scenarios");
     tb.innerHTML = "";
-    var todos = PAIRS.map(function(p,i){ return priceOf(i); });
-    PAIRS.map(function(_,i){ return i+1; }).forEach(function(kk){
-      var sc = calcular(kk, todos);
+    var maxScenario = Math.max(PAIRS.length,k), todos = [];
+    for (var scenarioPrice=0;scenarioPrice<maxScenario;scenarioPrice++) todos.push(priceOf(scenarioPrice % PAIRS.length));
+    var baseScenario = calcularPelaRegra(1,todos);
+    Array.from({length:maxScenario},function(_,i){ return i+1; }).forEach(function(kk){
+      var sc = calcularPelaRegra(kk, todos);
       var tr = document.createElement("tr");
       tr.className = (kk === k ? "featured" : "") + (sc.indisponivel ? " fora" : "");
       var label = kk === 1 ? "1 par" : kk + " juntos";
@@ -1071,7 +1345,9 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
           '<td>'+brl(sc.tenis)+'</td>' +
           '<td>'+brl(sc.taxa)+'</td>' +
           '<td class="total">≈ '+brl(sc.total)+'</td>' +
-          '<td>≈ '+brl(sc.per)+'</td>';
+          '<td>≈ '+brl(sc.per) + (kk > 1 && !baseScenario.indisponivel
+            ? '<span class="saving"><span class="saving-label">economiza '+brl(Math.max(0,baseScenario.per-sc.per))+'/par</span><span class="saving-track"><span class="saving-bar" style="width:'+Math.max(5,Math.min(100,((baseScenario.per-sc.per)/baseScenario.per)*260))+'%"></span></span></span>'
+            : '') + '</td>';
       }
       tb.appendChild(tr);
     });
@@ -1093,7 +1369,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
 
     // serviço
     var tiersHtml = "";
-    for (var q = 1; q <= PAIRS.length; q++){
+    for (var q = 1; q <= Math.max(PAIRS.length,k); q++){
       var vq = taxaDe(q);
       tiersHtml += '<div class="tier' + (q === k ? ' now' : '') + '">' +
         '<span class="q">' + (q === 1 ? "1 par" : q + " juntos") + '</span>' +
@@ -1107,21 +1383,22 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
 
     // pagamento
     var nomes = nomesSelecionados();
-    var podePagar = (k > 0 && !s.indisponivel);
+    var podePagar = (k > 0 && !s.indisponivel && settingsOk);
     $("buyTotal").textContent = podePagar ? "≈ " + brl(s.total) : "—";
     $("buyPairs").textContent = k === 0 ? "Nenhum par selecionado"
                               : (nomes.join(" · ") + " · " + nomeLinha());
     var btn = $("buyBtn");
     btn.disabled = !podePagar;
     btn.textContent = k === 0 ? "Selecione um par"
-                    : (s.indisponivel ? "Troque o frete" : (pixOpen ? "Ver Pix abaixo" : "Fechar pedido"));
+                    : (!settingsOk ? "Revise os ajustes" : (s.indisponivel ? "Revise a quantidade" : (pixOpen ? "Ver Pix abaixo" : "Fechar pedido")));
+    ["shareQuote","copySummary","whatsappQuote"].forEach(function(id){ $(id).disabled = !podePagar; });
 
     var mobileBtn = $("mobileBuyBtn");
     $("mobileBar").hidden = k === 0;
     $("mobileCount").textContent = k === 1 ? "1 par · " + nomeLinha() : k + " pares · " + nomeLinha();
     $("mobileTotal").textContent = podePagar ? "≈ " + brl(s.total) : "Combinação indisponível";
     mobileBtn.disabled = !podePagar;
-    mobileBtn.textContent = s.indisponivel ? "Troque o frete" : (pixOpen ? "Ver Pix" : "Fechar pedido");
+    mobileBtn.textContent = !settingsOk ? "Revise os ajustes" : (s.indisponivel ? "Revise a quantidade" : (pixOpen ? "Ver Pix" : "Fechar pedido"));
 
     if (!podePagar){
       pixOpen = false; pixCopiado = null; lastQrCode = null;
@@ -1136,6 +1413,9 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
       $("pixwarn").hidden = !(pixCopiado && pixCopiado !== codigo);
     }
 
+    updateJourney(k,podePagar);
+    updateChangedFields();
+
     save();
   }
 
@@ -1143,12 +1423,19 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     var iofTxt = n("iof") > 0 ? (", IOF de " + n("iof").toLocaleString("pt-BR") + "%") : "";
     $("stamp").textContent = "Cotado em " + txt("data") + " · R$ 1,00 = ¥ "
       + n("cotacao").toLocaleString("pt-BR",{minimumFractionDigits:2}) + iofTxt
-      + " · peso estimado de " + g(n("peso")) + " por par";
+      + " · peso estimado de " + g(n("peso")) + " por par · atualização manual, não em tempo real";
+    $("quoteStatus").textContent = "Referência " + txt("data") + " · manual";
+    $("quoteValidity").textContent = quoteValidityText();
+    $("quoteValidity").classList.toggle("expired",quoteValidityText() !== "Válida por 24 horas");
   }
 
   function save(){
     try{
       if (!EDIT) return;
+      if (!lastSettingsValid){
+        $("saveStatus").textContent = "Corrija os campos inválidos para salvar";
+        return;
+      }
       var d = {};
       ids.forEach(function(k2){ if($(k2)) d[k2] = $(k2).value; });
       PAIRS.forEach(function(p,i){ if($("p"+i)) d["p"+i] = $("p"+i).value; });
@@ -1189,8 +1476,100 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     } else { done(copiaLegada(payload)); }
   }
 
+  function settingsPayload(){
+    var values = {}, pairs = {};
+    ids.forEach(function(id){ values[id] = txt(id); });
+    PAIRS.forEach(function(p,i){ pairs[p.code] = String(priceOf(i)); });
+    return {exportedAt:new Date().toISOString(),storageKey:KEY,values:values,pairs:pairs};
+  }
+
+  function loadHistory(){
+    try{ var value = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); return Array.isArray(value) ? value : []; }
+    catch(e){ return []; }
+  }
+
+  function renderHistory(){
+    var host = $("settingsHistory"), history = loadHistory();
+    host.innerHTML = "";
+    if (!history.length){ host.innerHTML = '<span class="history-item">Nenhuma versão salva ainda</span>'; return; }
+    history.forEach(function(item,index){
+      var row = document.createElement("div"); row.className = "history-item";
+      var date = new Date(item.savedAt || item.exportedAt);
+      var label = isNaN(date.getTime()) ? "Versão salva" : date.toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"});
+      row.innerHTML = '<span>'+label+(item.label ? " · "+item.label : "")+'</span><button type="button" data-history="'+index+'">Restaurar</button>';
+      host.appendChild(row);
+    });
+  }
+
+  function saveVersion(label){
+    if (!validateSettings()){ notify("Corrija os campos antes de salvar uma versão"); return; }
+    var history = loadHistory(), payload = settingsPayload();
+    payload.savedAt = new Date().toISOString(); payload.label = label || "Manual";
+    history.unshift(payload); history = history.slice(0,6);
+    try{ localStorage.setItem(HISTORY_KEY,JSON.stringify(history)); }catch(e){}
+    renderHistory(); notify("Versão salva neste navegador ✓");
+  }
+
+  function validateImport(payload){
+    if (!payload || typeof payload !== "object" || !payload.values || !payload.pairs) return "Formato incompleto.";
+    if (payload.storageKey && payload.storageKey !== KEY) return "Este arquivo pertence a outra versão do site.";
+    for (var i=0;i<ids.length;i++){
+      var id = ids[i], value = payload.values[id];
+      if (id === "data"){ if (!String(value || "").trim()) return "A data de cotação está vazia."; continue; }
+      var number = parseFloat(value);
+      if (!isFinite(number) || number < 0 || (["cotacao","peso","bjLim"].indexOf(id) >= 0 && number <= 0)) return "Valor inválido em “"+id+"”.";
+    }
+    for (var j=0;j<PAIRS.length;j++){
+      var price = parseFloat(payload.pairs[PAIRS[j].code]);
+      if (!isFinite(price) || price <= 0) return "Preço inválido para “"+PAIRS[j].code+"”.";
+    }
+    return "";
+  }
+
+  function applySettingsPayload(payload){
+    ids.forEach(function(id){ $(id).value = payload.values[id]; });
+    PAIRS.forEach(function(p,i){ p.cny = parseFloat(payload.pairs[p.code]); });
+    buildPairs();
+    PAIRS.forEach(function(p,i){ if ($("p"+i)) $("p"+i).value = p.cny; });
+    render(); renderHistory();
+  }
+
+  function openImportDialog(){
+    $("importPayload").value = ""; $("importError").textContent = "";
+    document.body.classList.add("modal-open");
+    if ($("importDialog").showModal) $("importDialog").showModal(); else $("importDialog").setAttribute("open","");
+    setTimeout(function(){ $("importPayload").focus(); },30);
+  }
+
+  function closeImportDialog(){
+    if ($("importDialog").open && $("importDialog").close) $("importDialog").close(); else $("importDialog").removeAttribute("open");
+    document.body.classList.remove("modal-open");
+  }
+
+  function applyImport(){
+    try{
+      var payload = JSON.parse($("importPayload").value), error = validateImport(payload);
+      if (error){ $("importError").textContent = error; return; }
+      saveVersion("Antes da importação");
+      applySettingsPayload(payload); closeImportDialog(); notify("Configurações importadas e salvas ✓");
+    }catch(e){ $("importError").textContent = "JSON inválido. Copie o conteúdo completo e tente novamente."; }
+  }
+
+  function restoreHistory(index){
+    var history = loadHistory(), payload = history[index];
+    if (!payload) return;
+    applySettingsPayload(payload); notify("Versão restaurada ✓");
+  }
+
+  function customerPreview(){
+    allowLeave = true;
+    window.open(location.href.split("#")[0],"_blank","noopener");
+    setTimeout(function(){ allowLeave = false; },1000);
+  }
+
   function restoreDefaults(){
     if (!window.confirm("Restaurar todos os valores padrão deste site?")) return;
+    saveVersion("Antes de restaurar padrões");
     try{ localStorage.removeItem(KEY); }catch(e){}
     ids.forEach(function(id){ if ($(id)) $(id).value = DEFAULT_VALUES[id]; });
     PAIRS.forEach(function(p,i){ p.cny = DEFAULT_PAIR_PRICES[i]; });
@@ -1211,6 +1590,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
       : "Taxa de importação, se houver, é paga na entrega e não está inclusa.";
     buildPairs();
     if (EDIT) PAIRS.forEach(function(p,i){ if($("p"+i)) $("p"+i).value = p.cny; });
+    renderHistory();
     render();
   }
 
@@ -1231,17 +1611,65 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     if (!e.target.closest) return;
 
     var l = e.target.closest(".line");
-    if (l){ linha = l.getAttribute("data-linha"); render(); return; }
+    if (l){
+      var requested = l.getAttribute("data-linha"), count = selectedCount();
+      if (count > 0 && requested !== requiredLine(count)){
+        notify(count > 2 ? "Acima de 2 pares, o frete é SH‑SAL." : "Até 2 pares, o frete é BJ‑EUB.");
+        linha = requiredLine(count);
+      } else linha = requested;
+      render(); return;
+    }
+
+    var qtyButton = e.target.closest("[data-qty]");
+    if (qtyButton){
+      var qi = +qtyButton.getAttribute("data-pair"), delta = +qtyButton.getAttribute("data-qty");
+      if (delta > 0 && selectedCount() >= maxPairCount()){
+        notify("O limite desta cotação é " + maxPairCount() + " pares por envio SH‑SAL."); return;
+      }
+      quantities[qi] = Math.max(0,Math.min(9,quantities[qi] + delta));
+      syncSelection(); render(); return;
+    }
 
     var s = e.target.closest(".selbtn");
-    if (s){ var i = +s.getAttribute("data-pair"); sel[i] = !sel[i]; render(); return; }
+    if (s){
+      var i = +s.getAttribute("data-pair");
+      if (quantities[i] === 0 && selectedCount() >= maxPairCount()){
+        notify("O limite desta cotação é " + maxPairCount() + " pares por envio SH‑SAL."); return;
+      }
+      quantities[i] = quantities[i] > 0 ? 0 : 1; syncSelection(); render(); return;
+    }
+
+    if (e.target.closest("#selectAll")){
+      var maxAll = maxPairCount(); quantities = quantities.map(function(_,i){ return i < maxAll ? 1 : 0; });
+      syncSelection(); render(); return;
+    }
+    if (e.target.closest("#clearAll")){ quantities = quantities.map(function(){ return 0; }); syncSelection(); render(); return; }
 
     if (e.target.closest("#buyBtn") || e.target.closest("#mobileBuyBtn")){ handleBuy(); return; }
     if (e.target.closest("#confirmOrder")){ showPix(); return; }
     if (e.target.closest("#cancelOrder")){ closeConfirmation(); return; }
     if (e.target.closest("#copyPix")){ copiarPix(); return; }
+    if (e.target.closest("#shareQuote")){ shareQuote(); return; }
+    if (e.target.closest("#copySummary")){ var summary = quoteSummary(); if (summary) copyText(summary,"Resumo copiado ✓"); return; }
+    if (e.target.closest("#whatsappQuote")){ whatsappQuote(); return; }
     if (e.target.closest("#exportSettings")){ exportSettings(); return; }
+    if (e.target.closest("#importSettings")){ openImportDialog(); return; }
+    if (e.target.closest("#saveVersion")){ saveVersion("Manual"); return; }
+    if (e.target.closest("#customerPreview")){ customerPreview(); return; }
     if (e.target.closest("#restoreDefaults")){ restoreDefaults(); return; }
+    if (e.target.closest("#applyImport")){ applyImport(); return; }
+    if (e.target.closest("#cancelImport")){ closeImportDialog(); return; }
+
+    var historyButton = e.target.closest("[data-history]");
+    if (historyButton){ restoreHistory(+historyButton.getAttribute("data-history")); return; }
+
+    var journeyButton = e.target.closest(".journey button");
+    if (journeyButton){
+      var target = $(journeyButton.getAttribute("data-target"));
+      if (target && !target.hidden) target.scrollIntoView({behavior:"smooth",block:"start"});
+      else notify("Conclua a etapa anterior primeiro.");
+      return;
+    }
 
     var t = e.target.closest(".gallery-open");
     if (t){
@@ -1262,6 +1690,10 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     }
   });
   $("confirmDialog").addEventListener("close", function(){ document.body.classList.remove("modal-open"); });
+  $("importDialog").addEventListener("close", function(){ document.body.classList.remove("modal-open"); });
+  window.addEventListener("beforeunload",function(e){
+    if (!allowLeave && pixOpen && selectedCount() > 0){ e.preventDefault(); e.returnValue = ""; }
+  });
 })();
 </script>
 </html>
