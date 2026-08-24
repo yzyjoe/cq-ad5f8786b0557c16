@@ -383,12 +383,27 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
 .quote-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
 .quote-chip{padding:6px 9px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.02);color:var(--muted);font:600 9px/1.3 "JetBrains Mono",monospace;letter-spacing:.05em;text-transform:uppercase}
 .quote-chip.live{border-color:#294C38;background:var(--action-soft);color:var(--action)}.quote-chip.expired{border-color:var(--warn-line);background:var(--warn-soft);color:var(--warn)}
-.journey{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:9px;border:1px solid var(--line);border-radius:14px;background:rgba(9,11,14,.88);box-shadow:var(--shadow)}
-.journey button{position:relative;min-width:0;padding:11px 12px;border:0;border-radius:9px;background:transparent;color:var(--muted);cursor:pointer;text-align:left;font:600 10px/1.35 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.06em;transition:background .18s ease,color .18s ease,transform .18s ease}
-.journey button::before{content:attr(data-step);display:inline-grid;place-items:center;width:20px;height:20px;margin-right:8px;border:1px solid var(--line);border-radius:50%;font-size:8px;vertical-align:middle}
-.journey button.done{color:var(--ink-2)}.journey button.done::before{content:"✓";border-color:#315E42;background:var(--action-soft);color:var(--action)}
-.journey button.current{background:var(--accent-soft);color:var(--accent-ink)}.journey button.current::before{border-color:var(--accent);color:var(--accent-ink)}
-.journey button:hover{background:var(--surface-2);transform:translateY(-1px)}
+.journey{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:16px 14px 12px;border:1px solid #202733;border-radius:14px;
+  background:linear-gradient(180deg,rgba(125,157,255,.045),transparent 72%),rgba(7,9,12,.94);
+  box-shadow:0 16px 38px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.025)
+}
+.journey button{
+  position:relative;z-index:0;display:flex;min-width:0;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:0 4px;border:0;border-radius:0;background:transparent;color:#667181;cursor:pointer;text-align:center;
+  font:600 9.5px/1.3 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.065em;
+  transition:color .18s ease,transform .18s ease
+}
+.journey button::before{
+  content:attr(data-step);position:relative;z-index:2;display:grid;place-items:center;width:27px;height:27px;margin:0 0 8px;
+  border:1px solid #343D4A;border-radius:50%;background:#090C10;color:#748091;font-size:8px;
+  box-shadow:0 0 0 5px #090B0F,inset 0 0 0 1px rgba(255,255,255,.025);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease
+}
+.journey button::after{content:"";position:absolute;z-index:1;top:13px;left:50%;width:100%;height:1px;background:linear-gradient(90deg,#343D4A,#232A34);pointer-events:none}
+.journey button:last-child::after{display:none}
+.journey button.done{color:#9DB6A7}.journey button.done::before{content:"✓";border-color:#3A7550;background:#10251A;color:var(--action);box-shadow:0 0 0 5px #090B0F,0 0 15px rgba(118,230,165,.14)}.journey button.done::after{background:linear-gradient(90deg,#3A7550,#315E42)}
+.journey button.current{color:var(--accent-ink)}.journey button.current::before{border-color:var(--accent);background:#121A32;color:#D9E1FF;box-shadow:0 0 0 5px #090B0F,0 0 19px rgba(125,157,255,.3),inset 0 0 9px rgba(125,157,255,.14)}
+.journey button:hover{color:var(--ink)}.journey button:hover::before{transform:translateY(-1px);border-color:var(--ship)}
 .freight-status{display:flex;align-items:flex-start;gap:10px;margin-top:14px;padding:12px 14px;border:1px solid #28444E;border-radius:10px;background:#0A171C;color:var(--ink-2);font-size:13px}
 .freight-status::before{content:"↳";color:var(--ship);font:700 14px/1.5 "JetBrains Mono",monospace}.freight-status strong{color:var(--ship)}
 .line.recommended{box-shadow:0 0 0 1px rgba(98,216,255,.16) inset}.line.locked:not(.on){filter:saturate(.68)}
@@ -432,7 +447,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   #pairs{grid-template-columns:1fr}
   .qrarea{grid-template-columns:1fr}
   .qrpanel{width:236px;max-width:100%;margin:0 auto}
-  .journey{grid-template-columns:repeat(2,1fr)}
+  .journey{grid-template-columns:repeat(4,1fr)}
   .how-grid{grid-template-columns:1fr}
 }
 
