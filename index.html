@@ -576,9 +576,9 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
       <p class="stamp" id="stamp">—</p>
     </div>
     <div class="headline" aria-live="polite">
-      <span class="lbl" id="hlLbl">Total aproximado</span>
+      <span class="lbl" id="hlLbl">Monte seu pedido</span>
       <span class="big" id="hlTotal">—</span>
-      <span class="per" id="hlPer">—</span>
+      <span class="per" id="hlPer">Selecione os pares abaixo</span>
     </div>
   </header>
 
@@ -688,7 +688,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   <section class="panel" id="secPagar" hidden>
     <div class="panel-head">
       <h2><span class="step">4</span>Fechar pedido</h2>
-      <span class="note">Pix para Joao Lucas Prudente</span>
+      <span class="note">Pagamento via Pix</span>
     </div>
     <div class="panel-body">
       <div class="buyrow">
@@ -708,7 +708,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
         <p class="pixwarn" id="pixwarn" hidden>Você mudou o pedido depois de copiar. O código abaixo é novo — copie de novo antes de pagar.</p>
         <p class="pixhead">
           <span>Pix de <b id="pixValor">—</b></span>
-          <span>para <b>Joao Lucas Prudente</b></span>
+          <span>Confira o recebedor no aplicativo do banco antes de pagar</span>
         </p>
         <div class="qrarea">
           <div class="qrpanel">
@@ -852,7 +852,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   var sel = PAIRS.map(function(){ return false; });
   var quantities = PAIRS.map(function(){ return 0; });
   var activePairIndex = null;
-  var linha = null;          // "BJ" | "SH"
+  var linha = "BJ";          // BJ até 2 pares; SH a partir de 3
   var EDIT = false;
   var pixOpen = false;
   var pixCopiado = null;
@@ -1255,7 +1255,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   }
 
   function updateJourney(k,podePagar){
-    var current = linha === null ? 0 : (k === 0 ? 1 : (pixOpen ? 4 : (podePagar ? 3 : 2)));
+    var current = linha === null ? 0 : (k === 0 ? 2 : (pixOpen ? 4 : (podePagar ? 3 : 2)));
     document.querySelectorAll(".journey button").forEach(function(button,index){
       var step = index + 1;
       button.classList.toggle("done",step < current);
@@ -1286,16 +1286,16 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     $("tagBJ").textContent = "Obrigatória para 1–2 pares · 1 par: " + (bj1 === null ? "acima do limite" : cny(bj1));
     $("tagSH").textContent = "Obrigatória para 3+ pares · até " + g(3000) + ": " + cny(n("sh3"));
     $("freightStatus").innerHTML = k === 0
-      ? "Escolha a linha para começar. Ao adicionar os pares, a regra é aplicada automaticamente."
+      ? "<strong>BJ‑EUB aplicada para começar.</strong> Ao adicionar o 3º par, o site troca automaticamente para SH‑SAL."
       : (k <= 2
         ? "<strong>BJ‑EUB aplicada automaticamente.</strong> Esta é a linha usada para pedidos de até 2 pares."
         : "<strong>SH‑SAL aplicada automaticamente.</strong> Pedidos acima de 2 pares sempre seguem por esta linha.");
 
     var escolhido = linha !== null;
     $("secPares").hidden = !escolhido;
-    $("secConta").hidden = !escolhido;
-    $("secComp").hidden = !escolhido;
-    $("secPagar").hidden = !escolhido;
+    $("secConta").hidden = !escolhido || k === 0;
+    $("secComp").hidden = !escolhido || k === 0;
+    $("secPagar").hidden = !escolhido || k === 0;
     if (!escolhido){
       $("mobileBar").hidden = true;
       $("hlLbl").textContent = "Comece pelo frete";
@@ -1405,9 +1405,9 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
 
     // topo
     if (k === 0){
-      $("hlLbl").textContent = "Nenhum par";
+      $("hlLbl").textContent = "Monte seu pedido";
       $("hlTotal").textContent = "—";
-      $("hlPer").textContent = "Selecione os pares";
+      $("hlPer").textContent = "Selecione os pares abaixo";
     } else if (s.indisponivel){
       $("hlLbl").textContent = "Não cabe na " + nomeLinha();
       $("hlTotal").textContent = "—";
