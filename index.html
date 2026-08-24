@@ -368,6 +368,14 @@ body.modal-open{overflow:hidden}
 
 .mobile-checkout{display:none}
 .mobile-checkout[hidden]{display:none!important}
+.mobile-actions{display:flex;align-items:center;gap:7px}.mobile-edit{min-height:42px;padding:9px 11px;border:1px solid #315D43;border-radius:9px;background:transparent;color:var(--action);cursor:pointer;font:700 9px/1 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.05em}
+
+.cart-drawer{width:min(calc(100% - 28px),480px);padding:0;border:1px solid var(--line);border-radius:17px;background:linear-gradient(160deg,#11151B,#080A0D);color:var(--ink);box-shadow:0 28px 100px #000}
+.cart-drawer::backdrop{background:rgba(0,0,0,.82);backdrop-filter:blur(5px)}.cart-drawer[open]{animation:drawerIn .22s cubic-bezier(.2,.75,.2,1) both}@keyframes drawerIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.cart-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 18px 14px;border-bottom:1px solid var(--line-soft)}.cart-head h2{margin:0;font-size:18px}.cart-head p{margin:3px 0 0;color:var(--muted);font-size:12px}
+.cart-close{flex:0 0 auto;width:34px;height:34px;border:1px solid var(--line);border-radius:50%;background:var(--surface-2);color:var(--ink-2);cursor:pointer;font-size:18px;line-height:1}
+.cart-list{display:grid;gap:8px;max-height:min(52vh,430px);overflow:auto;padding:13px 14px}.cart-item{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 12px;border:1px solid var(--line-soft);border-radius:11px;background:var(--surface-2)}.cart-item-name{min-width:0}.cart-item-name strong{display:block;font-size:14px}.cart-item-name span{display:block;color:var(--muted);font:500 9px/1.4 "JetBrains Mono",monospace;letter-spacing:.06em}.cart-item .qty-control{flex:0 0 auto}.cart-empty{margin:0;padding:23px;text-align:center;color:var(--muted);font-size:13px}
+.cart-foot{display:flex;gap:9px;padding:12px 14px 14px;border-top:1px solid var(--line-soft)}.cart-foot .btn{flex:1}.cart-foot .clear-cart{background:transparent;color:var(--warn);border-color:var(--warn-line)}
 
 footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px solid var(--line);padding-top:18px}
 
@@ -470,6 +478,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   .mobile-count{color:var(--muted);font:600 9px/1.4 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.08em}
   .mobile-total{color:var(--action);font-size:19px;font-weight:700;white-space:nowrap}
   .mobile-checkout .btn{flex:0 0 auto;padding:13px 15px;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  .cart-drawer{inset:auto 0 0 0;width:100%;max-width:none;max-height:78dvh;margin:0;border-width:1px 0 0;border-radius:19px 19px 0 0;padding-bottom:env(safe-area-inset-bottom)}
   .pair-toolbar{align-items:flex-start;flex-direction:column}.toolbar-actions{width:100%}.toolbar-actions .mini-btn{flex:1}
 }
 
@@ -779,8 +788,23 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     <span class="mobile-count" id="mobileCount">—</span>
     <span class="mobile-total" id="mobileTotal">—</span>
   </div>
-  <button class="btn" id="mobileBuyBtn" type="button">Fechar pedido</button>
+  <div class="mobile-actions">
+    <button class="mobile-edit" id="mobileCartEdit" type="button" aria-controls="cartDrawer">Editar</button>
+    <button class="btn" id="mobileBuyBtn" type="button">Fechar pedido</button>
+  </div>
 </div>
+
+<dialog class="cart-drawer" id="cartDrawer">
+  <div class="cart-head">
+    <div><h2>Seu carrinho</h2><p>Diminua ou remova sem voltar aos produtos.</p></div>
+    <button class="cart-close" id="closeCartDrawer" type="button" aria-label="Fechar carrinho">×</button>
+  </div>
+  <div class="cart-list" id="cartDrawerItems"></div>
+  <div class="cart-foot">
+    <button class="btn clear-cart" id="clearCartDrawer" type="button">Limpar carrinho</button>
+    <button class="btn" id="doneCartDrawer" type="button">Pronto</button>
+  </div>
+</dialog>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -989,6 +1013,36 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
       if (quantities[i]) nomes.push((quantities[i] > 1 ? quantities[i] + "× " : "") + pairLabel(p.name));
     });
     return nomes;
+  }
+
+  function renderCartDrawer(){
+    var host = $("cartDrawerItems"), html = "";
+    PAIRS.forEach(function(p,i){
+      if (!quantities[i]) return;
+      html += '<div class="cart-item">' +
+        '<div class="cart-item-name"><strong>'+pairLabel(p.name)+'</strong><span>'+p.code+'</span></div>' +
+        '<div class="qty-control" aria-label="Quantidade de '+pairLabel(p.name)+'">' +
+          '<button type="button" data-cart-qty="-1" data-pair="'+i+'" aria-label="Diminuir quantidade">−</button>' +
+          '<span class="qty-value">'+quantities[i]+'</span>' +
+          '<button type="button" data-cart-qty="1" data-pair="'+i+'" aria-label="Aumentar quantidade">+</button>' +
+        '</div></div>';
+    });
+    host.innerHTML = html || '<p class="cart-empty">Seu carrinho está vazio.</p>';
+  }
+
+  function openCartDrawer(){
+    renderCartDrawer();
+    document.body.classList.add("modal-open");
+    var drawer = $("cartDrawer");
+    if (drawer.showModal) drawer.showModal(); else drawer.setAttribute("open","");
+    setTimeout(function(){ $("closeCartDrawer").focus(); },20);
+  }
+
+  function closeCartDrawer(){
+    var drawer = $("cartDrawer");
+    if (drawer.open && drawer.close) drawer.close(); else drawer.removeAttribute("open");
+    document.body.classList.remove("modal-open");
+    if (!$("mobileBar").hidden) $("mobileCartEdit").focus();
   }
 
   function closeConfirmation(){
@@ -1415,6 +1469,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
 
     updateJourney(k,podePagar);
     updateChangedFields();
+    if ($("cartDrawer").open) renderCartDrawer();
 
     save();
   }
@@ -1620,6 +1675,16 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
       render(); return;
     }
 
+    var cartQtyButton = e.target.closest("[data-cart-qty]");
+    if (cartQtyButton){
+      var cartIndex = +cartQtyButton.getAttribute("data-pair"), cartDelta = +cartQtyButton.getAttribute("data-cart-qty");
+      if (cartDelta > 0 && selectedCount() >= maxPairCount()){
+        notify("O limite desta cotação é " + maxPairCount() + " pares por envio SH‑SAL."); return;
+      }
+      quantities[cartIndex] = Math.max(0,Math.min(9,quantities[cartIndex] + cartDelta));
+      syncSelection(); render(); return;
+    }
+
     var qtyButton = e.target.closest("[data-qty]");
     if (qtyButton){
       var qi = +qtyButton.getAttribute("data-pair"), delta = +qtyButton.getAttribute("data-qty");
@@ -1644,6 +1709,12 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
       syncSelection(); render(); return;
     }
     if (e.target.closest("#clearAll")){ quantities = quantities.map(function(){ return 0; }); syncSelection(); render(); return; }
+
+    if (e.target.closest("#mobileCartEdit")){ openCartDrawer(); return; }
+    if (e.target.closest("#closeCartDrawer") || e.target.closest("#doneCartDrawer")){ closeCartDrawer(); return; }
+    if (e.target.closest("#clearCartDrawer")){
+      quantities = quantities.map(function(){ return 0; }); syncSelection(); render(); closeCartDrawer(); notify("Carrinho limpo"); return;
+    }
 
     if (e.target.closest("#buyBtn") || e.target.closest("#mobileBuyBtn")){ handleBuy(); return; }
     if (e.target.closest("#confirmOrder")){ showPix(); return; }
@@ -1691,6 +1762,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   });
   $("confirmDialog").addEventListener("close", function(){ document.body.classList.remove("modal-open"); });
   $("importDialog").addEventListener("close", function(){ document.body.classList.remove("modal-open"); });
+  $("cartDrawer").addEventListener("close", function(){ document.body.classList.remove("modal-open"); });
   window.addEventListener("beforeunload",function(e){
     if (!allowLeave && pixOpen && selectedCount() > 0){ e.preventDefault(); e.returnValue = ""; }
   });
