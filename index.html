@@ -438,6 +438,28 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
 
 @media (max-width:640px){
   .lines{grid-template-columns:1fr}
+  .journey{
+    grid-template-columns:repeat(4,1fr);gap:0;padding:13px 7px 10px;border-color:#202733;border-radius:13px;
+    background:linear-gradient(180deg,rgba(125,157,255,.045),transparent 70%),rgba(7,9,12,.96);
+    box-shadow:0 14px 34px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.025)
+  }
+  .journey button{
+    z-index:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:visible;
+    padding:0 2px;border-radius:0;background:transparent!important;color:#5F6876;text-align:center;
+    font-size:8.5px;line-height:1.25;letter-spacing:.045em;transform:none!important
+  }
+  .journey button::before{
+    position:relative;z-index:2;display:grid;width:23px;height:23px;margin:0 0 7px;border-color:#343D4A;
+    background:#090C10;color:#717C8C;box-shadow:0 0 0 4px #090B0F,inset 0 0 0 1px rgba(255,255,255,.025)
+  }
+  .journey button::after{
+    content:"";position:absolute;z-index:1;top:11px;left:50%;width:100%;height:1px;
+    background:linear-gradient(90deg,#343D4A,#232A34);pointer-events:none
+  }
+  .journey button:last-child::after{display:none}
+  .journey button.done{color:#9DB6A7}.journey button.done::before{border-color:#3A7550;background:#10251A;color:var(--action);box-shadow:0 0 0 4px #090B0F,0 0 14px rgba(118,230,165,.13)}
+  .journey button.done::after{background:linear-gradient(90deg,#3A7550,#315E42)}
+  .journey button.current{color:var(--accent-ink)}.journey button.current::before{border-color:var(--accent);background:#121A32;color:#D9E1FF;box-shadow:0 0 0 4px #090B0F,0 0 17px rgba(125,157,255,.28),inset 0 0 8px rgba(125,157,255,.13)}
   .panel-head{align-items:flex-start;padding:15px 17px}
   .panel-head .note{width:100%;padding-left:39px;font-size:12px}
   .panel-body{padding:17px}
@@ -507,7 +529,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   .settings-actions{padding-left:16px;padding-right:16px}.settings-actions .btn{width:100%}
   .lb{padding:10px}.lb-head{margin-bottom:8px}.lb-nav{width:40px;height:52px}.lb-prev{left:2px}.lb-next{right:2px}
   .confirm-actions{flex-direction:column-reverse}.confirm-actions .btn{width:100%}
-  .journey{gap:5px;padding:6px}.journey button{padding:9px 8px;font-size:8.5px}.journey button::before{display:block;margin:0 0 5px}
+  .journey{padding-left:4px;padding-right:4px}.journey button{font-size:7.7px;letter-spacing:.025em}
 }
 
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
