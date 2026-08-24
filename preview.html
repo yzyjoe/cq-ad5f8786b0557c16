@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Rascunho visual · YZYNOAH</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23090c10'/%3E%3Cpath d='M13 17h9l10 15 10-15h9L36 39v10h-8V39z' fill='%2362d8ff'/%3E%3C/svg%3E">
+<style>
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:#000;color:#f4f7fb;font-family:system-ui,sans-serif;overflow:hidden}
+  .preview-bar{height:38px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 14px;border-bottom:1px solid #252b34;background:#0b0e12;color:#aeb8c7;font:600 10px/1 ui-monospace,monospace;letter-spacing:.07em;text-transform:uppercase}
+  .preview-bar strong{color:#62d8ff}.preview-bar a{color:#b1c2ff;text-decoration:none}.preview-bar a:hover{text-decoration:underline}
+  iframe{display:block;width:100%;height:calc(100% - 38px);border:0;background:#000}
+  @media(max-width:520px){.preview-bar{font-size:8px;padding:0 9px}.preview-bar span:last-child{display:none}}
+</style>
+</head>
+<body>
+  <div class="preview-bar">
+    <span><strong>Rascunho</strong> · acabamento de site completo</span>
+    <span>O site principal não foi alterado · <a href="index.html" target="_blank">abrir versão atual ↗</a></span>
+  </div>
+  <iframe id="sitePreview" src="index.html?prototype=site-completo" title="Rascunho visual do site YZYNOAH"></iframe>
+
+<script>
+(function(){
+  var frame = document.getElementById("sitePreview");
+  frame.addEventListener("load",function(){
+    var doc = frame.contentDocument;
+    if (!doc || doc.getElementById("prototypeNav")) return;
+    doc.title = "YZYNOAH · Rascunho visual";
+    doc.body.classList.add("prototype-site");
+
+    var favicon = doc.createElement("link");
+    favicon.rel = "icon";
+    favicon.href = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23090c10'/%3E%3Cpath d='M13 17h9l10 15 10-15h9L36 39v10h-8V39z' fill='%2362d8ff'/%3E%3C/svg%3E";
+    doc.head.appendChild(favicon);
+
+    var style = doc.createElement("style");
+    style.textContent = `
+      .prototype-nav{position:sticky;top:10px;z-index:34;min-height:58px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:22px;padding:9px 12px 9px 10px;border:1px solid #28313d;border-radius:14px;background:rgba(8,11,15,.9);box-shadow:0 14px 40px rgba(0,0,0,.44);backdrop-filter:blur(16px)}
+      .prototype-brand{display:flex;align-items:center;gap:10px}.prototype-logo{width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(98,216,255,.45);border-radius:11px;background:linear-gradient(145deg,#10242c,#11131b);color:#62d8ff;font:700 12px/1 "JetBrains Mono",monospace;letter-spacing:-.08em;box-shadow:0 0 22px rgba(98,216,255,.1)}
+      .prototype-wordmark strong{display:block;font-size:13px;letter-spacing:.02em}.prototype-wordmark span{display:block;color:#697585;font:600 8px/1.4 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase}
+      .prototype-links{display:flex;align-items:center;justify-content:center;gap:4px}.prototype-links button{padding:9px 11px;border:0;border-radius:8px;background:transparent;color:#8f9aab;cursor:pointer;font:600 9px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;transition:.18s ease}.prototype-links button:hover{background:#141922;color:#f4f7fb}
+      .prototype-private{display:flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid #294c38;border-radius:999px;background:#102a1b;color:#76e6a5;font:600 8px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase}.prototype-private::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 10px currentColor}
+      .prototype-faq .panel-body{display:grid;gap:8px}.prototype-faq details{border:1px solid #222a35;border-radius:10px;background:#0b0e12;overflow:hidden}.prototype-faq summary{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;cursor:pointer;list-style:none;color:#d5dbe4;font-weight:600;font-size:14px}.prototype-faq summary::-webkit-details-marker{display:none}.prototype-faq summary::after{content:"+";color:#7d9dff;font:600 15px/1 "JetBrains Mono",monospace}.prototype-faq details[open] summary::after{content:"−"}.prototype-faq details p{margin:0;padding:0 16px 15px;color:#838d9c;font-size:13px;max-width:76ch}
+      .prototype-cart{position:fixed;z-index:39;top:90px;right:18px;width:252px;padding:16px;border:1px solid #31513c;border-radius:15px;background:linear-gradient(150deg,rgba(15,37,24,.97),rgba(8,13,10,.98));box-shadow:0 22px 60px rgba(0,0,0,.58);backdrop-filter:blur(16px)}.prototype-cart[hidden]{display:none}.prototype-cart-label{display:block;color:#76e6a5;font:700 9px/1.4 "JetBrains Mono",monospace;letter-spacing:.09em;text-transform:uppercase}.prototype-cart-total{display:block;margin-top:6px;color:#76e6a5;font-size:28px;font-weight:700;letter-spacing:-.04em}.prototype-cart-count{display:block;margin:3px 0 13px;color:#838d9c;font-size:12px}.prototype-cart button{width:100%;padding:12px;border:0;border-radius:9px;background:#76e6a5;color:#050709;cursor:pointer;font-weight:700;font-size:12px}
+      .prototype-footer{display:grid;grid-template-columns:1.25fr .75fr .75fr;gap:28px;padding:24px!important;border:1px solid #202733!important;border-radius:14px;background:linear-gradient(145deg,#0d1117,#07090c);text-align:left!important}.prototype-footer-brand strong{display:block;color:#f4f7fb;font-size:20px}.prototype-footer-brand p,.prototype-footer-col span{display:block;margin:6px 0 0;color:#747f8f;font-size:12px}.prototype-footer-col b{display:block;margin-bottom:8px;color:#c7cfda;font:700 9px/1 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase}.prototype-footer-meta{grid-column:1/-1;padding-top:15px;border-top:1px solid #1b212a;color:#697585!important;font-size:10px!important}
+      @media(min-width:1200px){body.prototype-site{padding-right:290px}.prototype-site .wrap{max-width:980px}.prototype-cart{display:block}}
+      @media(max-width:1199px){.prototype-cart{display:none!important}}
+      @media(max-width:700px){.prototype-nav{top:6px;grid-template-columns:1fr auto;gap:10px;min-height:52px}.prototype-links{display:none}.prototype-private{font-size:0;padding:9px}.prototype-private::after{content:"Não indexada";font-size:7px}.prototype-footer{grid-template-columns:1fr}.prototype-footer-meta{grid-column:1}}
+    `;
+    doc.head.appendChild(style);
+
+    var nav = doc.createElement("nav");
+    nav.id = "prototypeNav";
+    nav.className = "prototype-nav";
+    nav.setAttribute("aria-label","Navegação principal do rascunho");
+    nav.innerHTML = '<div class="prototype-brand"><span class="prototype-logo">YN</span><span class="prototype-wordmark"><strong>YZYNOAH</strong><span>Importação assistida</span></span></div>' +
+      '<div class="prototype-links"><button data-go="lineBJ">Frete</button><button data-go="secPares">Modelos</button><button data-go="secComp">Comparativo</button><button data-go="prototypeFaq">FAQ</button></div>' +
+      '<span class="prototype-private">Página não indexada</span>';
+    var wrap = doc.querySelector(".wrap");
+    var masthead = doc.querySelector(".masthead");
+    wrap.insertBefore(nav,masthead);
+
+    var faq = doc.createElement("section");
+    faq.id = "prototypeFaq";
+    faq.className = "panel prototype-faq";
+    faq.innerHTML = '<div class="panel-head"><h2>Perguntas frequentes</h2><span class="note">O essencial antes de fechar</span></div>' +
+      '<div class="panel-body">' +
+      '<details><summary>Por que o valor é aproximado?</summary><p>O câmbio e o peso final são confirmados no fechamento do pacote. Qualquer ajuste é demonstrado com o comprovante do CSSBUY.</p></details>' +
+      '<details><summary>Como funciona o frete?</summary><p>BJ‑EUB atende pedidos de até 2 pares. A partir do 3º par, o cálculo usa SH‑SAL e divide o frete igualmente entre todos.</p></details>' +
+      '<details><summary>O que são as fotos de QC?</summary><p>São imagens reais do produto no armazém, usadas para conferir aparência e detalhes antes do envio internacional.</p></details>' +
+      '<details><summary>Existe chance de tributação?</summary><p>Sim. Uma eventual taxa de importação cobrada na entrega não está incluída na cotação apresentada.</p></details>' +
+      '<details><summary>Por quanto tempo a cotação vale?</summary><p>A referência é válida por 24 horas. Depois disso, confirme novamente o câmbio e os valores de frete.</p></details>' +
+      '</div>';
+    var settings = doc.getElementById("settings");
+    wrap.insertBefore(faq,settings);
+
+    var footer = doc.getElementById("foot");
+    footer.className = "prototype-footer";
+    footer.innerHTML = '<div class="prototype-footer-brand"><strong>YZYNOAH</strong><p>Curadoria, QC e importação assistida em uma cotação transparente.</p></div>' +
+      '<div class="prototype-footer-col"><b>Processo</b><span>Frete por quantidade</span><span>QC antes do envio</span><span>Acompanhamento</span></div>' +
+      '<div class="prototype-footer-col"><b>Importante</b><span>Valores aproximados</span><span>Possível tributação</span><span>Validade de 24h</span></div>' +
+      '<span class="prototype-footer-meta">Página não indexada · Pagamento via Pix · Confira sempre os dados no aplicativo do banco</span>';
+
+    var cart = doc.createElement("aside");
+    cart.className = "prototype-cart";
+    cart.hidden = true;
+    cart.innerHTML = '<span class="prototype-cart-label">Resumo do pedido</span><strong class="prototype-cart-total">—</strong><span class="prototype-cart-count">Nenhum par selecionado</span><button type="button">Fechar pedido</button>';
+    doc.body.appendChild(cart);
+    var mobileBar = doc.getElementById("mobileBar");
+    function updateCart(){
+      cart.hidden = mobileBar.hidden;
+      cart.querySelector(".prototype-cart-total").textContent = doc.getElementById("mobileTotal").textContent;
+      cart.querySelector(".prototype-cart-count").textContent = doc.getElementById("mobileCount").textContent;
+      cart.querySelector("button").textContent = doc.getElementById("mobileBuyBtn").textContent;
+      cart.querySelector("button").disabled = doc.getElementById("mobileBuyBtn").disabled;
+    }
+    new MutationObserver(updateCart).observe(mobileBar,{attributes:true,childList:true,subtree:true,characterData:true});
+    updateCart();
+
+    nav.addEventListener("click",function(event){
+      var button = event.target.closest("[data-go]");
+      if (!button) return;
+      var target = doc.getElementById(button.getAttribute("data-go"));
+      if (target && !target.hidden) target.scrollIntoView({behavior:"smooth",block:"start"});
+    });
+    cart.querySelector("button").addEventListener("click",function(){ doc.getElementById("mobileBuyBtn").click(); });
+  });
+})();
+</script>
+</body>
+</html>
