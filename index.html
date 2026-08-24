@@ -576,9 +576,9 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
       <p class="stamp" id="stamp">—</p>
     </div>
     <div class="headline" aria-live="polite">
-      <span class="lbl" id="hlLbl">Monte seu pedido</span>
+      <span class="lbl" id="hlLbl">Escolha o frete</span>
       <span class="big" id="hlTotal">—</span>
-      <span class="per" id="hlPer">Selecione os pares abaixo</span>
+      <span class="per" id="hlPer">Defina a linha para continuar</span>
     </div>
   </header>
 
@@ -852,7 +852,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   var sel = PAIRS.map(function(){ return false; });
   var quantities = PAIRS.map(function(){ return 0; });
   var activePairIndex = null;
-  var linha = "BJ";          // BJ até 2 pares; SH a partir de 3
+  var linha = null;          // cliente escolhe antes de ver os pares
   var EDIT = false;
   var pixOpen = false;
   var pixCopiado = null;
@@ -1285,11 +1285,13 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     var bj1 = freteBJ(pesoUm), sh1 = freteSH(pesoUm);
     $("tagBJ").textContent = "Obrigatória para 1–2 pares · 1 par: " + (bj1 === null ? "acima do limite" : cny(bj1));
     $("tagSH").textContent = "Obrigatória para 3+ pares · até " + g(3000) + ": " + cny(n("sh3"));
-    $("freightStatus").innerHTML = k === 0
-      ? "<strong>BJ‑EUB aplicada para começar.</strong> Ao adicionar o 3º par, o site troca automaticamente para SH‑SAL."
+    $("freightStatus").innerHTML = linha === null
+      ? "Escolha BJ‑EUB ou SH‑SAL para liberar os pares e continuar a cotação."
+      : (k === 0
+      ? "<strong>" + nomeLinha() + " escolhida.</strong> Agora selecione os pares; a quantidade mantém a regra correta de envio."
       : (k <= 2
         ? "<strong>BJ‑EUB aplicada automaticamente.</strong> Esta é a linha usada para pedidos de até 2 pares."
-        : "<strong>SH‑SAL aplicada automaticamente.</strong> Pedidos acima de 2 pares sempre seguem por esta linha.");
+        : "<strong>SH‑SAL aplicada automaticamente.</strong> Pedidos acima de 2 pares sempre seguem por esta linha."));
 
     var escolhido = linha !== null;
     $("secPares").hidden = !escolhido;
@@ -1298,9 +1300,9 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     $("secPagar").hidden = !escolhido || k === 0;
     if (!escolhido){
       $("mobileBar").hidden = true;
-      $("hlLbl").textContent = "Comece pelo frete";
+      $("hlLbl").textContent = "Escolha o frete";
       $("hlTotal").textContent = "—";
-      $("hlPer").textContent = "Escolha a linha acima";
+      $("hlPer").textContent = "Defina a linha para continuar";
       carimbo();
       updateJourney(0,false);
       updateChangedFields();
