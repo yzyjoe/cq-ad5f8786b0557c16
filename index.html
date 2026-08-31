@@ -728,8 +728,8 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   <details class="settings" id="settings" hidden>
     <summary>Ajustar valores</summary>
     <div class="fields">
-      <div class="field"><label for="data">Cotado em</label><input id="data" type="text" value="21/08/2026"></div>
-      <div class="field"><label for="cotacao">Cotação (¥ por R$1)</label><input id="cotacao" type="number" min="0.01" step="0.01" value="1.20"></div>
+      <div class="field"><label for="data">Cotado em</label><input id="data" type="text" value="31/08/2026"></div>
+      <div class="field"><label for="cotacao">Cotação (¥ por R$1)</label><input id="cotacao" type="number" min="0.01" step="0.01" value="1.19"></div>
       <div class="field"><label for="seguro">Seguro (%)</label><input id="seguro" type="number" min="0" step="0.1" value="3"></div>
       <div class="field"><label for="peso">Peso por par (g)</label><input id="peso" type="number" min="1" step="1" value="704"></div>
       <div class="field"><label for="bjBase">BJ · base (¥)</label><input id="bjBase" type="number" min="0" step="0.01" value="33.46"></div>
@@ -847,6 +847,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     city: "GUARULHOS"
   };
   var KEY = "cotacao-bj-eub-v3";
+  var CURRENT_QUOTE = { date:"31/08/2026", rate:"1.19", revision:"2026-08-31-1.19" };
   var ids = ["data","cotacao","seguro","peso","bjBase","bjKg","bjLim",
              "sh3","sh4","sh5","sh6","sh7","x1","x2","x3","xExtra","iof","imposto"];
   var sel = PAIRS.map(function(){ return false; });
@@ -1517,6 +1518,23 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
     }catch(e){}
   }
 
+  function migrateCurrentQuote(){
+    try{
+      var revisionKey = KEY + "-quote-revision";
+      if (localStorage.getItem(revisionKey) === CURRENT_QUOTE.revision) return;
+      var raw = localStorage.getItem(KEY);
+      if (raw){
+        var d = JSON.parse(raw);
+        if (d && typeof d === "object"){
+          d.data = CURRENT_QUOTE.date;
+          d.cotacao = CURRENT_QUOTE.rate;
+          localStorage.setItem(KEY,JSON.stringify(d));
+        }
+      }
+      localStorage.setItem(revisionKey,CURRENT_QUOTE.revision);
+    }catch(e){}
+  }
+
   function exportSettings(){
     var values = {};
     ids.forEach(function(id){ values[id] = txt(id); });
@@ -1654,6 +1672,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;border-top:1px soli
   }
 
   ids.forEach(function(id){ if ($(id)) DEFAULT_VALUES[id] = $(id).defaultValue; });
+  migrateCurrentQuote();
   load();
   applyMode();
   window.addEventListener("hashchange", function(){ load(); applyMode(); });
