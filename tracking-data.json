@@ -1,0 +1,15 @@
+{
+  "updatedAt": "2026-09-01T03:06:15-03:00",
+  "orders": [
+    {
+      "code": "O260901502091",
+      "product": "Yeezy 350 V2 Bone",
+      "model": "HQ6316",
+      "image": "img/qc/hq6316-1.webp",
+      "statusKey": "submitted",
+      "statusPt": "Pedido enviado. Aguarde o agente aceitar o pedido.",
+      "statusEn": "You have submitted an order, please wait for the agent to take the order",
+      "statusAt": "2026-09-01 03:06:15"
+    }
+  ]
+}
