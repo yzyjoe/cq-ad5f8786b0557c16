@@ -1,14 +1,14 @@
 {
-  "updatedAt": "2026-09-01T03:06:16-03:00",
+  "updatedAt": "2026-09-01T03:06:18-03:00",
   "orders": [
     {
       "code": "O260901502091",
       "product": "Yeezy 350 V2 Bone",
       "model": "HQ6316",
       "image": "img/qc/hq6316-1.webp",
-      "statusKey": "accepted",
-      "statusPt": "O agente assumiu o pedido e está se comunicando com o vendedor.",
-      "statusAt": "2026-09-01 03:06:16",
+      "statusKey": "purchased",
+      "statusPt": "Seu produto foi comprado. Número da transação: 854836543275865.",
+      "statusAt": "2026-09-01 03:06:18",
       "history": [
         {
           "statusKey": "submitted",
@@ -19,6 +19,11 @@
           "statusKey": "accepted",
           "statusPt": "O agente assumiu o pedido e está se comunicando com o vendedor.",
           "statusAt": "2026-09-01 03:06:16"
+        },
+        {
+          "statusKey": "purchased",
+          "statusPt": "Seu produto foi comprado. Número da transação: 854836543275865.",
+          "statusAt": "2026-09-01 03:06:18"
         }
       ]
     }
