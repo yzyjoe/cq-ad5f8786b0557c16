@@ -751,10 +751,55 @@ body.tracking-mode .desktop-cart{display:none!important}
   .tracking-product{grid-template-columns:76px minmax(0,1fr);gap:11px;padding:13px}.tracking-photo{width:76px}.tracking-product h3{font-size:16px}.tracking-order{padding:15px 13px}
 }
 
+/* ---------- home / navegação por ferramentas ---------- */
+body.home-mode{min-height:100vh;padding-bottom:28px;background:
+  radial-gradient(circle at 78% 8%,rgba(126,71,255,.13),transparent 28%),
+  radial-gradient(circle at 12% 0,rgba(255,255,255,.055),transparent 24%),#050608}
+body.home-mode .wrap{width:100%;max-width:none;margin-inline:auto;gap:0}
+body.home-mode .wrap>:not(#siteHome){display:none!important}
+body.home-mode .mobile-site-nav,body.home-mode .mobile-checkout,body.home-mode .desktop-cart{display:none!important}
+.site-home{min-height:calc(100vh - 56px);display:flex;flex-direction:column;justify-content:center;gap:18px;padding:22px 0}
+.home-top{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:3px 2px 10px}
+.home-brand{display:flex;align-items:center;gap:11px}.home-logo{width:43px;height:43px;display:grid;place-items:center;border:1px solid #fff;border-radius:12px;background:#fff;color:#07080a;font:900 18px/1 Inter,sans-serif;box-shadow:0 0 28px rgba(255,255,255,.1)}
+.home-brand>span:last-child{display:flex;flex-direction:column;gap:2px}.home-brand strong{font-size:13px;letter-spacing:-.02em}.home-brand small{color:#7f858e;font:600 7px/1.2 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase}
+.home-safe{padding:9px 12px;border:1px solid #343941;border-radius:999px;color:#dfe3e9;background:rgba(255,255,255,.025);font:700 8px/1 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase}
+.home-safe:before{content:"";display:inline-block;width:6px;height:6px;margin-right:7px;border-radius:50%;background:#fff;box-shadow:0 0 12px rgba(255,255,255,.7)}
+.home-hero{position:relative;overflow:hidden;padding:clamp(30px,5vw,64px);border:1px solid #343941;border-radius:22px;background:linear-gradient(125deg,rgba(255,255,255,.055),rgba(255,255,255,.012) 46%,rgba(122,65,255,.08));box-shadow:0 28px 90px rgba(0,0,0,.42)}
+.home-hero:after{content:"";position:absolute;right:-80px;bottom:-145px;width:390px;height:390px;border:1px solid rgba(255,255,255,.08);border-radius:50%;box-shadow:0 0 0 38px rgba(255,255,255,.018),0 0 0 76px rgba(124,68,255,.025);pointer-events:none}
+.home-eyebrow{margin:0 0 17px;color:#a8adb6;font:700 9px/1.2 "JetBrains Mono",monospace;letter-spacing:.15em}.home-eyebrow:before{content:"";display:inline-block;width:24px;height:1px;margin:0 10px 3px 0;background:#fff}
+.home-hero h1{position:relative;z-index:1;margin:0;max-width:780px;color:#fff;font-size:clamp(38px,6.4vw,82px);line-height:.96;letter-spacing:-.065em}
+.home-hero>p:last-child{position:relative;z-index:1;max-width:620px;margin:22px 0 0;color:#989ea8;font-size:15px;line-height:1.65}
+.home-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.home-card{position:relative;isolation:isolate;min-height:202px;overflow:hidden;padding:25px;border:1px solid #30353c;border-radius:18px;background:linear-gradient(145deg,#111419,#080a0d);color:#fff;text-align:left;cursor:pointer;transition:transform .24s ease,border-color .24s ease,box-shadow .24s ease}.home-card:before{content:"";position:absolute;z-index:-1;inset:auto -55px -95px auto;width:210px;height:210px;border:1px solid rgba(255,255,255,.07);border-radius:50%}.home-card:after{content:"↗";position:absolute;right:23px;top:22px;color:#727984;font-size:22px;transition:transform .24s ease,color .24s ease}
+.home-card:hover,.home-card:focus-visible{outline:0;transform:translateY(-4px);border-color:#747b85;box-shadow:0 24px 58px rgba(0,0,0,.42)}.home-card:hover:after,.home-card:focus-visible:after{color:#fff;transform:translate(2px,-2px)}
+.home-card-index{display:inline-grid;place-items:center;width:31px;height:31px;margin-right:10px;border:1px solid #414750;border-radius:9px;color:#c5cad2;font:700 9px/1 "JetBrains Mono",monospace}.home-card-kicker{color:#878e99;font:700 8px/1 "JetBrains Mono",monospace;letter-spacing:.11em}
+.home-card strong{display:block;margin-top:30px;font-size:clamp(22px,2.7vw,34px);line-height:1;letter-spacing:-.045em}.home-card small{display:block;max-width:390px;margin-top:9px;color:#9299a4;font-size:12px;line-height:1.5}.home-card-action{display:block;margin-top:24px;color:#e4e7eb;font:700 8px/1 "JetBrains Mono",monospace;letter-spacing:.1em}
+.home-card-primary{border-color:#626872;background:linear-gradient(145deg,#1a1d22,#090b0e)}.home-card-primary .home-card-index{border-color:#fff;background:#fff;color:#08090b}
+.home-card-purple{border-color:#6e4bc3;background:linear-gradient(145deg,rgba(73,35,145,.52),#0b0911 72%);box-shadow:inset 0 1px 0 rgba(203,185,255,.12)}.home-card-purple .home-card-index{border-color:#a77cff;color:#d9c9ff}.home-card-purple .home-card-action{color:#b99aff}.home-card-purple:hover,.home-card-purple:focus-visible{border-color:#a980ff;box-shadow:0 24px 64px rgba(77,37,161,.25)}
+.home-resume,.home-faq{width:100%;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 21px;border:1px solid #353a42;border-radius:14px;background:#0b0e12;color:#fff;text-align:left;cursor:pointer}.home-resume[hidden]{display:none}.home-resume span,.home-faq span{display:flex;flex-direction:column;gap:5px}.home-resume small{color:#a68aff;font:700 8px/1 "JetBrains Mono",monospace;letter-spacing:.11em}.home-resume strong,.home-faq strong{font-size:14px}.home-resume b,.home-faq b{font:700 8px/1 "JetBrains Mono",monospace;letter-spacing:.08em}.home-resume{border-color:#6642b5;background:linear-gradient(90deg,rgba(95,48,190,.21),rgba(255,255,255,.015))}
+.home-faq{padding-block:15px;background:rgba(255,255,255,.018)}.home-faq small{color:#818791;font-size:11px}.home-faq:hover,.home-faq:focus-visible,.home-resume:hover,.home-resume:focus-visible{outline:0;border-color:#8c929b;background-color:#14171c}
+.home-trust{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;padding-top:2px}.home-trust span{color:#777e88;font:700 7px/1 "JetBrains Mono",monospace;letter-spacing:.1em}.home-trust span:not(:last-child):after{content:"·";margin-left:9px;color:#454a51}
+.site-home-link{appearance:none;border:0;background:transparent;color:inherit;cursor:pointer;text-align:left;font:inherit}
+body.app-mode #siteHome{display:none!important}
+body.app-mode .masthead,body.app-mode .journey,body.app-mode #secTracking,body.app-mode #secFrete,body.app-mode #secPares,body.app-mode #secConta,body.app-mode #secComp,body.app-mode #secHow,body.app-mode #secService,body.app-mode #secPagar,body.app-mode #siteFaq,body.app-mode .site-footer,body.app-mode #foot,body.app-mode #settings{display:none!important}
+body.route-frete #secFrete,body.route-rastreio #secTracking,body.route-comparativo #secComp,body.route-faq #siteFaq{display:block!important}
+body.route-modelos #secPares{display:block!important}
+body.route-modelos #secConta:not([hidden]),body.route-modelos #secPagar:not([hidden]){display:block!important}
+body.app-mode #settings[open]{display:block!important}
+body.app-mode:not(.route-modelos) .mobile-checkout,body.app-mode:not(.route-modelos) .desktop-cart{display:none!important}
+
+@media(max-width:700px){
+  body.home-mode{padding:8px 8px 24px}.site-home{min-height:calc(100vh - 32px);justify-content:flex-start;padding:9px 0 22px;gap:12px}.home-top{padding:2px 2px 5px}.home-logo{width:39px;height:39px;border-radius:10px}.home-safe{font-size:6.5px;padding:8px 9px}
+  .home-hero{padding:29px 21px;border-radius:17px}.home-hero:after{right:-140px;bottom:-185px}.home-eyebrow{font-size:7px;margin-bottom:14px}.home-hero h1{font-size:clamp(38px,13vw,57px)}.home-hero>p:last-child{margin-top:16px;font-size:12.5px;line-height:1.55}
+  .home-grid{grid-template-columns:1fr;gap:9px}.home-card{min-height:151px;padding:19px;border-radius:15px}.home-card:after{right:18px;top:17px}.home-card-index{width:28px;height:28px}.home-card strong{margin-top:20px;font-size:24px}.home-card small{font-size:11px}.home-card-action{margin-top:16px}
+  .home-resume,.home-faq{padding:15px 16px}.home-resume b,.home-faq b{font-size:7px}.home-faq small{font-size:10px}.home-trust{padding:6px 14px 0;line-height:1.8}
+  body.app-mode{padding-bottom:96px}
+}
+
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
 </style>
 </head>
-<body class="site-redesign">
+<body class="site-redesign home-mode">
 
 <div class="wrap">
 
@@ -763,8 +808,48 @@ body.tracking-mode .desktop-cart{display:none!important}
     <span class="save-status" id="saveStatus" aria-live="polite">Valores carregados</span>
   </div>
 
+  <main class="site-home" id="siteHome">
+    <div class="home-top">
+      <div class="home-brand"><span class="home-logo" aria-hidden="true">Y</span><span><strong>YZYNOAH</strong><small>Importação assistida</small></span></div>
+      <span class="home-safe">Cotação segura</span>
+    </div>
+
+    <section class="home-hero" aria-labelledby="homeTitle">
+      <p class="home-eyebrow">CURADORIA · QC REAL · ACOMPANHAMENTO</p>
+      <h1 id="homeTitle">O que você quer fazer?</h1>
+      <p>Escolha uma ferramenta para começar. Sua cotação permanece disponível enquanto você navega.</p>
+    </section>
+
+    <section class="home-grid" aria-label="Ferramentas YZYNOAH">
+      <button class="home-card home-card-primary" type="button" data-site-route="modelos">
+        <span class="home-card-index">01</span><span class="home-card-kicker">COMEÇAR PEDIDO</span>
+        <strong>Escolher modelos</strong><small>Veja fotos reais, preços e monte sua cotação.</small><span class="home-card-action">ABRIR CATÁLOGO</span>
+      </button>
+      <button class="home-card home-card-purple" type="button" data-site-route="rastreio">
+        <span class="home-card-index">02</span><span class="home-card-kicker">PEDIDO EM ANDAMENTO</span>
+        <strong>Rastrear pedido</strong><small>Consulte etapas e atualizações pelo seu código.</small><span class="home-card-action">CONSULTAR AGORA</span>
+      </button>
+      <button class="home-card" type="button" data-site-route="comparativo">
+        <span class="home-card-index">03</span><span class="home-card-kicker">PLANEJAR COMPRA</span>
+        <strong>Comparar custos</strong><small>Compare quantidade, peso, frete e valor por par.</small><span class="home-card-action">VER COMPARATIVO</span>
+      </button>
+      <button class="home-card" type="button" data-site-route="frete">
+        <span class="home-card-index">04</span><span class="home-card-kicker">CALCULAR ENVIO</span>
+        <strong>Calcular frete</strong><small>Entenda qual linha atende melhor seu pedido.</small><span class="home-card-action">ESCOLHER LINHA</span>
+      </button>
+    </section>
+
+    <button class="home-resume" id="resumeQuote" type="button" data-site-route="modelos" hidden>
+      <span><small>CONTINUAR SUA COTAÇÃO</small><strong id="resumeQuoteText">Pedido em andamento</strong></span><b>CONTINUAR →</b>
+    </button>
+
+    <button class="home-faq" type="button" data-site-route="faq"><span><strong>Ficou com alguma dúvida?</strong><small>Veja respostas sobre frete, QC, tributação e pagamento.</small></span><b>ABRIR FAQ →</b></button>
+
+    <div class="home-trust"><span>FOTOS REAIS DE QC</span><span>CUSTO COMPLETO</span><span>ACOMPANHAMENTO</span></div>
+  </main>
+
   <nav class="site-nav" aria-label="Navegação principal">
-    <div class="site-brand"><span class="site-logo" aria-hidden="true">Y</span><span class="site-wordmark"><strong>YZYNOAH</strong><span>Importação assistida</span></span></div>
+    <button class="site-brand site-home-link" id="siteHomeLink" type="button" aria-label="Voltar ao início"><span class="site-logo" aria-hidden="true">Y</span><span class="site-wordmark"><strong>YZYNOAH</strong><span>← Voltar ao início</span></span></button>
     <div class="site-links"><button type="button" data-site-go="lineBJ">Frete</button><button type="button" data-site-go="secPares">Modelos</button><button type="button" data-site-go="secTracking">Rastreio</button><button type="button" data-site-go="secComp">Comparativo</button><button type="button" data-site-go="siteFaq">FAQ</button></div>
     <span class="site-safe">Cotação segura</span>
   </nav>
@@ -840,7 +925,7 @@ body.tracking-mode .desktop-cart{display:none!important}
     </article>
   </section>
 
-  <section class="panel">
+  <section class="panel" id="secFrete">
     <div class="panel-head">
       <h2><span class="step">1</span>Frete do pedido</h2>
       <span class="note">A quantidade confirma a linha automaticamente</span>
@@ -903,7 +988,7 @@ body.tracking-mode .desktop-cart{display:none!important}
     </div>
   </section>
 
-  <section class="panel">
+  <section class="panel" id="secHow">
     <div class="panel-head">
       <h2>Como funciona</h2>
       <span class="note">Do QC ao acompanhamento da entrega</span>
@@ -918,7 +1003,7 @@ body.tracking-mode .desktop-cart{display:none!important}
     </div>
   </section>
 
-  <section class="panel">
+  <section class="panel" id="secService">
     <div class="panel-head">
       <h2>O que o meu serviço cobre</h2>
       <span class="note">Cresce com a quantidade, mas cada par a mais sai mais barato</span>
@@ -1547,6 +1632,16 @@ body.tracking-mode .desktop-cart{display:none!important}
     });
   }
 
+  function updateHomeResume(k,summary){
+    var resume = $("resumeQuote");
+    if (!resume) return;
+    resume.hidden = k === 0;
+    if (k === 0) return;
+    var label = k === 1 ? "1 par selecionado" : k + " pares selecionados";
+    if (summary && !summary.indisponivel) label += " · ≈ " + brl(summary.total);
+    $("resumeQuoteText").textContent = label;
+  }
+
   function render(){
     syncSelection();
     var pedidoCount = selectedCount();
@@ -1555,6 +1650,7 @@ body.tracking-mode .desktop-cart{display:none!important}
     var s = selecionado();
     var k = s.k;
     var settingsOk = validateSettings();
+    updateHomeResume(k,s);
 
     // etiquetas das duas linhas
     var pesoUm = n("peso");
@@ -1940,6 +2036,70 @@ body.tracking-mode .desktop-cart{display:none!important}
     $("saveStatus").textContent = "Valores padrão restaurados e salvos";
   }
 
+  var SITE_ROUTE_TARGETS = {
+    frete:"lineBJ",
+    modelos:"secPares",
+    rastreio:"secTracking",
+    comparativo:"secComp",
+    faq:"siteFaq"
+  };
+
+  function clearSiteRouteClasses(){
+    document.body.classList.remove("home-mode","app-mode","route-frete","route-modelos","route-rastreio","route-comparativo","route-faq","tracking-mode");
+  }
+
+  function routeForTarget(targetId){
+    var found = "";
+    Object.keys(SITE_ROUTE_TARGETS).some(function(route){
+      if (SITE_ROUTE_TARGETS[route] === targetId){ found = route; return true; }
+      return false;
+    });
+    return found;
+  }
+
+  function updateRouteUrl(route,push){
+    if (!push) return;
+    var hash = route === "home" ? "" : "#" + route;
+    if (location.hash === hash) return;
+    history.pushState({siteRoute:route},"",location.pathname + location.search + hash);
+  }
+
+  function openSiteHome(push){
+    clearSiteRouteClasses();
+    document.body.classList.add("home-mode");
+    $("siteHome").hidden = false;
+    setActiveSiteLink("");
+    updateRouteUrl("home",push);
+    window.scrollTo({top:0,behavior:push ? "smooth" : "auto"});
+  }
+
+  function openSiteRoute(route,push){
+    if (!SITE_ROUTE_TARGETS[route]){ openSiteHome(push); return; }
+    clearSiteRouteClasses();
+    document.body.classList.add("app-mode","route-" + route);
+    $("siteHome").hidden = true;
+
+    if ((route === "modelos" || route === "comparativo") && linha === null){
+      linha = "BJ";
+      render();
+    }
+    if (route === "modelos") $("secPares").hidden = false;
+    if (route === "comparativo") $("secComp").hidden = false;
+    if (route === "rastreio") $("secTracking").hidden = false;
+
+    setActiveSiteLink(SITE_ROUTE_TARGETS[route]);
+    updateRouteUrl(route,push);
+    window.scrollTo({top:0,behavior:push ? "smooth" : "auto"});
+    if (route === "rastreio") setTimeout(function(){ $("trackingInput").focus(); },260);
+  }
+
+  function routeFromLocation(){
+    var route = location.hash.replace(/^#/,"").toLowerCase();
+    if (route === "edit"){ openSiteRoute("frete",false); return; }
+    if (SITE_ROUTE_TARGETS[route]) openSiteRoute(route,false);
+    else openSiteHome(false);
+  }
+
   function applyMode(){
     EDIT = location.hash === "#edit";
     $("settings").hidden = !EDIT;
@@ -1952,6 +2112,7 @@ body.tracking-mode .desktop-cart{display:none!important}
     if (EDIT) PAIRS.forEach(function(p,i){ if($("p"+i)) $("p"+i).value = p.cny; });
     renderHistory();
     render();
+    routeFromLocation();
   }
 
   ids.forEach(function(id){ if ($(id)) DEFAULT_VALUES[id] = $(id).defaultValue; });
@@ -1978,15 +2139,11 @@ body.tracking-mode .desktop-cart{display:none!important}
   var trackingCache = null;
 
   function openTrackingPanel(){
-    document.body.classList.add("tracking-mode");
-    $("secTracking").hidden = false;
-    $("secTracking").scrollIntoView({behavior:"smooth",block:"start"});
-    setTimeout(function(){ $("trackingInput").focus(); },350);
+    openSiteRoute("rastreio",true);
   }
 
   function closeTrackingPanel(){
     document.body.classList.remove("tracking-mode");
-    $("secTracking").hidden = true;
   }
 
   function trackingStepIndex(key){
@@ -2091,7 +2248,6 @@ body.tracking-mode .desktop-cart{display:none!important}
 
   $("openTracking").addEventListener("click",function(){
     openTrackingPanel();
-    setActiveSiteLink("secTracking");
   });
   $("trackingForm").addEventListener("submit",function(event){
     event.preventDefault();
@@ -2114,14 +2270,14 @@ body.tracking-mode .desktop-cart{display:none!important}
       var button = event.target.closest("[data-site-go]");
       if (!button) return;
       var targetId = button.getAttribute("data-site-go");
-      var target = $(targetId);
-      if (target && target.id === "secTracking"){ openTrackingPanel(); setActiveSiteLink(targetId); return; }
-      closeTrackingPanel();
-      if (target && !target.hidden){ setActiveSiteLink(targetId); target.scrollIntoView({behavior:"smooth",block:"start"}); }
-      else notify("Monte o pedido para liberar esta seção.");
+      var route = routeForTarget(targetId);
+      if (route) openSiteRoute(route,true);
     });
   });
-  setActiveSiteLink("lineBJ");
+  document.querySelectorAll("[data-site-route]").forEach(function(button){
+    button.addEventListener("click",function(){ openSiteRoute(button.getAttribute("data-site-route"),true); });
+  });
+  $("siteHomeLink").addEventListener("click",function(){ openSiteHome(true); });
 
   document.addEventListener("input", function(e){
     var t = e.target;
