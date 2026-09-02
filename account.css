@@ -36,9 +36,9 @@ body.route-conta #accountArea{display:grid!important}
 .account-desktop-main{display:contents}
 
 @media(min-width:701px){
-  body.route-conta{background:radial-gradient(circle at 86% 7%,rgba(158,91,218,.07),transparent 31rem),#050608}
-  body.route-conta .wrap{width:min(calc(100% - 36px),1440px);max-width:1440px}
-  body.route-conta #accountArea.account-area{display:grid!important;grid-template-columns:245px minmax(0,1fr);gap:0;min-height:700px;padding:0;overflow:hidden;border:1px solid #343941;border-radius:20px;background:#080a0d;box-shadow:0 26px 80px rgba(0,0,0,.55)}
+  body.site-redesign.route-conta{padding:14px 18px 24px;background:radial-gradient(circle at 86% 7%,rgba(158,91,218,.07),transparent 31rem),#050608}
+  body.route-conta .wrap{width:100%;max-width:none}
+  body.route-conta #accountArea.account-area{display:grid!important;grid-template-columns:245px minmax(0,1fr);gap:0;min-height:calc(100vh - 140px);padding:0;overflow:hidden;border:1px solid #343941;border-radius:20px;background:#080a0d;box-shadow:0 26px 80px rgba(0,0,0,.55)}
   .account-desktop-sidebar{display:flex;min-width:0;flex-direction:column;padding:24px 16px;border-right:1px solid #292d33;background:linear-gradient(180deg,#07090c,#06070a)}
   .account-desktop-user{display:flex;align-items:center;gap:11px;padding:6px 7px 22px;border-bottom:1px solid #24282e}
   .account-desktop-avatar{flex:0 0 auto;width:39px;height:39px;display:grid;place-items:center;border:1px solid #76548b;border-radius:11px;background:linear-gradient(145deg,#2c1938,#17101e);color:#ecd7ff;box-shadow:inset 0 1px rgba(255,255,255,.07),0 8px 22px rgba(85,36,119,.18);font:800 12px/1 "Rubik",sans-serif}
