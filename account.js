@@ -202,6 +202,55 @@
     "</article>";
   }
 
+  function compactDate(value){
+    if (!value) return "—";
+    var date = new Date(value);
+    if (isNaN(date.getTime())) return "—";
+    return new Intl.DateTimeFormat("pt-BR",{day:"2-digit",month:"2-digit"}).format(date);
+  }
+
+  function desktopRecentOrder(order){
+    var events = sortedEvents(order);
+    var latest = events[0];
+    var updated = latest ? latest.occurred_at : (order.updated_at || order.ordered_at);
+    return "<article class=\"account-desktop-order\">" +
+      "<span class=\"account-desktop-order-thumb\">" + escapeHtml(order.model_code || "K") + "</span>" +
+      "<span class=\"account-desktop-order-copy\"><strong>" + escapeHtml(order.product_name) + "</strong><small>" + escapeHtml(order.order_code) + " · " + escapeHtml(order.quantity) + " produto" + (Number(order.quantity) === 1 ? "" : "s") + "</small></span>" +
+      "<span class=\"account-desktop-order-state\"><b>" + escapeHtml(STATUS_LABELS[order.status] || order.status) + "</b><small>" + escapeHtml(formatDate(updated)) + "</small></span>" +
+    "</article>";
+  }
+
+  function renderDesktopOverview(total,active,delivered){
+    byId("accountDesktopOrdersCount").textContent = String(total).padStart(2,"0");
+    byId("accountDesktopActiveCount").textContent = String(active).padStart(2,"0");
+    byId("accountDesktopDeliveredCount").textContent = String(delivered).padStart(2,"0");
+
+    var recent = currentOrders.slice(0,2);
+    byId("accountDesktopRecentOrders").innerHTML = recent.length
+      ? recent.map(desktopRecentOrder).join("")
+      : "<div class=\"account-empty\">Nenhum pedido vinculado ainda.</div>";
+
+    var activities = [];
+    currentOrders.forEach(function(order){
+      var events = sortedEvents(order);
+      if (!events.length) events = [{status:order.status,description:STATUS_DESCRIPTIONS[order.status],occurred_at:order.updated_at || order.ordered_at}];
+      events.forEach(function(event){ activities.push({event:event,order:order}); });
+    });
+    activities.sort(function(a,b){ return new Date(b.event.occurred_at) - new Date(a.event.occurred_at); });
+    activities = activities.slice(0,3);
+
+    var newest = activities[0];
+    byId("accountDesktopLastUpdate").textContent = newest ? compactDate(newest.event.occurred_at) : "—";
+    byId("accountDesktopLastUpdateLabel").textContent = newest
+      ? (newest.event.description || STATUS_LABELS[newest.event.status] || "Atualização registrada")
+      : "Nenhuma atualização";
+    byId("accountDesktopActivity").innerHTML = activities.length
+      ? activities.map(function(item){
+          return "<article class=\"account-desktop-activity-item\"><strong>" + escapeHtml(STATUS_LABELS[item.event.status] || item.event.status) + "</strong><small>" + escapeHtml(item.event.description || item.order.order_code) + "</small></article>";
+        }).join("")
+      : "<div class=\"account-empty\">Nenhuma atualização registrada.</div>";
+  }
+
   function renderCustomerOrders(){
     var total = currentOrders.length;
     var active = currentOrders.filter(function(order){ return order.status !== "delivered" && order.status !== "cancelled"; }).length;
@@ -212,6 +261,7 @@
     byId("accountLatestOrder").innerHTML = total ? orderCard(currentOrders[0],false) : "Nenhum pedido vinculado ainda.";
     byId("accountLatestOrder").classList.toggle("account-empty",!total);
     byId("accountOrderList").innerHTML = total ? currentOrders.map(orderTrackingCard).join("") : "<div class=\"account-empty\">Seus pedidos aparecerão aqui quando forem vinculados pelo atendimento.</div>";
+    renderDesktopOverview(total,active,delivered);
   }
 
   async function loadProfile(){
@@ -221,6 +271,18 @@
     currentProfile = response.data;
     byId("accountIdentity").textContent = (currentProfile.full_name || "Cliente") + " · " + currentProfile.email;
     var isAdmin = currentProfile.role === "admin";
+    var fullName = clean(currentProfile.full_name) || "Cliente KICKNITY";
+    var nameParts = fullName.split(/\s+/).filter(Boolean);
+    var firstName = nameParts[0] || "Cliente";
+    var initials = ((nameParts[0] || "K").charAt(0) + (nameParts.length > 1 ? nameParts[nameParts.length - 1].charAt(0) : "")).toUpperCase();
+    byId("accountDesktopName").textContent = fullName;
+    byId("accountDesktopEmail").textContent = currentProfile.email;
+    byId("accountDesktopAvatar").textContent = initials;
+    byId("accountDesktopGreeting").textContent = "Olá, " + firstName + ".";
+    var verified = !!(currentSession.user && currentSession.user.email_confirmed_at);
+    byId("accountVerifiedBadge").textContent = verified ? "E-MAIL VERIFICADO" : "E-MAIL PENDENTE";
+    byId("accountVerifiedBadge").classList.toggle("pending",!verified);
+    all("[data-admin-account-tab]").forEach(function(button){ button.hidden = !isAdmin; });
     byId("adminTabButton").hidden = !isAdmin;
     return currentProfile;
   }
@@ -559,7 +621,7 @@
     byId("signupForm").addEventListener("submit",submitSignup);
     byId("recoveryForm").addEventListener("submit",submitRecovery);
     byId("forgotPassword").addEventListener("click",sendRecovery);
-    byId("accountLogout").addEventListener("click",async function(){ await client.auth.signOut(); location.hash = ""; });
+    ["accountLogout","accountDesktopLogout"].forEach(function(id){ byId(id).addEventListener("click",async function(){ await client.auth.signOut(); location.hash = ""; }); });
     all("[data-account-tab]").forEach(function(button){ button.addEventListener("click",function(){ selectAccountTab(button.getAttribute("data-account-tab")); }); });
     all("[data-open-account-orders]").forEach(function(button){ button.addEventListener("click",function(){ selectAccountTab("orders"); }); });
     byId("refreshAccountOrders").addEventListener("click",function(){ loadOrders().catch(console.error); });

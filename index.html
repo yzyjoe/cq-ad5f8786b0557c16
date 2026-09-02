@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Rubik:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="account.css?v=20260902d">
+<link rel="stylesheet" href="account.css?v=20260902e">
 
 <style>
 /* Tema único, fundo preto. Todas as cores saem destes tokens. */
@@ -1185,8 +1185,25 @@ body.route-pedido .journey{
   </section>
 
   <section class="account-area" id="accountArea" aria-labelledby="accountTitle">
+    <aside class="account-desktop-sidebar" aria-label="Navegação da conta">
+      <div class="account-desktop-user">
+        <span class="account-desktop-avatar" id="accountDesktopAvatar">K</span>
+        <span><strong id="accountDesktopName">Cliente KICKNITY</strong><small id="accountDesktopEmail">Carregando…</small></span>
+      </div>
+      <nav class="account-desktop-nav">
+        <button class="active" type="button" data-account-tab="overview"><span>01</span><b>Visão geral</b></button>
+        <button type="button" data-account-tab="orders"><span>02</span><b>Meus pedidos</b></button>
+        <button type="button" data-site-route="pedido"><span>03</span><b>Montar pedido</b></button>
+        <button type="button" data-site-route="rastreio"><span>04</span><b>Rastreio</b></button>
+        <button type="button" data-site-route="faq"><span>05</span><b>Suporte</b></button>
+        <button type="button" data-account-tab="admin" data-admin-account-tab hidden><span>06</span><b>Administração</b></button>
+      </nav>
+      <button class="account-desktop-logout" id="accountDesktopLogout" type="button">Sair da conta</button>
+    </aside>
+    <div class="account-desktop-main">
     <header class="account-hero">
-      <div><span class="account-kicker">ÁREA DO CLIENTE</span><h2 id="accountTitle">Minha conta</h2><p id="accountIdentity">Carregando seus dados…</p></div>
+      <div><span class="account-kicker">MINHA CONTA</span><h2 class="account-mobile-title" id="accountTitle">Minha conta</h2><h2 class="account-desktop-title" id="accountDesktopGreeting">Olá.</h2><p id="accountIdentity">Carregando seus dados…</p></div>
+      <span class="account-verified-badge" id="accountVerifiedBadge">E-MAIL VERIFICADO</span>
       <button class="account-logout" id="accountLogout" type="button">Sair</button>
     </header>
     <nav class="account-tabs" aria-label="Seções da conta">
@@ -1196,12 +1213,30 @@ body.route-pedido .journey{
     </nav>
 
     <div class="account-view" data-account-view="overview">
-      <div class="account-metrics">
+      <div class="account-desktop-overview">
+        <div class="account-desktop-metrics">
+          <article class="highlight"><span>Pedidos ativos</span><strong id="accountDesktopActiveCount">0</strong><small>Em acompanhamento</small></article>
+          <article><span>Total de pedidos</span><strong id="accountDesktopOrdersCount">0</strong><small>Vinculados à sua conta</small></article>
+          <article><span>Pedidos concluídos</span><strong id="accountDesktopDeliveredCount">0</strong><small>Entregues com sucesso</small></article>
+          <article><span>Última atualização</span><strong id="accountDesktopLastUpdate">—</strong><small id="accountDesktopLastUpdateLabel">Nenhuma atualização</small></article>
+        </div>
+        <div class="account-desktop-content-grid">
+          <section class="account-desktop-card">
+            <div class="account-desktop-card-head"><h3>Pedidos recentes</h3><button type="button" data-open-account-orders>Ver todos</button></div>
+            <div class="account-desktop-recent" id="accountDesktopRecentOrders"><div class="account-empty">Nenhum pedido vinculado ainda.</div></div>
+          </section>
+          <section class="account-desktop-card">
+            <div class="account-desktop-card-head"><h3>Histórico recente</h3></div>
+            <div class="account-desktop-activity" id="accountDesktopActivity"><div class="account-empty">Nenhuma atualização registrada.</div></div>
+          </section>
+        </div>
+      </div>
+      <div class="account-mobile-overview account-metrics">
         <article><span>Pedidos</span><strong id="accountOrdersCount">0</strong><small>vinculados à sua conta</small></article>
         <article><span>Em andamento</span><strong id="accountActiveCount">0</strong><small>com atualização disponível</small></article>
         <article><span>Entregues</span><strong id="accountDeliveredCount">0</strong><small>pedidos concluídos</small></article>
       </div>
-      <section class="account-panel"><div class="account-panel-head"><div><span>ÚLTIMA ATUALIZAÇÃO</span><h3>Pedido mais recente</h3></div><button type="button" data-open-account-orders>Ver todos</button></div><div id="accountLatestOrder" class="account-empty">Nenhum pedido vinculado ainda.</div></section>
+      <section class="account-mobile-overview account-panel"><div class="account-panel-head"><div><span>ÚLTIMA ATUALIZAÇÃO</span><h3>Pedido mais recente</h3></div><button type="button" data-open-account-orders>Ver todos</button></div><div id="accountLatestOrder" class="account-empty">Nenhum pedido vinculado ainda.</div></section>
     </div>
 
     <div class="account-view" data-account-view="orders" hidden>
@@ -1244,6 +1279,7 @@ body.route-pedido .journey{
         </section>
         <section class="account-panel admin-orders"><div class="account-panel-head"><div><span>GESTÃO</span><h3>Pedidos cadastrados</h3></div><button type="button" id="refreshAdminOrders">Atualizar</button></div><div class="admin-order-list" id="adminOrderList"></div></section>
       </div>
+    </div>
     </div>
   </section>
 
@@ -1400,7 +1436,7 @@ body.route-pedido .journey{
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="vendor/supabase-2.112.4.min.js"></script>
-<script src="account.js?v=20260902d"></script>
+<script src="account.js?v=20260902e"></script>
 <script src="vendor/qrcode.min.js"></script>
 <script>
 (function(){
