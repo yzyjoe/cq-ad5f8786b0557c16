@@ -35,6 +35,19 @@ body.route-conta #accountArea{display:grid!important}
 .account-desktop-sidebar,.account-desktop-overview,.account-desktop-title,.account-verified-badge{display:none}
 .account-desktop-main{display:contents}
 
+/* Ícones brancos compartilhados entre o início e o sidebar da conta. */
+.account-nav-icon{position:relative;color:#fff}
+.account-nav-icon i,.account-nav-icon i:before,.account-nav-icon i:after{position:absolute;display:block;box-sizing:border-box;content:"";color:#fff}
+.icon-overview i{left:50%;top:50%;width:5px;height:5px;border-radius:1px;background:#fff;box-shadow:8px 0 #fff,0 8px #fff,8px 8px #fff;transform:translate(-6.5px,-6.5px)}
+.icon-orders i{left:50%;top:50%;width:16px;height:14px;border:2px solid #fff;border-radius:2px;transform:translate(-50%,-50%)}.icon-orders i:before{left:-2px;right:-2px;top:3px;border-top:2px solid #fff}.icon-orders i:after{left:5px;top:-2px;height:14px;border-left:2px solid #fff}
+.icon-shopping i{left:50%;top:53%;width:16px;height:13px;border:2px solid #fff;border-radius:2px;transform:translate(-50%,-50%)}.icon-shopping i:before{left:3px;top:-7px;width:7px;height:7px;border:2px solid #fff;border-bottom:0;border-radius:7px 7px 0 0}
+.icon-tracking i{left:50%;top:46%;width:14px;height:14px;border:2px solid #fff;border-radius:50% 50% 50% 0;transform:translate(-50%,-50%) rotate(-45deg)}.icon-tracking i:after{left:3px;top:3px;width:4px;height:4px;border-radius:50%;background:#fff}
+.icon-compare i{left:50%;bottom:6px;width:3px;height:7px;border-radius:2px 2px 0 0;background:#fff;box-shadow:-6px 3px #fff,6px -5px #fff;transform:translateX(-50%)}
+.icon-faq i{inset:0;display:grid;place-items:center;font:800 17px/1 "Rubik",sans-serif}.icon-faq i:before{content:"?";position:static}
+.icon-support i{left:50%;top:47%;width:16px;height:12px;border:2px solid #fff;border-radius:4px;transform:translate(-50%,-50%)}.icon-support i:before{left:2px;bottom:-5px;width:6px;height:6px;border-left:2px solid #fff;transform:skewY(-38deg)}.icon-support i:after{left:3px;top:3px;width:2px;height:2px;border-radius:50%;background:#fff;box-shadow:4px 0 #fff,8px 0 #fff}
+.icon-admin i{left:50%;top:50%;width:14px;height:17px;border:2px solid #fff;border-radius:7px 7px 9px 9px;transform:translate(-50%,-50%)}.icon-admin i:before{left:3px;top:4px;width:5px;height:3px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg)}
+.home-card-rabbit{position:absolute;right:8px;bottom:-7px;z-index:0;width:86px;height:94px;opacity:.075;pointer-events:none;transition:opacity .24s ease,transform .24s ease}.home-card-rabbit i{position:absolute;left:50%;bottom:0;width:56px;height:49px;border-radius:52% 52% 45% 45%;background:#fff;transform:translateX(-50%)}.home-card-rabbit i:before,.home-card-rabbit i:after{content:"";position:absolute;bottom:35px;width:18px;height:49px;border-radius:74% 74% 34% 34%;background:#fff;transform-origin:bottom}.home-card-rabbit i:before{left:3px;transform:rotate(-9deg)}.home-card-rabbit i:after{right:3px;transform:rotate(9deg)}.home-card>*:not(.home-card-rabbit){position:relative;z-index:1}.home-card:hover .home-card-rabbit,.home-card:focus-visible .home-card-rabbit{opacity:.13;transform:translateY(-3px)}
+
 @media(min-width:701px){
   body.site-redesign.route-conta{padding:14px 18px 24px;background:radial-gradient(circle at 86% 7%,rgba(158,91,218,.07),transparent 31rem),#050608}
   body.route-conta .wrap{width:100%;max-width:none}

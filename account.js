@@ -114,14 +114,6 @@
     if (byId("homeAccountCard")) byId("homeAccountCard").hidden = !signedIn;
     if (byId("homeFaqCard")) byId("homeFaqCard").hidden = signedIn;
     if (byId("homeFaqSecondary")) byId("homeFaqSecondary").hidden = !signedIn;
-    var homeNumbers = signedIn
-      ? [["homeAccountCard","01"],["homeOrderCard","02"],["homeTrackingCard","03"],["homeCompareCard","04"]]
-      : [["homeOrderCard","01"],["homeTrackingCard","02"],["homeCompareCard","03"],["homeFaqCard","04"]];
-    homeNumbers.forEach(function(item){
-      var card = byId(item[0]);
-      var number = card && card.querySelector(".home-card-index");
-      if (number) number.textContent = item[1];
-    });
   }
 
   function goToAccount(){

@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Rubik:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="account.css?v=20260902g">
+<link rel="stylesheet" href="account.css?v=20260902h">
 
 <style>
 /* Tema único, fundo preto. Todas as cores saem destes tokens. */
@@ -903,23 +903,23 @@ body.route-pedido .journey{
 
     <section class="home-grid" aria-label="Ferramentas KICKNITY">
       <button class="home-card account-home-card" id="homeAccountCard" type="button" data-site-route="conta" hidden>
-        <span class="home-card-index">01</span><span class="home-card-kicker">PEDIDOS + ACOMPANHAMENTO</span>
+        <span class="home-card-index account-nav-icon icon-overview" aria-hidden="true"><i></i></span><span class="home-card-kicker">PEDIDOS + ACOMPANHAMENTO</span><span class="home-card-rabbit" aria-hidden="true"><i></i></span>
         <strong>Minha conta</strong><small>Acompanhe seus pedidos e consulte cada atualização automaticamente.</small><span class="home-card-action">ABRIR MINHA CONTA</span>
       </button>
       <button class="home-card" id="homeOrderCard" type="button" data-site-route="pedido">
-        <span class="home-card-index">01</span><span class="home-card-kicker">FRETE + MODELOS + TOTAL</span>
+        <span class="home-card-index account-nav-icon icon-shopping" aria-hidden="true"><i></i></span><span class="home-card-kicker">FRETE + MODELOS + TOTAL</span><span class="home-card-rabbit" aria-hidden="true"><i></i></span>
         <strong>Montar pedido</strong><small>Escolha o frete, selecione seus modelos e confira o valor completo.</small><span class="home-card-action">COMEÇAR PEDIDO</span>
       </button>
       <button class="home-card" id="homeTrackingCard" type="button" data-site-route="rastreio">
-        <span class="home-card-index">02</span><span class="home-card-kicker">PEDIDO EM ANDAMENTO</span>
+        <span class="home-card-index account-nav-icon icon-tracking" aria-hidden="true"><i></i></span><span class="home-card-kicker">PEDIDO EM ANDAMENTO</span><span class="home-card-rabbit" aria-hidden="true"><i></i></span>
         <strong>Rastrear pedido</strong><small>Consulte etapas e atualizações pelo seu código.</small><span class="home-card-action">CONSULTAR AGORA</span>
       </button>
       <button class="home-card" id="homeCompareCard" type="button" data-site-route="comparativo">
-        <span class="home-card-index">03</span><span class="home-card-kicker">PLANEJAR COMPRA</span>
+        <span class="home-card-index account-nav-icon icon-compare" aria-hidden="true"><i></i></span><span class="home-card-kicker">PLANEJAR COMPRA</span><span class="home-card-rabbit" aria-hidden="true"><i></i></span>
         <strong>Comparar preços</strong><small>Compare quantidade, peso, frete e valor por par.</small><span class="home-card-action">VER COMPARATIVO</span>
       </button>
       <button class="home-card" id="homeFaqCard" type="button" data-site-route="faq">
-        <span class="home-card-index">04</span><span class="home-card-kicker">DÚVIDAS FREQUENTES</span>
+        <span class="home-card-index account-nav-icon icon-faq" aria-hidden="true"><i></i></span><span class="home-card-kicker">DÚVIDAS FREQUENTES</span><span class="home-card-rabbit" aria-hidden="true"><i></i></span>
         <strong>FAQ</strong><small>Veja respostas sobre frete, QC, tributação e pagamento.</small><span class="home-card-action">ABRIR FAQ</span>
       </button>
     </section>
@@ -1191,12 +1191,12 @@ body.route-pedido .journey{
         <span><strong id="accountDesktopName">Cliente KICKNITY</strong><small id="accountDesktopEmail">Carregando…</small></span>
       </div>
       <nav class="account-desktop-nav">
-        <button class="active" type="button" data-account-tab="overview"><span>01</span><b>Visão geral</b></button>
-        <button type="button" data-account-tab="orders"><span>02</span><b>Meus pedidos</b></button>
-        <button type="button" data-site-route="pedido"><span>03</span><b>Montar pedido</b></button>
-        <button type="button" data-site-route="rastreio"><span>04</span><b>Rastreio</b></button>
-        <button type="button" data-site-route="faq"><span>05</span><b>Suporte</b></button>
-        <button type="button" data-account-tab="admin" data-admin-account-tab hidden><span>06</span><b>Administração</b></button>
+        <button class="active" type="button" data-account-tab="overview"><span class="account-nav-icon icon-overview" aria-hidden="true"><i></i></span><b>Visão geral</b></button>
+        <button type="button" data-account-tab="orders"><span class="account-nav-icon icon-orders" aria-hidden="true"><i></i></span><b>Meus pedidos</b></button>
+        <button type="button" data-site-route="pedido"><span class="account-nav-icon icon-shopping" aria-hidden="true"><i></i></span><b>Montar pedido</b></button>
+        <button type="button" data-site-route="rastreio"><span class="account-nav-icon icon-tracking" aria-hidden="true"><i></i></span><b>Rastreio</b></button>
+        <button type="button" data-site-route="faq"><span class="account-nav-icon icon-support" aria-hidden="true"><i></i></span><b>Suporte</b></button>
+        <button type="button" data-account-tab="admin" data-admin-account-tab hidden><span class="account-nav-icon icon-admin" aria-hidden="true"><i></i></span><b>Administração</b></button>
       </nav>
       <button class="account-desktop-logout" id="accountDesktopLogout" type="button">Sair da conta</button>
     </aside>
@@ -1436,7 +1436,7 @@ body.route-pedido .journey{
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="vendor/supabase-2.112.4.min.js"></script>
-<script src="account.js?v=20260902e"></script>
+<script src="account.js?v=20260902h"></script>
 <script src="vendor/qrcode.min.js"></script>
 <script>
 (function(){
