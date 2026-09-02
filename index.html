@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Rubik:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="account.css?v=20260902">
+<link rel="stylesheet" href="account.css?v=20260902c">
 
 <style>
 /* Tema único, fundo preto. Todas as cores saem destes tokens. */
@@ -894,23 +894,29 @@ body.route-pedido .journey{
     </section>
 
     <section class="home-grid" aria-label="Ferramentas KICKNITY">
-      <button class="home-card" type="button" data-site-route="pedido">
+      <button class="home-card account-home-card" id="homeAccountCard" type="button" data-site-route="conta" hidden>
+        <span class="home-card-index">01</span><span class="home-card-kicker">PEDIDOS + ACOMPANHAMENTO</span>
+        <strong>Minha conta</strong><small>Acompanhe seus pedidos e consulte cada atualização automaticamente.</small><span class="home-card-action">ABRIR MINHA CONTA</span>
+      </button>
+      <button class="home-card" id="homeOrderCard" type="button" data-site-route="pedido">
         <span class="home-card-index">01</span><span class="home-card-kicker">FRETE + MODELOS + TOTAL</span>
         <strong>Montar pedido</strong><small>Escolha o frete, selecione seus modelos e confira o valor completo.</small><span class="home-card-action">COMEÇAR PEDIDO</span>
       </button>
-      <button class="home-card" type="button" data-site-route="rastreio">
+      <button class="home-card" id="homeTrackingCard" type="button" data-site-route="rastreio">
         <span class="home-card-index">02</span><span class="home-card-kicker">PEDIDO EM ANDAMENTO</span>
         <strong>Rastrear pedido</strong><small>Consulte etapas e atualizações pelo seu código.</small><span class="home-card-action">CONSULTAR AGORA</span>
       </button>
-      <button class="home-card" type="button" data-site-route="comparativo">
+      <button class="home-card" id="homeCompareCard" type="button" data-site-route="comparativo">
         <span class="home-card-index">03</span><span class="home-card-kicker">PLANEJAR COMPRA</span>
-        <strong>Comparar custos</strong><small>Compare quantidade, peso, frete e valor por par.</small><span class="home-card-action">VER COMPARATIVO</span>
+        <strong>Comparar preços</strong><small>Compare quantidade, peso, frete e valor por par.</small><span class="home-card-action">VER COMPARATIVO</span>
       </button>
-      <button class="home-card" type="button" data-site-route="faq">
+      <button class="home-card" id="homeFaqCard" type="button" data-site-route="faq">
         <span class="home-card-index">04</span><span class="home-card-kicker">DÚVIDAS FREQUENTES</span>
         <strong>FAQ</strong><small>Veja respostas sobre frete, QC, tributação e pagamento.</small><span class="home-card-action">ABRIR FAQ</span>
       </button>
     </section>
+
+    <button class="home-faq-secondary" id="homeFaqSecondary" type="button" data-site-route="faq" hidden><span><small>PRECISA DE AJUDA?</small><strong>Perguntas frequentes</strong></span><b>ABRIR FAQ →</b></button>
 
     <button class="home-resume" id="resumeQuote" type="button" data-site-route="pedido" hidden>
       <span><small>CONTINUAR SEU PEDIDO</small><strong id="resumeQuoteText">Pedido em andamento</strong></span><b>CONTINUAR →</b>
@@ -1361,7 +1367,7 @@ body.route-pedido .journey{
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.js"></script>
-<script src="account.js?v=20260902b"></script>
+<script src="account.js?v=20260902c"></script>
 <script src="vendor/qrcode.min.js"></script>
 <script>
 (function(){

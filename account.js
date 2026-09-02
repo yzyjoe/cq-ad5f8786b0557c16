@@ -8,6 +8,8 @@
   var currentProfile = null;
   var currentOrders = [];
   var authReady = false;
+  var accountChannel = null;
+  var realtimeRefreshTimer = null;
 
   function byId(id){ return document.getElementById(id); }
   function all(selector){ return Array.prototype.slice.call(document.querySelectorAll(selector)); }
@@ -33,6 +35,25 @@
     logistics:"Em transporte", warehouse:"Armazém / QC", shipped:"Enviado",
     delivered:"Entregue", cancelled:"Cancelado"
   };
+  var STATUS_DESCRIPTIONS = {
+    submitted:"Pedido recebido. Aguardando atendimento.",
+    accepted:"O agente assumiu o pedido e está falando com o vendedor.",
+    purchased:"O produto foi comprado.",
+    logistics:"A transportadora e o código de rastreio foram identificados.",
+    warehouse:"O produto chegou ao armazém e está em inspeção de qualidade.",
+    shipped:"O pedido foi enviado para o destino.",
+    delivered:"Pedido entregue.",
+    cancelled:"Pedido cancelado."
+  };
+  var ACCOUNT_TRACKING_STEPS = [
+    {key:"submitted",label:"Recebido"},
+    {key:"accepted",label:"Atendimento"},
+    {key:"purchased",label:"Comprado"},
+    {key:"logistics",label:"Transporte"},
+    {key:"warehouse",label:"Armazém / QC"},
+    {key:"shipped",label:"Enviado"},
+    {key:"delivered",label:"Entregue"}
+  ];
 
   function authMessage(message,type){
     var target = byId("authFeedback");
@@ -82,6 +103,17 @@
     if (byId("mobileAccountButton")) byId("mobileAccountButton").textContent = signedIn ? "Conta" : "Entrar";
     if (byId("desktopAccountRoute")) byId("desktopAccountRoute").hidden = !signedIn;
     if (byId("accountLogout")) byId("accountLogout").hidden = !signedIn;
+    if (byId("homeAccountCard")) byId("homeAccountCard").hidden = !signedIn;
+    if (byId("homeFaqCard")) byId("homeFaqCard").hidden = signedIn;
+    if (byId("homeFaqSecondary")) byId("homeFaqSecondary").hidden = !signedIn;
+    var homeNumbers = signedIn
+      ? [["homeAccountCard","01"],["homeOrderCard","02"],["homeTrackingCard","03"],["homeCompareCard","04"]]
+      : [["homeOrderCard","01"],["homeTrackingCard","02"],["homeCompareCard","03"],["homeFaqCard","04"]];
+    homeNumbers.forEach(function(item){
+      var card = byId(item[0]);
+      var number = card && card.querySelector(".home-card-index");
+      if (number) number.textContent = item[1];
+    });
   }
 
   function goToAccount(){
@@ -93,6 +125,54 @@
   function sortedEvents(order){
     return (order.order_events || []).slice().sort(function(a,b){ return new Date(b.occurred_at) - new Date(a.occurred_at); });
   }
+  function trackingStepIndex(status){
+    var index = ACCOUNT_TRACKING_STEPS.findIndex(function(step){ return step.key === status; });
+    return index < 0 ? 0 : index;
+  }
+  function accountTimeline(order){
+    var current = trackingStepIndex(order.status);
+    return ACCOUNT_TRACKING_STEPS.map(function(step,index){
+      var state = order.status === "cancelled" ? "" : (index < current ? " done" : (index === current ? " current" : ""));
+      return "<span class=\"tracking-step" + state + "\">" + escapeHtml(step.label) + "</span>";
+    }).join("");
+  }
+  function accountHistory(order){
+    var events = sortedEvents(order);
+    if (!events.length){
+      events = [{status:order.status,description:STATUS_DESCRIPTIONS[order.status] || "Atualização do pedido registrada.",occurred_at:order.updated_at || order.ordered_at}];
+    }
+    return events.map(function(item,index){
+      return "<article class=\"tracking-history-item" + (index === 0 ? " current" : "") + "\">" +
+        "<div class=\"tracking-history-top\"><span class=\"tracking-history-state\">" + escapeHtml(STATUS_LABELS[item.status] || item.status) + "</span><time>" + escapeHtml(formatDate(item.occurred_at)) + "</time></div>" +
+        "<p>" + escapeHtml(item.description || STATUS_DESCRIPTIONS[item.status] || "Atualização do pedido registrada.") + "</p>" +
+      "</article>";
+    }).join("");
+  }
+  function productPhoto(model){
+    var normalized = clean(model).toUpperCase();
+    var available = ["GW3773","GW3774","HQ6316","F36980","FW5190","HQ4540"];
+    return available.indexOf(normalized) >= 0 ? "img/qc/" + normalized.toLowerCase() + "-1.webp" : "";
+  }
+  function orderTrackingCard(order){
+    var events = sortedEvents(order);
+    var latest = events[0] || {description:STATUS_DESCRIPTIONS[order.status],occurred_at:order.updated_at || order.ordered_at};
+    var image = productPhoto(order.model_code);
+    var productVisual = image
+      ? "<div class=\"tracking-photo\"><img src=\"" + escapeHtml(image) + "\" alt=\"Foto de " + escapeHtml(order.product_name) + "\"></div>"
+      : "<div class=\"tracking-photo account-tracking-placeholder\" aria-hidden=\"true\"><span>K</span></div>";
+    return "<article class=\"account-tracking-card" + (order.status === "cancelled" ? " cancelled" : "") + " data-order-id=\"" + order.id + "\">" +
+      "<div class=\"account-tracking-label\"><span>ACOMPANHAMENTO AUTOMÁTICO</span><small>Atualiza sem pesquisar o código</small></div>" +
+      "<div class=\"tracking-result account-tracking-result\">" +
+        "<div class=\"tracking-product\">" + productVisual + "<div><h3>" + escapeHtml(order.product_name) + "</h3><p class=\"tracking-model\">Modelo " + escapeHtml(order.model_code || "não informado") + "</p></div></div>" +
+        "<div class=\"tracking-order\">" +
+          "<div class=\"tracking-order-head\"><div><span class=\"tracking-code-label\">Código do pedido</span><strong class=\"tracking-code\">" + escapeHtml(order.order_code) + "</strong></div><span class=\"tracking-badge\">" + escapeHtml(STATUS_LABELS[order.status] || order.status) + "</span></div>" +
+          "<div class=\"tracking-current\"><h4>" + escapeHtml(latest.description || STATUS_DESCRIPTIONS[order.status] || "Atualização registrada.") + "</h4><time class=\"tracking-time\">Última atualização: " + escapeHtml(formatDate(latest.occurred_at)) + "</time>" + (order.tracking_code ? "<span class=\"account-tracking-code\">Rastreio: " + escapeHtml(order.tracking_code) + "</span>" : "") + "</div>" +
+          "<section class=\"tracking-history-wrap\"><h5>Histórico do pedido</h5><div class=\"tracking-history\">" + accountHistory(order) + "</div></section>" +
+          "<div class=\"tracking-timeline account-tracking-timeline\" aria-label=\"Etapas do pedido\">" + accountTimeline(order) + "</div>" +
+        "</div>" +
+      "</div>" +
+    "</article>";
+  }
   function orderCard(order,admin){
     var events = sortedEvents(order);
     var latest = events[0];
@@ -102,6 +182,7 @@
         "<select data-admin-field=\"status\" aria-label=\"Status do pedido\">" + Object.keys(STATUS_LABELS).map(function(status){ return "<option value=\"" + status + "\"" + (order.status === status ? " selected" : "") + ">" + STATUS_LABELS[status] + "</option>"; }).join("") + "</select>" +
         "<input data-admin-field=\"tracking\" value=\"" + escapeHtml(order.tracking_code || "") + "\" placeholder=\"Código de rastreio\" aria-label=\"Código de rastreio\">" +
         "<button type=\"button\" data-admin-update=\"" + order.id + "\">Salvar</button>" +
+        "<button class=\"admin-delete-order\" type=\"button\" data-admin-delete=\"" + order.id + "\">Remover</button>" +
       "</div>"
     ) : "";
     return "<article class=\"account-order-card\" data-order-id=\"" + order.id + "\">" +
@@ -121,7 +202,7 @@
     byId("accountDeliveredCount").textContent = delivered;
     byId("accountLatestOrder").innerHTML = total ? orderCard(currentOrders[0],false) : "Nenhum pedido vinculado ainda.";
     byId("accountLatestOrder").classList.toggle("account-empty",!total);
-    byId("accountOrderList").innerHTML = total ? currentOrders.map(function(order){ return orderCard(order,false); }).join("") : "<div class=\"account-empty\">Seus pedidos aparecerão aqui quando forem vinculados pelo atendimento.</div>";
+    byId("accountOrderList").innerHTML = total ? currentOrders.map(orderTrackingCard).join("") : "<div class=\"account-empty\">Seus pedidos aparecerão aqui quando forem vinculados pelo atendimento.</div>";
   }
 
   async function loadProfile(){
@@ -141,6 +222,23 @@
     if (response.error) throw response.error;
     currentOrders = response.data || [];
     renderCustomerOrders();
+  }
+
+  function scheduleRealtimeRefresh(){
+    clearTimeout(realtimeRefreshTimer);
+    realtimeRefreshTimer = setTimeout(function(){
+      loadOrders().catch(console.error);
+      if (currentProfile && currentProfile.role === "admin") loadAdmin().catch(console.error);
+    },180);
+  }
+
+  function subscribeToAccountOrders(){
+    if (!client || !currentSession) return;
+    if (accountChannel){ client.removeChannel(accountChannel); accountChannel = null; }
+    accountChannel = client.channel("kicknity-orders-" + currentSession.user.id)
+      .on("postgres_changes",{event:"*",schema:"public",table:"orders",filter:"user_id=eq." + currentSession.user.id},scheduleRealtimeRefresh)
+      .on("postgres_changes",{event:"*",schema:"public",table:"order_events"},scheduleRealtimeRefresh)
+      .subscribe();
   }
 
   async function loadAdmin(){
@@ -174,13 +272,17 @@
     if (tab === "admin" && (!currentProfile || currentProfile.role !== "admin")) tab = "overview";
     all("[data-account-tab]").forEach(function(button){ button.classList.toggle("active",button.getAttribute("data-account-tab") === tab); });
     all("[data-account-view]").forEach(function(view){ view.hidden = view.getAttribute("data-account-view") !== tab; });
+    if (tab === "orders") loadOrders().catch(console.error);
     if (tab === "admin") loadAdmin().catch(function(error){ adminMessage(friendlyError(error),"error"); });
   }
 
   async function handleSession(session,event){
     currentSession = session || null;
     authReady = true;
-    if (!currentSession){ currentProfile = null; currentOrders = []; }
+    if (!currentSession){
+      currentProfile = null; currentOrders = [];
+      if (accountChannel && client){ client.removeChannel(accountChannel); accountChannel = null; }
+    }
     updateAuthUi();
     if (event === "PASSWORD_RECOVERY"){
       setAuthMode("recovery"); authMessage("Defina sua nova senha.");
@@ -188,6 +290,7 @@
       return;
     }
     if (currentSession){
+      subscribeToAccountOrders();
       closeAuth();
       if (location.hash === "#conta"){
         await loadAccount();
@@ -291,6 +394,24 @@
     finally{ button.disabled = false; }
   }
 
+  async function deleteAdminOrder(button){
+    var card = button.closest("[data-order-id]");
+    if (!card) return;
+    var orderId = Number(card.getAttribute("data-order-id"));
+    var orderCode = clean(card.querySelector(".account-order-code") && card.querySelector(".account-order-code").textContent) || String(orderId);
+    if (!window.confirm("Remover definitivamente o pedido " + orderCode + " e todo o histórico dele?")) return;
+    button.disabled = true; button.textContent = "Removendo";
+    try{
+      var response = await client.from("orders").delete().eq("id",orderId);
+      if (response.error) throw response.error;
+      adminMessage("Pedido " + orderCode + " removido.","success");
+      await Promise.all([loadAdmin(),loadOrders()]);
+    }catch(error){
+      button.disabled = false; button.textContent = "Remover";
+      adminMessage(friendlyError(error),"error");
+    }
+  }
+
   function wire(){
     ["homeAccountButton","navAccountButton"].forEach(function(id){ byId(id).addEventListener("click",goToAccount); });
     byId("authClose").addEventListener("click",closeAuth);
@@ -306,7 +427,12 @@
     byId("refreshAccountOrders").addEventListener("click",function(){ loadOrders().catch(console.error); });
     byId("refreshAdminOrders").addEventListener("click",function(){ loadAdmin().catch(function(error){ adminMessage(friendlyError(error),"error"); }); });
     byId("adminOrderForm").addEventListener("submit",createOrder);
-    byId("adminOrderList").addEventListener("click",function(event){ var button = event.target.closest("[data-admin-update]"); if (button) updateAdminOrder(button); });
+    byId("adminOrderList").addEventListener("click",function(event){
+      var updateButton = event.target.closest("[data-admin-update]");
+      if (updateButton){ updateAdminOrder(updateButton); return; }
+      var deleteButton = event.target.closest("[data-admin-delete]");
+      if (deleteButton) deleteAdminOrder(deleteButton);
+    });
   }
 
   function init(){
