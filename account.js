@@ -109,11 +109,11 @@
     var label = signedIn ? "Minha conta" : "Entrar";
     ["homeAccountButton","navAccountButton"].forEach(function(id){ if (byId(id)) byId(id).textContent = label; });
     if (byId("mobileAccountButton")) byId("mobileAccountButton").textContent = signedIn ? "Conta" : "Entrar";
-    if (byId("desktopAccountRoute")) byId("desktopAccountRoute").hidden = !signedIn;
     if (byId("accountLogout")) byId("accountLogout").hidden = !signedIn;
     if (byId("homeAccountCard")) byId("homeAccountCard").hidden = !signedIn;
-    if (byId("homeFaqCard")) byId("homeFaqCard").hidden = signedIn;
-    if (byId("homeFaqSecondary")) byId("homeFaqSecondary").hidden = !signedIn;
+    if (byId("homeTrackingCard")) byId("homeTrackingCard").hidden = signedIn;
+    if (byId("homeFaqCard")) byId("homeFaqCard").hidden = false;
+    if (byId("homeTrackingSecondary")) byId("homeTrackingSecondary").hidden = !signedIn;
   }
 
   function goToAccount(){
@@ -650,7 +650,7 @@
   window.KicknityAccount = {
     canOpen:function(){ return !!currentSession; },
     requireLogin:function(){ showAuth("login"); },
-    open:function(){ if (currentSession) loadAccount(); },
+    open:function(tab){ if (currentSession){ selectAccountTab(tab || "overview"); loadAccount(); } },
     isReady:function(){ return authReady; }
   };
 

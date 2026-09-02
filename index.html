@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'sha256-4Vl2dilizuL4h6KjB0B9Ed0/OjgCuDc4xnDid2+3waY='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://lgcvaxjsgymwueacqkec.supabase.co wss://lgcvaxjsgymwueacqkec.supabase.co; frame-src https://challenges.cloudflare.com; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'sha256-OCN1kSffZntkjtgmFIb0ZmIluf2s3P8+FoaH5WEbSPU='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://lgcvaxjsgymwueacqkec.supabase.co wss://lgcvaxjsgymwueacqkec.supabase.co; frame-src https://challenges.cloudflare.com; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive">
@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Rubik:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="account.css?v=20260902k">
+<link rel="stylesheet" href="account.css?v=20260902l">
 
 <style>
 /* Tema único, fundo preto. Todas as cores saem destes tokens. */
@@ -902,13 +902,13 @@ body.route-pedido .journey{
     </section>
 
     <section class="home-grid" aria-label="Ferramentas KICKNITY">
-      <button class="home-card account-home-card" id="homeAccountCard" type="button" data-site-route="conta" hidden>
-        <span class="home-card-index account-nav-icon icon-overview" aria-hidden="true"><i></i></span><span class="home-card-kicker">PEDIDOS + ACOMPANHAMENTO</span><span class="home-card-rabbit" aria-hidden="true"><i></i></span>
-        <strong>Minha conta</strong><small>Acompanhe seus pedidos e consulte cada atualização automaticamente.</small><span class="home-card-action">ABRIR MINHA CONTA</span>
+      <button class="home-card account-home-card" id="homeAccountCard" type="button" data-site-route="conta" data-account-target="orders" hidden>
+        <span class="home-card-index account-nav-icon icon-orders" aria-hidden="true"><i></i></span><span class="home-card-kicker">ACOMPANHAMENTO AUTOMÁTICO</span><span class="home-card-rabbit" aria-hidden="true"><i></i></span>
+        <strong>Meus pedidos</strong><small>Veja seus pedidos e todas as atualizações sem precisar informar o código.</small><span class="home-card-action">VER MEUS PEDIDOS</span>
       </button>
       <button class="home-card" id="homeOrderCard" type="button" data-site-route="pedido">
         <span class="home-card-index account-nav-icon icon-shopping" aria-hidden="true"><i></i></span><span class="home-card-kicker">FRETE + MODELOS + TOTAL</span><span class="home-card-rabbit" aria-hidden="true"><i></i></span>
-        <strong>Montar pedido</strong><small>Escolha o frete, selecione seus modelos e confira o valor completo.</small><span class="home-card-action">COMEÇAR PEDIDO</span>
+        <strong>Montar novo pedido</strong><small>Escolha o frete, selecione seus modelos e confira o valor completo.</small><span class="home-card-action">COMEÇAR PEDIDO</span>
       </button>
       <button class="home-card" id="homeTrackingCard" type="button" data-site-route="rastreio">
         <span class="home-card-index account-nav-icon icon-tracking" aria-hidden="true"><i></i></span><span class="home-card-kicker">PEDIDO EM ANDAMENTO</span><span class="home-card-rabbit" aria-hidden="true"><i></i></span>
@@ -924,7 +924,7 @@ body.route-pedido .journey{
       </button>
     </section>
 
-    <button class="home-faq-secondary" id="homeFaqSecondary" type="button" data-site-route="faq" hidden><span><small>PRECISA DE AJUDA?</small><strong>Perguntas frequentes</strong></span><b>ABRIR FAQ →</b></button>
+    <button class="home-faq-secondary" id="homeTrackingSecondary" type="button" data-site-route="rastreio" hidden><span><small>JÁ TEM OUTRO CÓDIGO?</small><strong>Consultar outro pedido</strong></span><b>CONSULTAR →</b></button>
 
     <button class="home-resume" id="resumeQuote" type="button" data-site-route="pedido" hidden>
       <span><small>CONTINUAR SEU PEDIDO</small><strong id="resumeQuoteText">Pedido em andamento</strong></span><b>CONTINUAR →</b>
@@ -935,7 +935,7 @@ body.route-pedido .journey{
 
   <nav class="site-nav" aria-label="Navegação principal">
     <button class="site-brand site-home-link" id="siteHomeLink" type="button" aria-label="Voltar ao início"><span class="site-logo" aria-hidden="true"><span class="rabbit-icon"><i></i></span></span><span class="site-wordmark"><strong>KICKNITY</strong><span>← Voltar ao início</span></span></button>
-    <div class="site-links"><button type="button" data-site-route="home">Início</button><button type="button" data-site-go="secPares">Pedido</button><button type="button" data-site-go="secTracking">Rastreio</button><button type="button" data-site-go="secComp">Comparativo</button><button type="button" data-site-go="siteFaq">FAQ</button><button type="button" data-site-route="conta" id="desktopAccountRoute" hidden>Minha conta</button></div>
+    <div class="site-links"><button type="button" data-site-route="home">Início</button><button type="button" data-site-go="secPares">Pedido</button><button type="button" data-site-go="secTracking">Rastreio</button></div>
     <div class="site-nav-actions"><span class="site-safe">Cotação segura</span><button class="account-entry compact" id="navAccountButton" type="button">Entrar</button></div>
   </nav>
 
@@ -953,7 +953,6 @@ body.route-pedido .journey{
         <span class="quote-chip live" id="quoteStatus">Atualização manual</span>
         <span class="quote-chip" id="quoteValidity">Validade de 24 horas</span>
         <span class="quote-chip">Valores aproximados</span>
-        <button class="tracking-launch" id="openTracking" type="button">Rastrear pedido</button>
       </div>
       <p class="stamp" id="stamp">—</p>
     </div>
@@ -1193,11 +1192,10 @@ body.route-pedido .journey{
       <nav class="account-desktop-nav">
         <button class="active" type="button" data-account-tab="overview"><span class="account-nav-icon icon-overview" aria-hidden="true"><i></i></span><b>Visão geral</b></button>
         <button type="button" data-account-tab="orders"><span class="account-nav-icon icon-orders" aria-hidden="true"><i></i></span><b>Meus pedidos</b></button>
-        <button type="button" data-site-route="pedido"><span class="account-nav-icon icon-shopping" aria-hidden="true"><i></i></span><b>Montar pedido</b></button>
-        <button type="button" data-site-route="rastreio"><span class="account-nav-icon icon-tracking" aria-hidden="true"><i></i></span><b>Rastreio</b></button>
         <button type="button" data-site-route="faq"><span class="account-nav-icon icon-support" aria-hidden="true"><i></i></span><b>Suporte</b></button>
         <button type="button" data-account-tab="admin" data-admin-account-tab hidden><span class="account-nav-icon icon-admin" aria-hidden="true"><i></i></span><b>Administração</b></button>
       </nav>
+      <button class="account-desktop-new-order" type="button" data-site-route="pedido">+ Novo pedido</button>
       <button class="account-desktop-logout" id="accountDesktopLogout" type="button">Sair da conta</button>
     </aside>
     <div class="account-desktop-main">
@@ -1211,6 +1209,7 @@ body.route-pedido .journey{
       <button type="button" data-account-tab="orders">Meus pedidos</button>
       <button type="button" data-account-tab="admin" id="adminTabButton" hidden>Administração</button>
     </nav>
+    <button class="account-mobile-new-order" type="button" data-site-route="pedido">+ Montar novo pedido</button>
 
     <div class="account-view" data-account-view="overview">
       <div class="account-desktop-overview">
@@ -1402,8 +1401,6 @@ body.route-pedido .journey{
   <button type="button" data-site-route="home">Início</button>
   <button type="button" data-site-go="secPares">Pedido</button>
   <button type="button" data-site-go="secTracking">Rastreio</button>
-  <button type="button" data-site-go="secComp">Comparativo</button>
-  <button type="button" data-site-go="siteFaq">FAQ</button>
   <button type="button" data-site-route="conta" id="mobileAccountButton">Entrar</button>
 </nav>
 
@@ -1436,7 +1433,7 @@ body.route-pedido .journey{
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="vendor/supabase-2.112.4.min.js"></script>
-<script src="account.js?v=20260902h"></script>
+<script src="account.js?v=20260902i"></script>
 <script src="vendor/qrcode.min.js"></script>
 <script>
 (function(){
@@ -1886,6 +1883,7 @@ body.route-pedido .journey{
       var step = index + 1;
       button.classList.toggle("done",step < current);
       button.classList.toggle("current",step === current || (current === 0 && step === 1));
+      button.disabled = step > effectiveCurrent;
     });
   }
 
@@ -1893,6 +1891,7 @@ body.route-pedido .journey{
     var resume = $("resumeQuote");
     if (!resume) return;
     resume.hidden = k === 0;
+    if ($("homeOrderCard")) $("homeOrderCard").hidden = k > 0;
     if (k === 0) return;
     var label = k === 1 ? "1 par selecionado" : k + " pares selecionados";
     if (summary && !summary.indisponivel) label += " · ≈ " + brl(summary.total);
@@ -2338,7 +2337,7 @@ body.route-pedido .journey{
     window.scrollTo({top:0,behavior:push ? "smooth" : "auto"});
   }
 
-  function openSiteRoute(route,push){
+  function openSiteRoute(route,push,accountTarget){
     if (!SITE_ROUTE_TARGETS[route]){ openSiteHome(push); return; }
     if (route === "conta" && window.KicknityAccount && !window.KicknityAccount.canOpen()){
       window.KicknityAccount.requireLogin();
@@ -2354,7 +2353,7 @@ body.route-pedido .journey{
     }
     if (route === "comparativo") $("secComp").hidden = false;
     if (route === "rastreio") $("secTracking").hidden = false;
-    if (route === "conta" && window.KicknityAccount) window.KicknityAccount.open();
+    if (route === "conta" && window.KicknityAccount) window.KicknityAccount.open(accountTarget);
 
     setActiveSiteLink(SITE_ROUTE_TARGETS[route]);
     updateRouteUrl(route,push);
@@ -2534,9 +2533,6 @@ body.route-pedido .journey{
     });
   }
 
-  $("openTracking").addEventListener("click",function(){
-    openTrackingPanel();
-  });
   $("trackingForm").addEventListener("submit",function(event){
     event.preventDefault();
     searchTracking($("trackingInput").value);
@@ -2566,7 +2562,7 @@ body.route-pedido .journey{
     button.addEventListener("click",function(){
       var route = button.getAttribute("data-site-route");
       if (route === "home") openSiteHome(true);
-      else openSiteRoute(route,true);
+      else openSiteRoute(route,true,button.getAttribute("data-account-target") || "");
     });
   });
   $("siteHomeLink").addEventListener("click",function(){ openSiteHome(true); });
