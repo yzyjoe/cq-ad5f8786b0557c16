@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import crypto from "node:crypto";
 
 const source = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const inlineScripts = [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)]
@@ -6,6 +7,16 @@ const inlineScripts = [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/scri
   .filter((script) => script.trim());
 
 inlineScripts.forEach((script) => new Function(script));
+
+const normalizedInlineScript = inlineScripts[0]?.replace(/\r\n/g, "\n");
+const inlineScriptHash = normalizedInlineScript
+  ? `sha256-${crypto.createHash("sha256").update(normalizedInlineScript).digest("base64")}`
+  : "";
+const declaredScriptHash = source.match(/script-src[^;]*'(sha256-[^']+)'/)?.[1] || "";
+
+if (inlineScriptHash !== declaredScriptHash) {
+  throw new Error(`Hash CSP divergente. Esperado: ${inlineScriptHash || "nenhum script inline"}`);
+}
 
 const ids = [...source.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
 const duplicates = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
