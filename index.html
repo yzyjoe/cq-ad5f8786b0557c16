@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=kicknity1" sizes="180x180">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Rubik:wght@700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
 
 <style>
 /* Tema único, fundo preto. Todas as cores saem destes tokens. */
@@ -772,7 +772,7 @@ body.home-mode .mobile-site-nav,body.home-mode .mobile-checkout,body.home-mode .
 .home-hero{position:relative;padding:clamp(34px,5.5vw,72px) 20px 38px;text-align:center}
 .home-hero:after{display:none}
 .home-eyebrow{display:flex;align-items:center;justify-content:center;gap:11px;margin:0 0 18px;color:#a8adb6;font:700 9px/1.2 "JetBrains Mono",monospace;letter-spacing:.15em}.home-eyebrow:before,.home-eyebrow:after{content:"";display:block;width:24px;height:1px;background:#626870}
-.home-hero h1{position:relative;z-index:1;max-width:920px;margin:0 auto;color:#fff;font-size:clamp(38px,6.4vw,82px);line-height:.96;letter-spacing:-.065em}
+.home-hero h1{position:relative;z-index:1;max-width:none;margin:0 auto;color:#fff;font-family:"Rubik",sans-serif;font-size:clamp(38px,6.4vw,82px);font-weight:700;line-height:.96;letter-spacing:-.055em;white-space:nowrap}
 .home-hero>p:last-child{position:relative;z-index:1;max-width:620px;margin:22px auto 0;color:#989ea8;font-size:15px;line-height:1.65}
 .home-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .home-card{position:relative;isolation:isolate;min-height:202px;overflow:hidden;padding:25px;border:1px solid #30353c;border-radius:18px;background:linear-gradient(145deg,#111419,#080a0d);color:#fff;text-align:left;cursor:pointer;transition:transform .24s ease,border-color .24s ease,box-shadow .24s ease}.home-card:before{content:"";position:absolute;z-index:-1;inset:auto -55px -95px auto;width:210px;height:210px;border:1px solid rgba(255,255,255,.07);border-radius:50%}.home-card:after{content:"↗";position:absolute;right:23px;top:22px;color:#727984;font-size:22px;transition:transform .24s ease,color .24s ease}
@@ -788,15 +788,43 @@ body.app-mode .masthead,body.app-mode .journey,body.app-mode #secTracking,body.a
 body.route-rastreio #secTracking,body.route-comparativo #secComp,body.route-faq #siteFaq{display:block!important}
 body.route-pedido #secFrete,body.route-pedido #secPares:not([hidden]){display:block!important}
 body.route-pedido #secConta:not([hidden]),body.route-pedido #secPagar:not([hidden]){display:block!important}
+body.route-pedido .journey{display:grid!important}
 body.app-mode #settings[open]{display:block!important}
 body.app-mode:not(.route-pedido) .mobile-checkout,body.app-mode:not(.route-pedido) .desktop-cart{display:none!important}
 
+/* ---------- conforto, confiança e feedback ---------- */
+body.app-mode .panel-head .note{font-size:12.5px;line-height:1.5}
+body.route-pedido .journey{top:88px;width:min(100%,820px);box-shadow:0 15px 44px rgba(0,0,0,.46)}
+body.route-pedido .line .regra{font-size:14px;line-height:1.58}
+body.route-pedido .card-hint{font-size:13px;line-height:1.55}
+.checkout-confidence{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 22px}
+.checkout-confidence span{display:flex;align-items:center;justify-content:center;min-height:44px;padding:10px 12px;border:1px solid #343941;border-radius:10px;background:rgba(255,255,255,.025);color:#c8cdd5;font-size:12px;font-weight:600;text-align:center}
+.checkout-confidence span:before{content:"✓";margin-right:8px;color:#76e6a5;font-weight:800}
+.support-card,.tracking-help{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px;border:1px solid #343941;border-radius:11px;background:linear-gradient(120deg,rgba(255,255,255,.045),rgba(255,255,255,.012))}
+.support-card{margin-top:8px}.support-card span,.tracking-help span{display:flex;min-width:0;flex-direction:column;gap:3px}.support-card strong,.tracking-help strong{font-size:14px}.support-card small,.tracking-help small{color:#8d949e;font-size:12px;line-height:1.45}
+.support-link{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:10px 14px;border:1px solid #626872;border-radius:9px;background:#f4f5f6;color:#08090b;text-decoration:none;font-size:12px;font-weight:700;transition:transform .18s ease,filter .18s ease}.support-link:hover,.support-link:focus-visible{outline:0;filter:brightness(1.08);transform:translateY(-1px)}
+.tracking-help{margin:14px 18px 18px}.tracking-help .support-link{background:transparent;color:#fff}
+.footer-contact{display:inline-block;margin-top:9px;color:#c9ced6;text-decoration:none}.footer-contact:hover,.footer-contact:focus-visible{color:#fff;text-decoration:underline}
+@keyframes pairConfirm{0%{box-shadow:0 0 0 0 rgba(255,255,255,.42)}55%{box-shadow:0 0 0 5px rgba(255,255,255,.12)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+.pair.just-added{animation:pairConfirm .65s ease}
+.pedido-live-summary{display:none}
+@media(min-width:701px) and (max-width:1499px){
+  body.route-pedido .pedido-live-summary:not([hidden]){position:sticky;top:196px;z-index:27;display:flex!important;align-items:center;justify-content:space-between;gap:18px;padding:13px 15px;border:1px solid #4b515a;border-radius:12px;background:rgba(11,13,16,.96);box-shadow:0 14px 36px rgba(0,0,0,.42);backdrop-filter:blur(14px)}
+  .pedido-live-summary span{display:flex;min-width:0;flex-direction:column;gap:2px}.pedido-live-summary small{color:#8d949e;font:700 8px/1.3 "JetBrains Mono",monospace;letter-spacing:.09em;text-transform:uppercase}.pedido-live-summary strong{overflow:hidden;color:#fff;font-size:14px;text-overflow:ellipsis;white-space:nowrap}.pedido-live-summary button{flex:0 0 auto;padding:9px 12px;border:1px solid #5b616a;border-radius:8px;background:#f3f4f5;color:#08090b;cursor:pointer;font-size:11px;font-weight:700}
+}
+
 @media(max-width:700px){
   body.home-mode{padding:8px 8px 24px}.site-home{min-height:calc(100vh - 32px);justify-content:flex-start;padding:9px 0 22px;gap:12px}.home-top{padding:2px 2px 5px}.home-logo{width:39px;height:39px;border-radius:10px}.home-safe{font-size:6.5px;padding:8px 9px}
-  .home-hero{padding:32px 17px 26px}.home-eyebrow{font-size:7px;margin-bottom:14px}.home-hero h1{font-size:clamp(38px,13vw,57px)}.home-hero>p:last-child{margin-top:16px;font-size:12.5px;line-height:1.55}
+  .home-hero{padding:32px 10px 26px}.home-eyebrow{font-size:7px;margin-bottom:14px}.home-hero h1{font-size:clamp(28px,9.2vw,44px);letter-spacing:-.045em}.home-hero>p:last-child{margin-top:16px;font-size:12.5px;line-height:1.55}
   .home-grid{grid-template-columns:1fr;gap:9px}.home-card{min-height:151px;padding:19px;border-radius:15px}.home-card:after{right:18px;top:17px}.home-card-index{width:28px;height:28px}.home-card strong{margin-top:20px;font-size:24px}.home-card small{font-size:11px}.home-card-action{margin-top:16px}
   .home-resume{padding:15px 16px}.home-resume b{font-size:7px}.home-trust{padding:6px 14px 0;line-height:1.8}
   body.app-mode{padding-bottom:96px}
+  body.route-pedido .journey{position:relative;top:auto;width:100%}
+  body.app-mode .panel-head .note{font-size:12px;line-height:1.5}
+  body.route-pedido .line .regra{font-size:13.5px}
+  body.route-pedido .card-hint{font-size:13px}
+  .checkout-confidence{grid-template-columns:1fr}.checkout-confidence span{justify-content:flex-start;text-align:left}
+  .support-card,.tracking-help{align-items:stretch;flex-direction:column}.support-link{width:100%}.tracking-help{margin:12px 14px 15px}
 }
 
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
@@ -882,10 +910,15 @@ body.app-mode:not(.route-pedido) .mobile-checkout,body.app-mode:not(.route-pedid
 
   <nav class="journey" aria-label="Progresso da cotação">
     <button type="button" data-step="01" data-target="lineBJ" class="current">Frete</button>
-    <button type="button" data-step="02" data-target="secPares">Pares</button>
-    <button type="button" data-step="03" data-target="secConta">Revisão</button>
+    <button type="button" data-step="02" data-target="secPares">Modelos</button>
+    <button type="button" data-step="03" data-target="secConta">Resumo</button>
     <button type="button" data-step="04" data-target="secPagar">Pagamento</button>
   </nav>
+
+  <div class="pedido-live-summary" id="pedidoLiveSummary" hidden>
+    <span><small>Seu pedido</small><strong id="pedidoLiveText">Nenhum par selecionado</strong></span>
+    <button type="button" id="goPedidoSummary">Ver resumo</button>
+  </div>
 
   <section class="panel tracking-panel" id="secTracking" hidden>
     <div class="panel-head">
@@ -903,6 +936,10 @@ body.app-mode:not(.route-pedido) .mobile-checkout,body.app-mode:not(.route-pedid
       </form>
     </div>
     <p class="tracking-feedback" id="trackingFeedback">Informe seu código para consultar o andamento.</p>
+    <div class="tracking-help">
+      <span><strong>Precisa de ajuda com o rastreio?</strong><small>Envie o código recebido para nossa equipe.</small></span>
+      <a class="support-link" href="mailto:kicknity@gmail.com?subject=Ajuda%20com%20rastreio%20KICKNITY">Falar conosco</a>
+    </div>
     <article class="tracking-result" id="trackingResult" hidden>
       <div class="tracking-product">
         <div class="tracking-photo"><img id="trackingImage" src="" alt=""></div>
@@ -1028,6 +1065,11 @@ body.app-mode:not(.route-pedido) .mobile-checkout,body.app-mode:not(.route-pedid
       <span class="note">Pagamento via Pix</span>
     </div>
     <div class="panel-body">
+      <div class="checkout-confidence" aria-label="Diferenciais do atendimento">
+        <span>Cotação transparente</span>
+        <span>Fotos reais de QC</span>
+        <span>Acompanhamento do pedido</span>
+      </div>
       <div class="buyrow">
         <div>
           <span class="lbl">Total aproximado</span>
@@ -1071,6 +1113,10 @@ body.app-mode:not(.route-pedido) .mobile-checkout,body.app-mode:not(.route-pedid
       <details><summary>O que são as fotos de QC?</summary><p>São imagens reais do produto no armazém, usadas para conferir aparência e detalhes antes do envio internacional.</p></details>
       <details><summary>Existe chance de tributação?</summary><p>Sim. Uma eventual taxa de importação cobrada na entrega não está incluída na cotação apresentada.</p></details>
       <details><summary>Por quanto tempo a cotação vale?</summary><p>A referência é válida por 24 horas. Depois disso, confirme novamente o câmbio e os valores de frete.</p></details>
+      <div class="support-card">
+        <span><strong>Ainda precisa de ajuda?</strong><small>Fale diretamente com a KICKNITY pelo e-mail.</small></span>
+        <a class="support-link" href="mailto:kicknity@gmail.com?subject=Atendimento%20KICKNITY">Falar conosco</a>
+      </div>
     </div>
   </section>
 
@@ -1111,7 +1157,7 @@ body.app-mode:not(.route-pedido) .mobile-checkout,body.app-mode:not(.route-pedid
   </details>
 
   <div class="site-footer">
-    <div><strong>KICKNITY</strong><p>Curadoria, QC e importação assistida em uma cotação transparente.</p></div>
+    <div><strong>KICKNITY</strong><p>Curadoria, QC e importação assistida em uma cotação transparente.</p><a class="footer-contact" href="mailto:kicknity@gmail.com">kicknity@gmail.com</a></div>
     <div><b>Processo</b><span>Frete por quantidade</span><span>QC antes do envio</span><span>Acompanhamento</span></div>
     <div><b>Importante</b><span>Valores aproximados</span><span>Possível tributação</span><span>Validade de 24h</span></div>
     <span class="site-footer-meta">Pagamento via Pix · Confira sempre os dados no aplicativo do banco</span>
@@ -1575,6 +1621,17 @@ body.app-mode:not(.route-pedido) .mobile-checkout,body.app-mode:not(.route-pedid
     });
   }
 
+  function confirmPairAdded(index){
+    var row = document.querySelectorAll(".pair")[index];
+    if (row){
+      row.classList.remove("just-added");
+      void row.offsetWidth;
+      row.classList.add("just-added");
+      setTimeout(function(){ row.classList.remove("just-added"); },700);
+    }
+    notify(pairLabel(PAIRS[index].name) + " adicionado ao pedido ✓");
+  }
+
   function linhaConta(oQue, detalhe, valorCny, valorBrl, classe){
     return '<div class="linha'+(classe?' '+classe:'')+'">' +
       '<span class="o-que">'+oQue+(detalhe?'<em>'+detalhe+'</em>':'')+'</span>' +
@@ -1653,6 +1710,14 @@ body.app-mode:not(.route-pedido) .mobile-checkout,body.app-mode:not(.route-pedid
     var k = s.k;
     var settingsOk = validateSettings();
     updateHomeResume(k,s);
+    var liveSummary = $("pedidoLiveSummary");
+    liveSummary.hidden = k === 0;
+    if (k > 0){
+      var liveLabel = k === 1 ? "1 par" : k + " pares";
+      liveLabel += " · " + nomeLinha() + " · ";
+      liveLabel += (!s.indisponivel && settingsOk) ? "≈ " + brl(s.total) : "valor em revisão";
+      $("pedidoLiveText").textContent = liveLabel;
+    }
 
     // etiquetas das duas linhas
     var pesoUm = n("peso");
@@ -2310,9 +2375,12 @@ body.app-mode:not(.route-pedido) .mobile-checkout,body.app-mode:not(.route-pedid
       if (delta > 0 && selectedCount() >= maxPairCount()){
         notify("O limite desta cotação é " + maxPairCount() + " pares por envio SH‑SAL."); return;
       }
+      var wasEmpty = quantities[qi] === 0;
       activePairIndex = qi;
       quantities[qi] = Math.max(0,Math.min(9,quantities[qi] + delta));
-      syncSelection(); render(); return;
+      syncSelection(); render();
+      if (wasEmpty && quantities[qi] > 0) confirmPairAdded(qi);
+      return;
     }
 
     var s = e.target.closest(".selbtn");
@@ -2321,16 +2389,20 @@ body.app-mode:not(.route-pedido) .mobile-checkout,body.app-mode:not(.route-pedid
       if (quantities[i] === 0 && selectedCount() >= maxPairCount()){
         notify("O limite desta cotação é " + maxPairCount() + " pares por envio SH‑SAL."); return;
       }
+      var adding = quantities[i] === 0;
       activePairIndex = i;
-      quantities[i] = quantities[i] > 0 ? 0 : 1; syncSelection(); render(); return;
+      quantities[i] = adding ? 1 : 0; syncSelection(); render();
+      if (adding) confirmPairAdded(i);
+      else notify(pairLabel(PAIRS[i].name) + " removido do pedido");
+      return;
     }
 
     if (e.target.closest("#selectAll")){
       var maxAll = maxPairCount(); quantities = quantities.map(function(_,i){ return i < maxAll ? 1 : 0; });
       activePairIndex = quantities[0] ? 0 : null;
-      syncSelection(); render(); return;
+      syncSelection(); render(); notify("Modelos adicionados ao pedido ✓"); return;
     }
-    if (e.target.closest("#clearAll")){ quantities = quantities.map(function(){ return 0; }); activePairIndex = null; syncSelection(); render(); return; }
+    if (e.target.closest("#clearAll")){ quantities = quantities.map(function(){ return 0; }); activePairIndex = null; syncSelection(); render(); notify("Pedido limpo"); return; }
 
     if (e.target.closest("#mobileMinus") || e.target.closest("#mobilePlus")){
       var active = activePair();
@@ -2344,6 +2416,10 @@ body.app-mode:not(.route-pedido) .mobile-checkout,body.app-mode:not(.route-pedid
       syncSelection(); render(); return;
     }
 
+    if (e.target.closest("#goPedidoSummary")){
+      if (!$('secConta').hidden) $('secConta').scrollIntoView({behavior:"smooth",block:"start"});
+      return;
+    }
     if (e.target.closest("#buyBtn") || e.target.closest("#mobileBuyBtn")){ handleBuy(); return; }
     if (e.target.closest("#confirmOrder")){ showPix(); return; }
     if (e.target.closest("#cancelOrder")){ closeConfirmation(); return; }
