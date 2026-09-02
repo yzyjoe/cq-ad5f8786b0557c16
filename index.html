@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Rubik:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="account.css?v=20260902">
 
 <style>
 /* Tema único, fundo preto. Todas as cores saem destes tokens. */
@@ -883,7 +884,7 @@ body.route-pedido .journey{
   <main class="site-home" id="siteHome">
     <div class="home-top">
       <div class="home-brand"><span class="home-logo" aria-hidden="true"><span class="rabbit-icon"><i></i></span></span><span><strong>KICKNITY</strong><small>Importação assistida</small></span></div>
-      <span class="home-safe">Cotação segura</span>
+      <div class="home-top-actions"><span class="home-safe">Cotação segura</span><button class="account-entry" id="homeAccountButton" type="button">Entrar</button></div>
     </div>
 
     <section class="home-hero" aria-labelledby="homeTitle">
@@ -920,8 +921,8 @@ body.route-pedido .journey{
 
   <nav class="site-nav" aria-label="Navegação principal">
     <button class="site-brand site-home-link" id="siteHomeLink" type="button" aria-label="Voltar ao início"><span class="site-logo" aria-hidden="true"><span class="rabbit-icon"><i></i></span></span><span class="site-wordmark"><strong>KICKNITY</strong><span>← Voltar ao início</span></span></button>
-    <div class="site-links"><button type="button" data-site-route="home">Início</button><button type="button" data-site-go="secPares">Pedido</button><button type="button" data-site-go="secTracking">Rastreio</button><button type="button" data-site-go="secComp">Comparativo</button><button type="button" data-site-go="siteFaq">FAQ</button></div>
-    <span class="site-safe">Cotação segura</span>
+    <div class="site-links"><button type="button" data-site-route="home">Início</button><button type="button" data-site-go="secPares">Pedido</button><button type="button" data-site-go="secTracking">Rastreio</button><button type="button" data-site-go="secComp">Comparativo</button><button type="button" data-site-go="siteFaq">FAQ</button><button type="button" data-site-route="conta" id="desktopAccountRoute" hidden>Minha conta</button></div>
+    <div class="site-nav-actions"><span class="site-safe">Cotação segura</span><button class="account-entry compact" id="navAccountButton" type="button">Entrar</button></div>
   </nav>
 
   <header class="masthead">
@@ -1165,6 +1166,49 @@ body.route-pedido .journey{
     </div>
   </section>
 
+  <section class="account-area" id="accountArea" aria-labelledby="accountTitle">
+    <header class="account-hero">
+      <div><span class="account-kicker">ÁREA DO CLIENTE</span><h2 id="accountTitle">Minha conta</h2><p id="accountIdentity">Carregando seus dados…</p></div>
+      <button class="account-logout" id="accountLogout" type="button">Sair</button>
+    </header>
+    <nav class="account-tabs" aria-label="Seções da conta">
+      <button class="active" type="button" data-account-tab="overview">Visão geral</button>
+      <button type="button" data-account-tab="orders">Meus pedidos</button>
+      <button type="button" data-account-tab="admin" id="adminTabButton" hidden>Administração</button>
+    </nav>
+
+    <div class="account-view" data-account-view="overview">
+      <div class="account-metrics">
+        <article><span>Pedidos</span><strong id="accountOrdersCount">0</strong><small>vinculados à sua conta</small></article>
+        <article><span>Em andamento</span><strong id="accountActiveCount">0</strong><small>com atualização disponível</small></article>
+        <article><span>Entregues</span><strong id="accountDeliveredCount">0</strong><small>pedidos concluídos</small></article>
+      </div>
+      <section class="account-panel"><div class="account-panel-head"><div><span>ÚLTIMA ATUALIZAÇÃO</span><h3>Pedido mais recente</h3></div><button type="button" data-open-account-orders>Ver todos</button></div><div id="accountLatestOrder" class="account-empty">Nenhum pedido vinculado ainda.</div></section>
+    </div>
+
+    <div class="account-view" data-account-view="orders" hidden>
+      <section class="account-panel"><div class="account-panel-head"><div><span>HISTÓRICO PESSOAL</span><h3>Meus pedidos</h3></div><button type="button" id="refreshAccountOrders">Atualizar</button></div><div class="account-order-list" id="accountOrderList"></div></section>
+    </div>
+
+    <div class="account-view" data-account-view="admin" hidden>
+      <div class="admin-grid">
+        <section class="account-panel admin-create"><div class="account-panel-head"><div><span>ADMINISTRAÇÃO</span><h3>Novo pedido</h3></div></div>
+          <form id="adminOrderForm" class="account-form">
+            <label>Cliente<select id="adminCustomer" required><option value="">Selecione</option></select></label>
+            <div class="account-form-row"><label>Código do pedido<input id="adminOrderCode" required maxlength="40" placeholder="O260..."></label><label>Quantidade<input id="adminQuantity" type="number" min="1" max="99" value="1" required></label></div>
+            <label>Produto<input id="adminProductName" required maxlength="160" placeholder="Yeezy 350 V2 Bone"></label>
+            <div class="account-form-row"><label>Modelo<input id="adminModelCode" maxlength="60" placeholder="HQ6316"></label><label>Valor total (R$)<input id="adminTotalAmount" type="number" min="0" step="0.01"></label></div>
+            <label>Status<select id="adminStatus"><option value="submitted">Recebido</option><option value="accepted">Em atendimento</option><option value="purchased">Comprado</option><option value="logistics">Em transporte</option><option value="warehouse">Armazém / QC</option><option value="shipped">Enviado</option><option value="delivered">Entregue</option><option value="cancelled">Cancelado</option></select></label>
+            <div class="account-form-row"><label>Transportadora<input id="adminCarrier" maxlength="100"></label><label>Rastreio<input id="adminTrackingCode" maxlength="100"></label></div>
+            <label>Observações<textarea id="adminNotes" rows="3" maxlength="800"></textarea></label>
+            <p class="account-feedback" id="adminCreateFeedback" aria-live="polite"></p><button class="account-primary" type="submit">Criar pedido</button>
+          </form>
+        </section>
+        <section class="account-panel admin-orders"><div class="account-panel-head"><div><span>GESTÃO</span><h3>Pedidos cadastrados</h3></div><button type="button" id="refreshAdminOrders">Atualizar</button></div><div class="admin-order-list" id="adminOrderList"></div></section>
+      </div>
+    </div>
+  </section>
+
   <details class="settings" id="settings" hidden>
     <summary>Ajustar valores</summary>
     <div class="fields">
@@ -1286,10 +1330,38 @@ body.route-pedido .journey{
   <button type="button" data-site-go="secTracking">Rastreio</button>
   <button type="button" data-site-go="secComp">Comparativo</button>
   <button type="button" data-site-go="siteFaq">FAQ</button>
+  <button type="button" data-site-route="conta" id="mobileAccountButton">Entrar</button>
 </nav>
+
+<dialog class="auth-dialog" id="authDialog" aria-labelledby="authTitle">
+  <button class="auth-close" id="authClose" type="button" aria-label="Fechar">×</button>
+  <div class="auth-brand"><span class="home-logo" aria-hidden="true"><span class="rabbit-icon"><i></i></span></span><div><strong>KICKNITY</strong><small>Conta opcional para acompanhar seus pedidos</small></div></div>
+  <div class="auth-tabs" id="authTabs"><button class="active" type="button" data-auth-mode="login">Entrar</button><button type="button" data-auth-mode="signup">Criar conta</button></div>
+  <form class="auth-form" id="loginForm">
+    <h2 id="authTitle">Bem-vindo de volta</h2><p>Acesse seus pedidos sem alterar a experiência pública do site.</p>
+    <label>E-mail<input id="loginEmail" type="email" autocomplete="email" required></label>
+    <label>Senha<input id="loginPassword" type="password" autocomplete="current-password" minlength="6" required></label>
+    <button class="auth-primary" type="submit">Entrar</button><button class="auth-link" id="forgotPassword" type="button">Esqueci minha senha</button>
+  </form>
+  <form class="auth-form" id="signupForm" hidden>
+    <h2>Criar sua conta</h2><p>O cadastro é gratuito e não é obrigatório para usar a cotação.</p>
+    <label>Nome<input id="signupName" type="text" autocomplete="name" maxlength="100" required></label>
+    <label>E-mail<input id="signupEmail" type="email" autocomplete="email" required></label>
+    <label>Senha<input id="signupPassword" type="password" autocomplete="new-password" minlength="6" required></label>
+    <button class="auth-primary" type="submit">Criar conta</button>
+  </form>
+  <form class="auth-form" id="recoveryForm" hidden>
+    <h2>Definir nova senha</h2><p>Escolha uma senha com pelo menos 6 caracteres.</p>
+    <label>Nova senha<input id="recoveryPassword" type="password" autocomplete="new-password" minlength="6" required></label>
+    <button class="auth-primary" type="submit">Salvar nova senha</button>
+  </form>
+  <p class="auth-feedback" id="authFeedback" aria-live="polite"></p>
+</dialog>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.js"></script>
+<script src="account.js"></script>
 <script src="vendor/qrcode.min.js"></script>
 <script>
 (function(){
@@ -2158,11 +2230,12 @@ body.route-pedido .journey{
     pedido:"secPares",
     rastreio:"secTracking",
     comparativo:"secComp",
-    faq:"siteFaq"
+    faq:"siteFaq",
+    conta:"accountArea"
   };
 
   function clearSiteRouteClasses(){
-    document.body.classList.remove("home-mode","app-mode","route-frete","route-modelos","route-pedido","route-rastreio","route-comparativo","route-faq","tracking-mode");
+    document.body.classList.remove("home-mode","app-mode","route-frete","route-modelos","route-pedido","route-rastreio","route-comparativo","route-faq","route-conta","tracking-mode");
   }
 
   function routeForTarget(targetId){
@@ -2192,6 +2265,10 @@ body.route-pedido .journey{
 
   function openSiteRoute(route,push){
     if (!SITE_ROUTE_TARGETS[route]){ openSiteHome(push); return; }
+    if (route === "conta" && window.KicknityAccount && !window.KicknityAccount.canOpen()){
+      window.KicknityAccount.requireLogin();
+      return;
+    }
     clearSiteRouteClasses();
     document.body.classList.add("app-mode","route-" + route);
     $("siteHome").hidden = true;
@@ -2202,6 +2279,7 @@ body.route-pedido .journey{
     }
     if (route === "comparativo") $("secComp").hidden = false;
     if (route === "rastreio") $("secTracking").hidden = false;
+    if (route === "conta" && window.KicknityAccount) window.KicknityAccount.open();
 
     setActiveSiteLink(SITE_ROUTE_TARGETS[route]);
     updateRouteUrl(route,push);
@@ -2358,6 +2436,12 @@ body.route-pedido .journey{
       var isActive = link.getAttribute("data-site-go") === targetId;
       link.classList.toggle("active",isActive);
       if (isActive) link.setAttribute("aria-current","page");
+      else link.removeAttribute("aria-current");
+    });
+    document.querySelectorAll('[data-site-route="conta"]').forEach(function(link){
+      var isAccount = targetId === "accountArea";
+      link.classList.toggle("active",isAccount);
+      if (isAccount) link.setAttribute("aria-current","page");
       else link.removeAttribute("aria-current");
     });
   }
