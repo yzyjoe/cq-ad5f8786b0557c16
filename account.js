@@ -11,10 +11,23 @@
   var accountChannel = null;
   var realtimeRefreshTimer = null;
   var currentMfaEnrollment = null;
+  var LAST_ACCOUNT_TAB_KEY = "kicknity-last-account-tab";
 
   function byId(id){ return document.getElementById(id); }
   function all(selector){ return Array.prototype.slice.call(document.querySelectorAll(selector)); }
   function clean(value){ return String(value == null ? "" : value).trim(); }
+  function readLastAccountTab(){
+    try{ return sessionStorage.getItem(LAST_ACCOUNT_TAB_KEY) || "overview"; }
+    catch(error){ return "overview"; }
+  }
+  function rememberAccountTab(tab){
+    try{ sessionStorage.setItem(LAST_ACCOUNT_TAB_KEY,tab); }
+    catch(error){}
+  }
+  function forgetAccountTab(){
+    try{ sessionStorage.removeItem(LAST_ACCOUNT_TAB_KEY); }
+    catch(error){}
+  }
   function escapeHtml(value){
     return String(value == null ? "" : value).replace(/[&<>'"]/g,function(char){
       return {"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char];
@@ -160,7 +173,7 @@
     var productVisual = image
       ? "<div class=\"tracking-photo\"><img src=\"" + escapeHtml(image) + "\" alt=\"Foto de " + escapeHtml(order.product_name) + "\"></div>"
       : "<div class=\"tracking-photo account-tracking-placeholder\" aria-hidden=\"true\"><span>K</span></div>";
-    return "<article class=\"account-tracking-card" + (order.status === "cancelled" ? " cancelled" : "") + " data-order-id=\"" + order.id + "\">" +
+    return "<article class=\"account-tracking-card tracking-animate" + (order.status === "cancelled" ? " cancelled" : "") + "\" data-order-id=\"" + order.id + "\" data-status=\"" + escapeHtml(order.status) + "\" data-updated-at=\"" + escapeHtml(latest.occurred_at || "") + "\">" +
       "<div class=\"account-tracking-label\"><span>ACOMPANHAMENTO AUTOMÁTICO</span><small>Atualiza sem pesquisar o código</small></div>" +
       "<div class=\"tracking-result account-tracking-result\">" +
         "<div class=\"tracking-product\">" + productVisual + "<div><h3>" + escapeHtml(order.product_name) + "</h3><p class=\"tracking-model\">Modelo " + escapeHtml(order.model_code || "não informado") + "</p></div></div>" +
@@ -256,6 +269,20 @@
     renderDesktopOverview(total,active,delivered);
   }
 
+  function skeletonCards(count){
+    return Array.from({length:count},function(){
+      return "<div class=\"account-skeleton\" aria-hidden=\"true\"><span></span><span></span><span></span></div>";
+    }).join("");
+  }
+
+  function showOrdersSkeleton(){
+    if (currentOrders.length) return;
+    byId("accountOrderList").innerHTML = skeletonCards(2);
+    byId("accountDesktopRecentOrders").innerHTML = skeletonCards(2);
+    byId("accountLatestOrder").innerHTML = skeletonCards(1);
+    byId("accountLatestOrder").classList.remove("account-empty");
+  }
+
   async function loadProfile(){
     if (!client || !currentSession) return null;
     var response = await client.from("profiles").select("id,email,full_name,role,created_at").eq("id",currentSession.user.id).single();
@@ -281,6 +308,7 @@
 
   async function loadOrders(){
     if (!client || !currentSession) return;
+    showOrdersSkeleton();
     var response = await client.from("orders").select("*,order_events(*)").eq("user_id",currentSession.user.id).is("deleted_at",null).order("updated_at",{ascending:false});
     if (response.error) throw response.error;
     currentOrders = response.data || [];
@@ -437,12 +465,32 @@
     }
   }
 
-  function selectAccountTab(tab){
+  function updateAccountIndicator(tab){
+    requestAnimationFrame(function(){
+      var nav = document.querySelector(".account-desktop-nav");
+      var active = nav && nav.querySelector('[data-account-tab="' + tab + '"]:not([hidden])');
+      if (!nav || !active) return;
+      nav.style.setProperty("--active-y",active.offsetTop + "px");
+      nav.classList.add("indicator-ready");
+    });
+  }
+
+  function selectAccountTab(tab,skipLoad){
     if (tab === "admin" && (!currentProfile || currentProfile.role !== "admin")) tab = "overview";
+    if (["overview","orders","admin"].indexOf(tab) < 0) tab = "overview";
+    rememberAccountTab(tab);
     all("[data-account-tab]").forEach(function(button){ button.classList.toggle("active",button.getAttribute("data-account-tab") === tab); });
-    all("[data-account-view]").forEach(function(view){ view.hidden = view.getAttribute("data-account-view") !== tab; });
-    if (tab === "orders") loadOrders().catch(console.error);
-    if (tab === "admin") loadAdmin().catch(function(error){ adminMessage(friendlyError(error),"error"); });
+    all("[data-account-view]").forEach(function(view){
+      var selected = view.getAttribute("data-account-view") === tab;
+      view.hidden = !selected;
+      if (selected){
+        view.classList.remove("account-view-enter");
+        requestAnimationFrame(function(){ view.classList.add("account-view-enter"); });
+      }
+    });
+    updateAccountIndicator(tab);
+    if (!skipLoad && tab === "orders") loadOrders().catch(console.error);
+    if (!skipLoad && tab === "admin") loadAdmin().catch(function(error){ adminMessage(friendlyError(error),"error"); });
   }
 
   async function handleSession(session,event){
@@ -450,6 +498,7 @@
     authReady = true;
     if (!currentSession){
       currentProfile = null; currentOrders = [];
+      forgetAccountTab();
       if (accountChannel && client){ client.removeChannel(accountChannel); accountChannel = null; }
     }
     updateAuthUi();
@@ -613,7 +662,7 @@
     byId("signupForm").addEventListener("submit",submitSignup);
     byId("recoveryForm").addEventListener("submit",submitRecovery);
     byId("forgotPassword").addEventListener("click",sendRecovery);
-    ["accountLogout","accountDesktopLogout"].forEach(function(id){ byId(id).addEventListener("click",async function(){ await client.auth.signOut(); location.hash = ""; }); });
+    ["accountLogout","accountDesktopLogout"].forEach(function(id){ byId(id).addEventListener("click",async function(){ forgetAccountTab(); await client.auth.signOut(); location.hash = ""; }); });
     all("[data-account-tab]").forEach(function(button){ button.addEventListener("click",function(){ selectAccountTab(button.getAttribute("data-account-tab")); }); });
     all("[data-open-account-orders]").forEach(function(button){ button.addEventListener("click",function(){ selectAccountTab("orders"); }); });
     byId("refreshAccountOrders").addEventListener("click",function(){ loadOrders().catch(console.error); });
@@ -650,7 +699,7 @@
   window.KicknityAccount = {
     canOpen:function(){ return !!currentSession; },
     requireLogin:function(){ showAuth("login"); },
-    open:function(tab){ if (currentSession){ selectAccountTab(tab || "overview"); loadAccount(); } },
+    open:function(tab){ if (currentSession){ selectAccountTab(tab || readLastAccountTab(),true); loadAccount(); } },
     isReady:function(){ return authReady; }
   };
 

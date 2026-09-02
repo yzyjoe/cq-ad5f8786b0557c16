@@ -91,3 +91,79 @@ body.route-conta #accountArea{display:grid!important}
 @media(min-width:701px) and (max-width:1050px){
   body.route-conta #accountArea.account-area{grid-template-columns:205px minmax(0,1fr)}.account-desktop-main{padding:30px 25px}.account-desktop-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.account-desktop-content-grid{grid-template-columns:1fr}.account-desktop-nav button b{font-size:9px}
 }
+
+/* Experiência visual KICKNITY: transições, estados vivos e interações discretas. */
+body.site-redesign.home-mode{background:radial-gradient(circle at 78% 8%,rgba(141,88,181,.09),transparent 34rem),#000}
+body.site-redesign.route-pedido{background:radial-gradient(circle at 84% 5%,rgba(255,255,255,.055),transparent 32rem),#000}
+body.site-redesign.route-rastreio{background:radial-gradient(circle at 84% 5%,rgba(68,157,218,.10),transparent 34rem),#000}
+body.site-redesign.route-comparativo{background:radial-gradient(circle at 82% 5%,rgba(173,118,215,.085),transparent 34rem),#000}
+body.site-redesign.route-faq{background:radial-gradient(circle at 82% 5%,rgba(255,255,255,.045),transparent 32rem),#000}
+body.site-redesign.route-conta{background:radial-gradient(circle at 86% 7%,rgba(158,91,218,.11),transparent 36rem),#050608}
+.route-transition-in .wrap{animation:kicknityRouteEnter .28s cubic-bezier(.22,.75,.25,1)}
+.account-view-enter{animation:kicknityViewEnter .24s cubic-bezier(.22,.75,.25,1)}
+@keyframes kicknityRouteEnter{from{opacity:.45;transform:translateY(8px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+@keyframes kicknityViewEnter{from{opacity:.35;transform:translateX(8px)}to{opacity:1;transform:none}}
+
+.home-card,.account-desktop-card,.account-order-card,.tracking-history-item{--spot-x:50%;--spot-y:50%;position:relative;isolation:isolate;overflow:hidden}
+.interaction-spotlight{position:absolute!important;z-index:0!important;left:0;top:0;width:100%;height:100%;border-radius:inherit;pointer-events:none;background:radial-gradient(170px circle at var(--spot-x) var(--spot-y),rgba(255,255,255,.12),transparent 67%);opacity:0;transition:opacity .22s ease}
+.home-card>.interaction-spotlight,.account-desktop-card>.interaction-spotlight,.account-order-card>.interaction-spotlight,.tracking-history-item>.interaction-spotlight{position:absolute;z-index:0}
+.home-card>*:not(.interaction-spotlight),.account-desktop-card>*:not(.interaction-spotlight),.account-order-card>*:not(.interaction-spotlight),.tracking-history-item>*:not(.interaction-spotlight){position:relative;z-index:1}
+.spotlight-active>.interaction-spotlight,.spotlight-tap>.interaction-spotlight{opacity:1}
+
+.account-desktop-nav{position:relative;isolation:isolate;--active-y:0px}
+.account-desktop-nav:before{content:"";position:absolute;z-index:0;left:0;right:0;top:0;height:54px;border:1px solid #454b55;border-radius:10px;background:linear-gradient(100deg,#1b1e24,#12151a);box-shadow:inset 3px 0 #c18be6,0 12px 30px rgba(0,0,0,.2);opacity:0;transform:translateY(var(--active-y));transition:transform .32s cubic-bezier(.2,.8,.2,1),opacity .2s ease;pointer-events:none}
+.account-desktop-nav.indicator-ready:before{opacity:1}
+.account-desktop-nav button{z-index:1}
+@media(min-width:701px){.account-desktop-nav button.active{border-color:transparent;background:transparent;box-shadow:none}}
+
+.account-skeleton{display:grid;gap:11px;min-height:104px;padding:18px;border:1px solid #292e35;border-radius:11px;background:#090b0e}
+.account-skeleton span{display:block;height:12px;border-radius:999px;background:linear-gradient(100deg,#15191f 25%,#2b3038 42%,#15191f 59%);background-size:240% 100%;animation:kicknitySkeleton 1.35s ease-in-out infinite}
+.account-skeleton span:nth-child(1){width:36%;height:9px}.account-skeleton span:nth-child(2){width:72%;height:18px}.account-skeleton span:nth-child(3){width:54%}
+@keyframes kicknitySkeleton{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+.tracking-animate .tracking-step{opacity:0;animation:kicknityStepReveal .34s cubic-bezier(.2,.75,.2,1) forwards;animation-delay:var(--step-delay,0ms)}
+.tracking-animate .tracking-step.done:after{transform-origin:left;animation:kicknityLineFill .45s ease-out both;animation-delay:calc(var(--step-delay,0ms) + 80ms)}
+.tracking-animate .tracking-step.current:before{animation:kicknityStatusPulse 2.3s ease-in-out infinite}
+@keyframes kicknityStepReveal{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@keyframes kicknityLineFill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes kicknityStatusPulse{0%,100%{filter:brightness(1);box-shadow:0 0 0 5px #090c10,0 0 11px rgba(255,255,255,.25)}50%{filter:brightness(1.18);box-shadow:0 0 0 5px #090c10,0 0 22px rgba(255,255,255,.58)}}
+
+.tracking-result,.account-tracking-card{--status-color:#c6cbd2;--status-soft:rgba(198,203,210,.08)}
+.status-accepted,.status-purchased{--status-color:#b89bd5;--status-soft:rgba(184,155,213,.10)}
+.status-logistics{--status-color:#8ab7ff;--status-soft:rgba(90,142,225,.12)}
+.status-warehouse{--status-color:#78d9ef;--status-soft:rgba(74,183,208,.12)}
+.status-shipped{--status-color:#e2c57c;--status-soft:rgba(213,177,83,.11)}
+.status-delivered{--status-color:#76e6a5;--status-soft:rgba(76,201,126,.12)}
+.status-cancelled{--status-color:#ff9caa;--status-soft:rgba(220,78,97,.12)}
+.status-accepted .tracking-badge,.status-purchased .tracking-badge,.status-logistics .tracking-badge,.status-warehouse .tracking-badge,.status-shipped .tracking-badge,.status-delivered .tracking-badge,.status-cancelled .tracking-badge{border-color:color-mix(in srgb,var(--status-color) 60%,#303740);background:var(--status-soft);color:var(--status-color);box-shadow:0 0 22px color-mix(in srgb,var(--status-color) 16%,transparent);animation:kicknityBadgeBreathe 2.6s ease-in-out infinite}
+.tracking-current{position:relative;box-shadow:inset 3px 0 var(--status-color);transition:box-shadow .25s ease,background .25s ease}
+@keyframes kicknityBadgeBreathe{0%,100%{filter:brightness(1)}50%{filter:brightness(1.18)}}
+.recent-update-indicator{display:inline-flex;align-items:center;gap:7px;width:max-content;margin-top:10px;color:var(--status-color);font:700 8px/1 "JetBrains Mono",monospace;letter-spacing:.065em;text-transform:uppercase}
+.recent-update-indicator i{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 0 color-mix(in srgb,currentColor 45%,transparent);animation:kicknityRecentPulse 1.8s ease-out infinite}
+@keyframes kicknityRecentPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,currentColor 50%,transparent)}70%,100%{box-shadow:0 0 0 8px transparent}}
+
+.product-preview-trigger{position:relative;overflow:hidden;cursor:zoom-in;outline:0}
+.product-preview-trigger:after{content:"AMPLIAR";position:absolute;right:8px;bottom:8px;padding:5px 7px;border:1px solid rgba(255,255,255,.34);border-radius:999px;background:rgba(4,6,8,.72);color:#fff;font:700 6px/1 "JetBrains Mono",monospace;letter-spacing:.08em;opacity:0;transform:translateY(4px);transition:opacity .2s ease,transform .2s ease;pointer-events:none}
+.product-preview-trigger:hover:after,.product-preview-trigger:focus-visible:after{opacity:1;transform:none}
+.product-preview-trigger img{transition:transform .24s cubic-bezier(.2,.75,.25,1),filter .2s ease;will-change:transform}
+.product-preview-trigger:hover img{filter:brightness(1.04)}
+.product-preview-dialog{width:min(920px,calc(100vw - 28px));max-height:calc(100vh - 28px);padding:0;border:1px solid #424952;border-radius:18px;background:#07090c;color:#fff;box-shadow:0 36px 120px rgba(0,0,0,.86)}
+.product-preview-dialog::backdrop{background:rgba(0,0,0,.86);backdrop-filter:blur(9px)}
+.product-preview-dialog figure{display:grid;gap:0;margin:0}.product-preview-dialog img{display:block;width:100%;max-height:calc(100vh - 105px);object-fit:contain;background:#0b0e12}.product-preview-dialog figcaption{padding:14px 18px;color:#aeb5bf;font-size:12px}
+.product-preview-close{position:absolute;z-index:2;right:12px;top:12px;width:38px;height:38px;border:1px solid rgba(255,255,255,.45);border-radius:50%;background:rgba(5,7,9,.82);color:#fff;cursor:pointer;font-size:23px;line-height:1}
+
+.delivery-celebration{position:fixed;z-index:200;inset:0;overflow:hidden;pointer-events:none}
+.delivery-celebration i{position:absolute;left:var(--particle-x);top:-20px;width:8px;height:16px;border-radius:3px;background:linear-gradient(180deg,#fff,#76e6a5);animation:kicknityConfetti 1.75s cubic-bezier(.18,.72,.35,1) var(--particle-delay) both}
+.delivery-celebration i:nth-child(3n){background:#b98ed9}.delivery-celebration i:nth-child(4n){background:#7ddcf0}
+@keyframes kicknityConfetti{from{opacity:0;transform:translateY(-5vh) rotate(0)}15%{opacity:1}to{opacity:0;transform:translateY(108vh) rotate(var(--particle-rotate))}}
+
+@media(max-width:700px){
+  .route-transition-in .wrap{animation-duration:.22s}.interaction-spotlight{background:radial-gradient(135px circle at 50% 50%,rgba(255,255,255,.11),transparent 70%)}
+  .product-preview-trigger:after{opacity:.78;transform:none}.product-preview-dialog{width:calc(100vw - 16px);max-height:calc(100vh - 16px);border-radius:15px}.product-preview-dialog img{max-height:calc(100vh - 94px)}
+  .recent-update-indicator{font-size:7px}.account-skeleton{min-height:94px;padding:15px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .route-transition-in .wrap,.account-view-enter,.account-skeleton span,.tracking-animate .tracking-step,.tracking-animate .tracking-step.done:after,.tracking-animate .tracking-step.current:before,.tracking-badge,.recent-update-indicator i,.delivery-celebration i{animation:none!important}
+  .account-desktop-nav:before,.interaction-spotlight,.product-preview-trigger img{transition:none!important}
+}
