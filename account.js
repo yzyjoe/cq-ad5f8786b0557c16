@@ -10,6 +10,7 @@
   var authReady = false;
   var accountChannel = null;
   var realtimeRefreshTimer = null;
+  var currentMfaEnrollment = null;
 
   function byId(id){ return document.getElementById(id); }
   function all(selector){ return Array.prototype.slice.call(document.querySelectorAll(selector)); }
@@ -67,12 +68,19 @@
     target.textContent = message || "";
     target.className = "account-feedback" + (type ? " " + type : "");
   }
+  function mfaMessage(message,type){
+    var target = byId("adminMfaFeedback");
+    if (!target) return;
+    target.textContent = message || "";
+    target.className = "account-feedback" + (type ? " " + type : "");
+  }
   function friendlyError(error){
     var message = clean(error && error.message).toLowerCase();
     if (message.indexOf("invalid login") >= 0) return "E-mail ou senha incorretos.";
     if (message.indexOf("email not confirmed") >= 0) return "Confirme seu e-mail antes de entrar.";
     if (message.indexOf("already registered") >= 0 || message.indexOf("already been registered") >= 0) return "Este e-mail já possui uma conta.";
-    if (message.indexOf("password") >= 0 && message.indexOf("characters") >= 0) return "A senha precisa ter pelo menos 6 caracteres.";
+    if (message.indexOf("row-level security") >= 0 || message.indexOf("aal2") >= 0) return "Confirme o código do autenticador para liberar esta ação administrativa.";
+    if (message.indexOf("password") >= 0 && message.indexOf("characters") >= 0) return "A senha precisa ter pelo menos 10 caracteres.";
     if (message.indexOf("rate limit") >= 0) return "Muitas tentativas. Aguarde alguns minutos e tente novamente.";
     return clean(error && error.message) || "Não foi possível concluir agora. Tente novamente.";
   }
@@ -176,17 +184,18 @@
   function orderCard(order,admin){
     var events = sortedEvents(order);
     var latest = events[0];
+    var archived = !!order.deleted_at;
     var customer = admin && order.profiles ? "<span class=\"admin-client\">Cliente: " + escapeHtml(order.profiles.full_name || order.profiles.email) + " · " + escapeHtml(order.profiles.email) + "</span>" : "";
-    var editor = admin ? (
+    var editor = admin && !archived ? (
       "<div class=\"admin-order-editor\">" +
         "<select data-admin-field=\"status\" aria-label=\"Status do pedido\">" + Object.keys(STATUS_LABELS).map(function(status){ return "<option value=\"" + status + "\"" + (order.status === status ? " selected" : "") + ">" + STATUS_LABELS[status] + "</option>"; }).join("") + "</select>" +
         "<input data-admin-field=\"tracking\" value=\"" + escapeHtml(order.tracking_code || "") + "\" placeholder=\"Código de rastreio\" aria-label=\"Código de rastreio\">" +
         "<button type=\"button\" data-admin-update=\"" + order.id + "\">Salvar</button>" +
-        "<button class=\"admin-delete-order\" type=\"button\" data-admin-delete=\"" + order.id + "\">Remover</button>" +
+        "<button class=\"admin-delete-order\" type=\"button\" data-admin-delete=\"" + order.id + "\">Arquivar</button>" +
       "</div>"
-    ) : "";
-    return "<article class=\"account-order-card\" data-order-id=\"" + order.id + "\">" +
-      "<div class=\"account-order-top\"><div><span class=\"account-order-code\">" + escapeHtml(order.order_code) + "</span><h4>" + escapeHtml(order.product_name) + "</h4></div><span class=\"account-status\">" + escapeHtml(STATUS_LABELS[order.status] || order.status) + "</span></div>" +
+    ) : (admin && archived ? "<div class=\"admin-order-editor\"><button class=\"admin-restore-order\" type=\"button\" data-admin-restore=\"" + order.id + "\">Restaurar pedido</button></div>" : "");
+    return "<article class=\"account-order-card" + (archived ? " archived" : "") + "\" data-order-id=\"" + order.id + "\">" +
+      "<div class=\"account-order-top\"><div><span class=\"account-order-code\">" + escapeHtml(order.order_code) + "</span><h4>" + escapeHtml(order.product_name) + "</h4></div><span class=\"account-status\">" + escapeHtml(archived ? "Arquivado" : (STATUS_LABELS[order.status] || order.status)) + "</span></div>" +
       customer +
       "<div class=\"account-order-meta\"><span>Modelo: " + escapeHtml(order.model_code || "—") + "</span><span>Qtd.: " + escapeHtml(order.quantity) + "</span><span>" + escapeHtml(formatMoney(order.total_amount,order.currency)) + "</span>" + (order.tracking_code ? "<span>Rastreio: " + escapeHtml(order.tracking_code) + "</span>" : "") + "</div>" +
       (latest ? "<div class=\"account-order-event\">" + escapeHtml(latest.description) + "<time>" + escapeHtml(formatDate(latest.occurred_at)) + "</time></div>" : "") + editor +
@@ -218,7 +227,7 @@
 
   async function loadOrders(){
     if (!client || !currentSession) return;
-    var response = await client.from("orders").select("*,order_events(*)").eq("user_id",currentSession.user.id).order("updated_at",{ascending:false});
+    var response = await client.from("orders").select("*,order_events(*)").eq("user_id",currentSession.user.id).is("deleted_at",null).order("updated_at",{ascending:false});
     if (response.error) throw response.error;
     currentOrders = response.data || [];
     renderCustomerOrders();
@@ -241,11 +250,116 @@
       .subscribe();
   }
 
+  function setMfaState(label,state,description){
+    var badge = byId("adminMfaBadge");
+    badge.textContent = label;
+    badge.className = "admin-security-badge" + (state ? " " + state : "");
+    byId("adminMfaDescription").textContent = description;
+  }
+
+  async function loadMfaSecurity(){
+    if (!client || !currentProfile || currentProfile.role !== "admin") return;
+    byId("adminMfaStart").hidden = true;
+    byId("adminMfaSetup").hidden = true;
+    byId("adminMfaEnrollForm").hidden = true;
+    byId("adminMfaChallengeForm").hidden = true;
+    mfaMessage("");
+
+    var results = await Promise.all([
+      client.auth.mfa.listFactors(),
+      client.auth.mfa.getAuthenticatorAssuranceLevel()
+    ]);
+    if (results[0].error) throw results[0].error;
+    if (results[1].error) throw results[1].error;
+
+    var verified = (results[0].data.totp || []).filter(function(factor){ return factor.status === "verified"; });
+    var assurance = results[1].data || {};
+    if (!verified.length){
+      setMfaState("Recomendado","warning","Ative um aplicativo autenticador. Depois disso, criar, alterar, arquivar ou restaurar pedidos exigirá o código de segurança.");
+      byId("adminMfaStart").hidden = false;
+      return;
+    }
+    if (assurance.currentLevel === "aal2"){
+      setMfaState("Protegido","secure","Autenticação em duas etapas confirmada nesta sessão. As ações administrativas estão liberadas.");
+      return;
+    }
+    setMfaState("Código necessário","warning","Sua conta já possui autenticação em duas etapas. Confirme o código para liberar as ações administrativas desta sessão.");
+    byId("adminMfaChallengeForm").hidden = false;
+  }
+
+  async function beginMfaEnrollment(){
+    var button = byId("adminMfaStart");
+    button.disabled = true;
+    mfaMessage("Gerando proteção…");
+    try{
+      var factors = await client.auth.mfa.listFactors();
+      if (factors.error) throw factors.error;
+      var pending = (factors.data.totp || []).filter(function(factor){ return factor.status !== "verified"; });
+      await Promise.all(pending.map(function(factor){ return client.auth.mfa.unenroll({factorId:factor.id}); }));
+      var response = await client.auth.mfa.enroll({factorType:"totp",friendlyName:"KICKNITY Admin"});
+      if (response.error) throw response.error;
+      currentMfaEnrollment = response.data;
+      var qrCode = clean(response.data && response.data.totp && response.data.totp.qr_code);
+      if (qrCode.indexOf("data:image/svg+xml") !== 0) throw new Error("QR Code de segurança inválido.");
+      byId("adminMfaQr").src = qrCode;
+      byId("adminMfaSecret").textContent = clean(response.data.totp.secret);
+      byId("adminMfaSetup").hidden = false;
+      byId("adminMfaEnrollForm").hidden = false;
+      button.hidden = true;
+      mfaMessage("Escaneie o QR Code e digite o código de 6 dígitos.","success");
+      byId("adminMfaEnrollCode").focus();
+    }catch(error){ mfaMessage(friendlyError(error),"error"); }
+    finally{ button.disabled = false; }
+  }
+
+  async function verifyMfaFactor(factorId,code){
+    var challenge = await client.auth.mfa.challenge({factorId:factorId});
+    if (challenge.error) throw challenge.error;
+    var verification = await client.auth.mfa.verify({factorId:factorId,challengeId:challenge.data.id,code:code});
+    if (verification.error) throw verification.error;
+  }
+
+  async function submitMfaEnrollment(event){
+    event.preventDefault();
+    var button = event.currentTarget.querySelector("button[type=submit]");
+    button.disabled = true;
+    mfaMessage("Confirmando código…");
+    try{
+      if (!currentMfaEnrollment || !currentMfaEnrollment.id) throw new Error("Inicie novamente a configuração do autenticador.");
+      await verifyMfaFactor(currentMfaEnrollment.id,clean(byId("adminMfaEnrollCode").value));
+      currentMfaEnrollment = null;
+      byId("adminMfaEnrollCode").value = "";
+      mfaMessage("Autenticação em duas etapas ativada.","success");
+      await loadMfaSecurity();
+      await loadAdmin();
+    }catch(error){ mfaMessage(friendlyError(error),"error"); }
+    finally{ button.disabled = false; }
+  }
+
+  async function submitMfaChallenge(event){
+    event.preventDefault();
+    var button = event.currentTarget.querySelector("button[type=submit]");
+    button.disabled = true;
+    mfaMessage("Verificando código…");
+    try{
+      var factors = await client.auth.mfa.listFactors();
+      if (factors.error) throw factors.error;
+      var factor = (factors.data.totp || []).find(function(item){ return item.status === "verified"; });
+      if (!factor) throw new Error("Nenhum autenticador ativo foi encontrado.");
+      await verifyMfaFactor(factor.id,clean(byId("adminMfaChallengeCode").value));
+      byId("adminMfaChallengeCode").value = "";
+      mfaMessage("Administração liberada nesta sessão.","success");
+      await loadMfaSecurity();
+      await loadAdmin();
+    }catch(error){ mfaMessage(friendlyError(error),"error"); }
+    finally{ button.disabled = false; }
+  }
+
   async function loadAdmin(){
     if (!client || !currentProfile || currentProfile.role !== "admin") return;
     var results = await Promise.all([
       client.from("profiles").select("id,email,full_name,role").order("created_at",{ascending:false}),
-      client.from("orders").select("*,profiles(email,full_name),order_events(*)").order("updated_at",{ascending:false})
+      client.from("orders").select("*,profiles:profiles!orders_user_id_fkey(email,full_name),order_events(*)").order("updated_at",{ascending:false})
     ]);
     if (results[0].error) throw results[0].error;
     if (results[1].error) throw results[1].error;
@@ -253,6 +367,7 @@
     byId("adminCustomer").innerHTML = "<option value=\"\">Selecione</option>" + customers.map(function(profile){ return "<option value=\"" + profile.id + "\">" + escapeHtml(profile.full_name || profile.email) + " · " + escapeHtml(profile.email) + "</option>"; }).join("");
     var orders = results[1].data || [];
     byId("adminOrderList").innerHTML = orders.length ? orders.map(function(order){ return orderCard(order,true); }).join("") : "<div class=\"account-empty\">Nenhum pedido cadastrado.</div>";
+    await loadMfaSecurity();
   }
 
   async function loadAccount(){
@@ -357,11 +472,14 @@
     var form = event.currentTarget;
     var button = form.querySelector("button[type=submit]"); button.disabled = true;
     var amount = clean(byId("adminTotalAmount").value);
+    var modelCode = clean(byId("adminModelCode").value).toUpperCase();
     var payload = {
       user_id:byId("adminCustomer").value,
       order_code:clean(byId("adminOrderCode").value).toUpperCase(),
       product_name:clean(byId("adminProductName").value),
-      model_code:clean(byId("adminModelCode").value) || null,
+      model_code:modelCode || null,
+      image_url:productPhoto(modelCode) || null,
+      public_tracking_enabled:true,
       quantity:Number(byId("adminQuantity").value) || 1,
       status:byId("adminStatus").value,
       carrier:clean(byId("adminCarrier").value) || null,
@@ -399,15 +517,35 @@
     if (!card) return;
     var orderId = Number(card.getAttribute("data-order-id"));
     var orderCode = clean(card.querySelector(".account-order-code") && card.querySelector(".account-order-code").textContent) || String(orderId);
-    if (!window.confirm("Remover definitivamente o pedido " + orderCode + " e todo o histórico dele?")) return;
-    button.disabled = true; button.textContent = "Removendo";
+    if (!window.confirm("Arquivar o pedido " + orderCode + "? Ele sairá da conta do cliente, mas poderá ser restaurado.")) return;
+    button.disabled = true; button.textContent = "Arquivando";
     try{
-      var response = await client.from("orders").delete().eq("id",orderId);
+      var response = await client.from("orders").update({
+        deleted_at:new Date().toISOString(),
+        deleted_by:currentSession.user.id,
+        deleted_reason:"Arquivado pelo painel administrativo"
+      }).eq("id",orderId).select().single();
       if (response.error) throw response.error;
-      adminMessage("Pedido " + orderCode + " removido.","success");
+      adminMessage("Pedido " + orderCode + " arquivado. Ele pode ser restaurado.","success");
       await Promise.all([loadAdmin(),loadOrders()]);
     }catch(error){
-      button.disabled = false; button.textContent = "Remover";
+      button.disabled = false; button.textContent = "Arquivar";
+      adminMessage(friendlyError(error),"error");
+    }
+  }
+
+  async function restoreAdminOrder(button){
+    var card = button.closest("[data-order-id]");
+    if (!card) return;
+    var orderId = Number(card.getAttribute("data-order-id"));
+    button.disabled = true; button.textContent = "Restaurando";
+    try{
+      var response = await client.from("orders").update({deleted_at:null,deleted_by:null,deleted_reason:null}).eq("id",orderId).select().single();
+      if (response.error) throw response.error;
+      adminMessage("Pedido restaurado e novamente visível para o cliente.","success");
+      await Promise.all([loadAdmin(),loadOrders()]);
+    }catch(error){
+      button.disabled = false; button.textContent = "Restaurar pedido";
       adminMessage(friendlyError(error),"error");
     }
   }
@@ -427,11 +565,16 @@
     byId("refreshAccountOrders").addEventListener("click",function(){ loadOrders().catch(console.error); });
     byId("refreshAdminOrders").addEventListener("click",function(){ loadAdmin().catch(function(error){ adminMessage(friendlyError(error),"error"); }); });
     byId("adminOrderForm").addEventListener("submit",createOrder);
+    byId("adminMfaStart").addEventListener("click",beginMfaEnrollment);
+    byId("adminMfaEnrollForm").addEventListener("submit",submitMfaEnrollment);
+    byId("adminMfaChallengeForm").addEventListener("submit",submitMfaChallenge);
     byId("adminOrderList").addEventListener("click",function(event){
       var updateButton = event.target.closest("[data-admin-update]");
       if (updateButton){ updateAdminOrder(updateButton); return; }
       var deleteButton = event.target.closest("[data-admin-delete]");
-      if (deleteButton) deleteAdminOrder(deleteButton);
+      if (deleteButton){ deleteAdminOrder(deleteButton); return; }
+      var restoreButton = event.target.closest("[data-admin-restore]");
+      if (restoreButton) restoreAdminOrder(restoreButton);
     });
   }
 

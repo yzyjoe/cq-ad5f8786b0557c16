@@ -2,6 +2,8 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'sha256-asFKZOtq5oTS9mAlY6E8+rDROiZZ7wNw8OXOuug+qXI='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://lgcvaxjsgymwueacqkec.supabase.co wss://lgcvaxjsgymwueacqkec.supabase.co; frame-src https://challenges.cloudflare.com; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="theme-color" content="#07090b">
@@ -12,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Rubik:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="account.css?v=20260902c">
+<link rel="stylesheet" href="account.css?v=20260902d">
 
 <style>
 /* Tema único, fundo preto. Todas as cores saem destes tokens. */
@@ -1207,6 +1209,26 @@ body.route-pedido .journey{
     </div>
 
     <div class="account-view" data-account-view="admin" hidden>
+      <section class="account-panel admin-security" aria-labelledby="adminSecurityTitle">
+        <div class="account-panel-head"><div><span>PROTEÇÃO DA CONTA</span><h3 id="adminSecurityTitle">Autenticação em duas etapas</h3></div><span class="admin-security-badge" id="adminMfaBadge">Verificando</span></div>
+        <div class="admin-security-body">
+          <p id="adminMfaDescription">Verificando a proteção da conta administrativa…</p>
+          <button class="account-primary admin-mfa-start" id="adminMfaStart" type="button" hidden>Ativar aplicativo autenticador</button>
+          <div class="admin-mfa-setup" id="adminMfaSetup" hidden>
+            <img id="adminMfaQr" alt="QR Code para configurar autenticação em duas etapas">
+            <div><strong>Escaneie no Google Authenticator, Microsoft Authenticator ou Authy.</strong><small>Se não conseguir escanear, use esta chave:</small><code id="adminMfaSecret"></code></div>
+          </div>
+          <form class="admin-mfa-form" id="adminMfaEnrollForm" hidden>
+            <label>Código de 6 dígitos<input id="adminMfaEnrollCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></label>
+            <button class="account-primary" type="submit">Confirmar e ativar</button>
+          </form>
+          <form class="admin-mfa-form" id="adminMfaChallengeForm" hidden>
+            <label>Código do autenticador<input id="adminMfaChallengeCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></label>
+            <button class="account-primary" type="submit">Liberar administração</button>
+          </form>
+          <p class="account-feedback" id="adminMfaFeedback" aria-live="polite"></p>
+        </div>
+      </section>
       <div class="admin-grid">
         <section class="account-panel admin-create"><div class="account-panel-head"><div><span>ADMINISTRAÇÃO</span><h3>Novo pedido</h3></div></div>
           <form id="adminOrderForm" class="account-form">
@@ -1356,19 +1378,20 @@ body.route-pedido .journey{
   <form class="auth-form" id="loginForm">
     <h2 id="authTitle">Bem-vindo de volta</h2><p>Acesse seus pedidos sem alterar a experiência pública do site.</p>
     <label>E-mail<input id="loginEmail" type="email" autocomplete="email" required></label>
-    <label>Senha<input id="loginPassword" type="password" autocomplete="current-password" minlength="6" required></label>
+    <label>Senha<input id="loginPassword" type="password" autocomplete="current-password" required></label>
     <button class="auth-primary" type="submit">Entrar</button><button class="auth-link" id="forgotPassword" type="button">Esqueci minha senha</button>
   </form>
   <form class="auth-form" id="signupForm" hidden>
     <h2>Criar sua conta</h2><p>O cadastro é gratuito e não é obrigatório para usar a cotação.</p>
     <label>Nome<input id="signupName" type="text" autocomplete="name" maxlength="100" required></label>
     <label>E-mail<input id="signupEmail" type="email" autocomplete="email" required></label>
-    <label>Senha<input id="signupPassword" type="password" autocomplete="new-password" minlength="6" required></label>
+    <label>Senha<input id="signupPassword" type="password" autocomplete="new-password" minlength="10" required aria-describedby="signupPasswordHelp"></label>
+    <small class="auth-password-help" id="signupPasswordHelp">Use pelo menos 10 caracteres e não reutilize senhas de outros sites.</small>
     <button class="auth-primary" type="submit">Criar conta</button>
   </form>
   <form class="auth-form" id="recoveryForm" hidden>
-    <h2>Definir nova senha</h2><p>Escolha uma senha com pelo menos 6 caracteres.</p>
-    <label>Nova senha<input id="recoveryPassword" type="password" autocomplete="new-password" minlength="6" required></label>
+    <h2>Definir nova senha</h2><p>Escolha uma senha com pelo menos 10 caracteres.</p>
+    <label>Nova senha<input id="recoveryPassword" type="password" autocomplete="new-password" minlength="10" required></label>
     <button class="auth-primary" type="submit">Salvar nova senha</button>
   </form>
   <p class="auth-feedback" id="authFeedback" aria-live="polite"></p>
@@ -1376,8 +1399,8 @@ body.route-pedido .journey{
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.js"></script>
-<script src="account.js?v=20260902c"></script>
+<script src="vendor/supabase-2.112.4.min.js"></script>
+<script src="account.js?v=20260902d"></script>
 <script src="vendor/qrcode.min.js"></script>
 <script>
 (function(){
@@ -2337,16 +2360,21 @@ body.route-pedido .journey{
     {key:"accepted",label:"Agente em contato"},
     {key:"purchased",label:"Compra realizada"},
     {key:"logistics",label:"Transporte identificado"},
-    {key:"warehouse",label:"Armazém / QC"}
+    {key:"warehouse",label:"Armazém / QC"},
+    {key:"shipped",label:"Enviado"},
+    {key:"delivered",label:"Entregue"}
   ];
   var TRACKING_STATUS_PT = {
     submitted:"Pedido enviado. Aguardando o agente assumir o atendimento.",
     accepted:"O agente assumiu o pedido e está se comunicando com o vendedor.",
     purchased:"O produto foi comprado pelo agente.",
     logistics:"A transportadora e o código logístico foram identificados.",
-    warehouse:"O produto chegou ao armazém da CSSBUY e está passando pela inspeção de qualidade."
+    warehouse:"O produto chegou ao armazém da CSSBUY e está passando pela inspeção de qualidade.",
+    shipped:"O pedido foi enviado para o destino.",
+    delivered:"Pedido entregue.",
+    cancelled:"Pedido cancelado."
   };
-  var trackingCache = null;
+  var PUBLIC_TRACKING_URL = "https://lgcvaxjsgymwueacqkec.supabase.co/functions/v1/public-tracking";
 
   function openTrackingPanel(){
     openSiteRoute("rastreio",true);
@@ -2371,7 +2399,7 @@ body.route-pedido .journey{
   }
 
   function trackingBadge(statusKey){
-    var labels = {submitted:"Aguardando agente",accepted:"Agente em contato",purchased:"Compra realizada",logistics:"Transporte identificado",warehouse:"Em inspeção de qualidade"};
+    var labels = {submitted:"Aguardando agente",accepted:"Agente em contato",purchased:"Compra realizada",logistics:"Transporte identificado",warehouse:"Em inspeção de qualidade",shipped:"Enviado",delivered:"Entregue",cancelled:"Cancelado"};
     return labels[statusKey] || "Em andamento";
   }
 
@@ -2398,7 +2426,8 @@ body.route-pedido .journey{
   }
 
   function showTrackingOrder(order){
-    $("trackingImage").src = order.image;
+    var localImages = {GW3773:"img/qc/gw3773-1.webp",GW3774:"img/qc/gw3774-1.webp",HQ6316:"img/qc/hq6316-1.webp",F36980:"img/qc/f36980-1.webp",FW5190:"img/qc/fw5190-1.webp",HQ4540:"img/qc/hq4540-1.webp"};
+    $("trackingImage").src = order.image || localImages[String(order.model || "").toUpperCase()] || "favicon.png";
     $("trackingImage").alt = "Foto de " + order.product;
     $("trackingProduct").textContent = order.product;
     $("trackingModel").textContent = "Modelo " + order.model;
@@ -2413,12 +2442,20 @@ body.route-pedido .journey{
     $("trackingResult").hidden = false;
   }
 
-  function loadTrackingData(){
-    if (trackingCache) return Promise.resolve(trackingCache);
-    return fetch("tracking-data.json",{cache:"no-store"}).then(function(response){
-      if (!response.ok) throw new Error("tracking-data-unavailable");
-      return response.json();
-    }).then(function(data){ trackingCache = data; return data; });
+  function requestTrackingOrder(code){
+    return fetch(PUBLIC_TRACKING_URL,{
+      method:"POST",
+      mode:"cors",
+      cache:"no-store",
+      credentials:"omit",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({code:code})
+    }).then(function(response){
+      return response.json().catch(function(){ return {}; }).then(function(data){
+        if (!response.ok) throw new Error(data.error || "Não foi possível consultar agora.");
+        return data.order;
+      });
+    });
   }
 
   function searchTracking(code){
@@ -2431,8 +2468,7 @@ body.route-pedido .journey{
     }
     $("trackingFeedback").classList.remove("error");
     $("trackingFeedback").textContent = "Consultando pedido…";
-    loadTrackingData().then(function(data){
-      var order = (data.orders || []).find(function(item){ return String(item.code).toUpperCase() === normalized; });
+    requestTrackingOrder(normalized).then(function(order){
       if (!order){
         $("trackingResult").hidden = true;
         $("trackingFeedback").classList.add("error");
@@ -2440,10 +2476,10 @@ body.route-pedido .journey{
         return;
       }
       showTrackingOrder(order);
-    }).catch(function(){
+    }).catch(function(error){
       $("trackingResult").hidden = true;
       $("trackingFeedback").classList.add("error");
-      $("trackingFeedback").textContent = "Não foi possível consultar agora. Tente novamente em alguns instantes.";
+      $("trackingFeedback").textContent = error && error.message ? error.message : "Não foi possível consultar agora. Tente novamente em alguns instantes.";
     });
   }
 
