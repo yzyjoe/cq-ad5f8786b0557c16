@@ -251,7 +251,8 @@
 
   async function createOrder(event){
     event.preventDefault(); adminMessage("Criando pedido…");
-    var button = event.currentTarget.querySelector("button[type=submit]"); button.disabled = true;
+    var form = event.currentTarget;
+    var button = form.querySelector("button[type=submit]"); button.disabled = true;
     var amount = clean(byId("adminTotalAmount").value);
     var payload = {
       user_id:byId("adminCustomer").value,
@@ -268,7 +269,7 @@
     try{
       var response = await client.from("orders").insert(payload).select().single();
       if (response.error) throw response.error;
-      event.currentTarget.reset(); byId("adminQuantity").value = "1";
+      form.reset(); byId("adminQuantity").value = "1";
       adminMessage("Pedido criado e vinculado ao cliente.","success");
       await Promise.all([loadAdmin(),loadOrders()]);
     }catch(error){ adminMessage(friendlyError(error),"error"); }
