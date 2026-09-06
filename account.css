@@ -249,3 +249,186 @@ body.site-redesign.route-conta{padding:0;background:#060607;background-image:rad
   .account-panel{background:#0c0c0e}
   .account-order-card{background:#080809}
 }
+
+/* Rastreio dentro de Meus pedidos: componente isolado do rastreio público antigo. */
+.account-tracking-card{
+  --order-line:rgba(255,255,255,.14);
+  overflow:hidden;
+  border:1px solid var(--order-line);
+  background:#0b0b0d;
+  color:#f5f5f6;
+}
+.account-tracking-card .account-tracking-label{
+  padding:14px 18px;
+  border-bottom:1px solid var(--order-line);
+  background:linear-gradient(105deg,rgba(255,255,255,.075),rgba(255,255,255,.015));
+}
+.account-tracking-card .account-tracking-label span{color:#fff;letter-spacing:.12em}
+.account-tracking-card .account-tracking-label small{color:#96969b}
+.account-tracking-card .account-tracking-result{
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:0;
+  display:grid;
+  grid-template-columns:minmax(230px,.72fr) minmax(0,1.28fr);
+  gap:0;
+  color:#f5f5f6;
+}
+.account-tracking-card .tracking-product{
+  min-width:0;
+  padding:24px;
+  display:flex!important;
+  flex-direction:column;
+  justify-content:flex-start;
+  gap:18px;
+  border-right:1px solid var(--order-line);
+  background:#080809;
+}
+.account-tracking-card .tracking-photo{
+  width:100%;
+  height:auto;
+  aspect-ratio:4/3;
+  overflow:hidden;
+  display:block;
+  border:1px solid var(--order-line);
+  background:#111114;
+}
+.account-tracking-card .tracking-photo img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  object-position:center;
+}
+.account-tracking-card .tracking-product h3{
+  margin:0 0 7px;
+  color:#fff;
+  font:800 clamp(20px,2vw,28px)/1 "Rubik",sans-serif;
+  letter-spacing:-.035em;
+}
+.account-tracking-card .tracking-model{
+  margin:0;
+  color:#929297;
+  font:700 9px/1.4 "JetBrains Mono",monospace;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.account-tracking-card .tracking-order{min-width:0;padding:26px 28px;background:#0d0d0f}
+.account-tracking-card .tracking-order-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.account-tracking-card .tracking-order-head>div{display:grid;gap:7px;min-width:0}
+.account-tracking-card .tracking-code-label{color:#8e8e93;font:700 8px/1 "JetBrains Mono",monospace;letter-spacing:.11em;text-transform:uppercase}
+.account-tracking-card .tracking-code{overflow-wrap:anywhere;color:#fff;font:800 15px/1.2 "JetBrains Mono",monospace;letter-spacing:.035em}
+.account-tracking-card .tracking-badge{
+  flex:0 0 auto;
+  padding:8px 10px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.06);
+  color:#fff;
+  font:800 8px/1 "JetBrains Mono",monospace;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+.account-tracking-card .tracking-current{
+  margin-top:22px;
+  padding:19px 18px;
+  border-top:1px solid var(--order-line);
+  border-bottom:1px solid var(--order-line);
+  background:rgba(255,255,255,.025);
+}
+.account-tracking-card .tracking-current h4{margin:0;color:#fff;font:700 15px/1.4 "Space Grotesk",sans-serif}
+.account-tracking-card .tracking-time{display:block;margin-top:8px;color:#89898e;font:600 8px/1.4 "JetBrains Mono",monospace;letter-spacing:.05em;text-transform:uppercase}
+.account-tracking-card .account-tracking-code{margin-top:8px;color:#dddde0}
+.account-tracking-card .tracking-history-wrap{margin-top:24px}
+.account-tracking-card .tracking-history-wrap h5{margin:0 0 11px;color:#fff;font:800 9px/1 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase}
+.account-tracking-card .tracking-history{display:grid;border-top:1px solid var(--order-line)}
+.account-tracking-card .tracking-history-item{padding:15px 2px;border-bottom:1px solid var(--order-line);background:transparent}
+.account-tracking-card .tracking-history-top{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.account-tracking-card .tracking-history-state{color:#fff;font:800 9px/1.2 "JetBrains Mono",monospace;text-transform:uppercase}
+.account-tracking-card .tracking-history-item time{color:#77777c;font:600 8px/1.2 "JetBrains Mono",monospace}
+.account-tracking-card .tracking-history-item p{margin:8px 0 0;color:#a9a9ae;font-size:12px;line-height:1.45}
+.account-tracking-card .account-tracking-timeline{
+  width:100%;
+  margin-top:22px;
+  padding:20px 0 8px;
+  display:grid;
+  grid-template-columns:repeat(7,minmax(82px,1fr));
+  overflow-x:auto;
+  overflow-y:hidden;
+  border-top:1px solid var(--order-line);
+  scrollbar-width:thin;
+}
+.account-tracking-card .tracking-step{
+  position:relative;
+  min-width:82px;
+  padding:20px 8px 0 0;
+  color:#66666b;
+  font:700 7px/1.25 "JetBrains Mono",monospace;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.account-tracking-card .tracking-step:before{
+  content:"";
+  position:absolute;
+  z-index:2;
+  left:1px;
+  top:1px;
+  width:8px;
+  height:8px;
+  border:2px solid #505056;
+  border-radius:50%;
+  background:#0d0d0f;
+}
+.account-tracking-card .tracking-step:after{
+  content:"";
+  position:absolute;
+  left:11px;
+  right:0;
+  top:5px;
+  height:1px;
+  background:#303035;
+}
+.account-tracking-card .tracking-step:last-child:after{display:none}
+.account-tracking-card .tracking-step.done{color:#b7b7bc}
+.account-tracking-card .tracking-step.done:before{border-color:#fff;background:#fff}
+.account-tracking-card .tracking-step.done:after{background:#fff}
+.account-tracking-card .tracking-step.current{color:#fff}
+.account-tracking-card .tracking-step.current:before{border-color:var(--status-color);background:var(--status-color)}
+.account-tracking-card .account-order-qc{border-color:var(--order-line)}
+.account-tracking-card .account-order-qc-grid button{border-color:var(--order-line);border-radius:0;background:#080809}
+.account-tracking-card .account-order-qc-grid img{object-position:center}
+
+@media(max-width:900px){
+  .account-tracking-card .account-tracking-result{grid-template-columns:minmax(190px,.62fr) minmax(0,1.38fr)}
+  .account-tracking-card .tracking-product{padding:18px}
+  .account-tracking-card .tracking-order{padding:22px}
+}
+
+@media(max-width:700px){
+  .account-tracking-card .account-tracking-label{align-items:flex-start;padding:12px 14px}
+  .account-tracking-card .account-tracking-result{grid-template-columns:1fr}
+  .account-tracking-card .tracking-product{
+    padding:15px;
+    display:grid!important;
+    grid-template-columns:108px minmax(0,1fr);
+    align-items:center;
+    gap:14px;
+    border-right:0;
+    border-bottom:1px solid var(--order-line);
+  }
+  .account-tracking-card .tracking-photo{width:108px;aspect-ratio:1/1}
+  .account-tracking-card .tracking-product h3{font-size:19px}
+  .account-tracking-card .tracking-order{padding:18px 15px 21px}
+  .account-tracking-card .tracking-order-head{align-items:flex-start}
+  .account-tracking-card .tracking-current{padding:16px 14px}
+  .account-tracking-card .tracking-history-top{align-items:flex-start;flex-direction:column;gap:5px}
+  .account-tracking-card .account-tracking-timeline{grid-template-columns:repeat(7,92px)}
+  .account-tracking-card .account-order-qc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:390px){
+  .account-tracking-card .tracking-product{grid-template-columns:86px minmax(0,1fr)}
+  .account-tracking-card .tracking-photo{width:86px}
+  .account-tracking-card .tracking-order-head{flex-direction:column}
+}
