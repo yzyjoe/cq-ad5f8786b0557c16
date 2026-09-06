@@ -123,8 +123,10 @@
   function updateAuthUi(){
     var signedIn = !!currentSession;
     var label = signedIn ? "Minha conta" : "Entrar";
-    ["homeAccountButton","navAccountButton"].forEach(function(id){ if (byId(id)) byId(id).textContent = label; });
-    if (byId("mobileAccountButton")) byId("mobileAccountButton").textContent = signedIn ? "Conta" : "Entrar";
+    if (byId("homeAccountButton")) byId("homeAccountButton").textContent = label;
+    var navAccountLabel = byId("navAccountButton") && byId("navAccountButton").querySelector("span:first-child");
+    if (navAccountLabel) navAccountLabel.textContent = label.toUpperCase();
+    if (byId("mobileAccountButton")) byId("mobileAccountButton").innerHTML = "<span aria-hidden=\"true\">○</span>" + (signedIn ? "Conta" : "Entrar");
     if (byId("accountLogout")) byId("accountLogout").hidden = !signedIn;
     if (byId("homeAccountCard")) byId("homeAccountCard").hidden = !signedIn;
     if (byId("homeTrackingCard")) byId("homeTrackingCard").hidden = signedIn;
