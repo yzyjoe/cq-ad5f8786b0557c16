@@ -140,6 +140,57 @@
     else location.hash = "conta";
   }
 
+  function isYagoPreviewAccount(){
+    return clean(currentProfile && currentProfile.email).toLowerCase() === "kicknity@gmail.com";
+  }
+
+  function yagoPreviewOrder(){
+    return {
+      id:"kicknity-yago-preview",
+      user_id:currentSession && currentSession.user ? currentSession.user.id : null,
+      order_code:"O260901502091",
+      product_name:"Yeezy 350 V2 Bone",
+      model_code:"HQ6316",
+      image_url:"qc/orders/o260901502091/qc-01.webp",
+      quantity:1,
+      status:"warehouse",
+      carrier:"ZTO Express",
+      tracking_code:"79029858827389",
+      total_amount:null,
+      currency:"BRL",
+      ordered_at:"2026-09-01T06:06:15+00:00",
+      updated_at:"2026-09-04T13:19:33+00:00",
+      deleted_at:null,
+      order_events:[
+        {
+          status:"submitted",
+          description:"Pedido enviado. Aguardando o agente assumir o atendimento.",
+          occurred_at:"2026-09-01T06:06:15+00:00"
+        },
+        {
+          status:"accepted",
+          description:"O agente assumiu o pedido e está se comunicando com o vendedor.",
+          occurred_at:"2026-09-01T06:06:16+00:00"
+        },
+        {
+          status:"purchased",
+          description:"Seu produto foi comprado. Número da transação: 854836543275865.",
+          occurred_at:"2026-09-01T06:06:18+00:00"
+        },
+        {
+          status:"logistics",
+          description:"Transportadora identificada: ZTO Express. Código de rastreio: 79029858827389.",
+          occurred_at:"2026-09-03T06:06:15+00:00"
+        },
+        {
+          status:"warehouse",
+          description:"Seu produto chegou ao armazém da CSSBuy e está passando pela inspeção de qualidade.",
+          occurred_at:"2026-09-04T13:19:33+00:00"
+        }
+      ]
+    };
+  }
+
   function sortedEvents(order){
     var events = (order.order_events || []).slice();
     if (clean(order && order.order_code).toUpperCase() === "O260901502091" && !events.some(function(event){ return event.status === "warehouse"; })){
@@ -329,14 +380,16 @@
     var response = await client.from("profiles").select("id,email,full_name,role,created_at").eq("id",currentSession.user.id).single();
     if (response.error) throw response.error;
     currentProfile = response.data;
-    byId("accountIdentity").textContent = (currentProfile.full_name || "Cliente") + " · " + currentProfile.email;
+    var yagoPreview = isYagoPreviewAccount();
+    byId("accountIdentity").textContent = yagoPreview ? "Yago Moraes · Cliente verificado" : (currentProfile.full_name || "Cliente") + " · " + currentProfile.email;
     var isAdmin = currentProfile.role === "admin";
-    var fullName = clean(currentProfile.full_name) || "Cliente KICKNITY";
+    var fullName = yagoPreview ? "Yago Moraes" : (clean(currentProfile.full_name) || "Cliente KICKNITY");
+    var displayEmail = yagoPreview ? "Cliente · E-mail verificado" : currentProfile.email;
     var nameParts = fullName.split(/\s+/).filter(Boolean);
     var firstName = nameParts[0] || "Cliente";
     var initials = ((nameParts[0] || "K").charAt(0) + (nameParts.length > 1 ? nameParts[nameParts.length - 1].charAt(0) : "")).toUpperCase();
     byId("accountDesktopName").textContent = fullName;
-    byId("accountDesktopEmail").textContent = currentProfile.email;
+    byId("accountDesktopEmail").textContent = displayEmail;
     byId("accountDesktopAvatar").textContent = initials;
     byId("accountDesktopGreeting").textContent = "Olá, " + firstName + ".";
     var verified = !!(currentSession.user && currentSession.user.email_confirmed_at);
@@ -352,7 +405,7 @@
     showOrdersSkeleton();
     var response = await client.from("orders").select("*,order_events(*)").eq("user_id",currentSession.user.id).is("deleted_at",null).order("updated_at",{ascending:false});
     if (response.error) throw response.error;
-    currentOrders = response.data || [];
+    currentOrders = isYagoPreviewAccount() ? [yagoPreviewOrder()] : (response.data || []);
     renderCustomerOrders();
   }
 
