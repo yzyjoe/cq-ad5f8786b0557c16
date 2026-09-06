@@ -93,8 +93,15 @@ function applyKnownTrackingUpdate(order: TrackingOrder): TrackingOrder {
     statusPt: "Seu produto chegou ao armazém da CSSBuy e está passando pela inspeção de qualidade.",
     statusAt: "2026-09-04T13:19:33+00:00",
   };
-  const history = order.history.some((event) => event.statusKey === "warehouse") ? order.history : [...order.history, warehouseEvent];
-  return { ...order, statusKey: "warehouse", statusPt: warehouseEvent.statusPt, statusAt: warehouseEvent.statusAt, history };
+  const parcelEvent: TrackingEvent = {
+    statusKey: "warehouse",
+    statusPt: "Pacote P260907637637 criado para envio internacional via BJ-EUB (0–2 kg).",
+    statusAt: "2026-09-06T12:00:00-03:00",
+  };
+  let history = order.history || [];
+  if (!history.some((event) => event.statusKey === "warehouse")) history = [...history, warehouseEvent];
+  if (!history.some((event) => event.statusPt.includes("P260907637637"))) history = [...history, parcelEvent];
+  return { ...order, statusKey: "warehouse", statusPt: parcelEvent.statusPt, statusAt: parcelEvent.statusAt, history };
 }
 
 function OrderTimeline({ history }: { history: TrackingEvent[] }) {
@@ -304,7 +311,7 @@ export default function Home() {
   useEffect(() => {
     if (document.querySelector('script[data-kicknity-account="true"]')) return;
     const script = document.createElement("script");
-    script.src = `./account.js?v=20260906-yago2`;
+    script.src = `./account.js?v=20260906-parcel1`;
     script.dataset.kicknityAccount = "true";
     document.body.appendChild(script);
   }, []);

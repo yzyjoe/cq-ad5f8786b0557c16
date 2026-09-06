@@ -38,6 +38,10 @@
   }
   function formatDate(value){
     if (!value) return "—";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(String(value))){
+      var parts = String(value).split("-");
+      return parts[2] + "/" + parts[1] + "/" + parts[0];
+    }
     var date = new Date(value);
     if (isNaN(date.getTime())) return "—";
     return new Intl.DateTimeFormat("pt-BR",{dateStyle:"short",timeStyle:"short"}).format(date);
@@ -144,6 +148,19 @@
     return clean(currentProfile && currentProfile.email).toLowerCase() === "lucaseumesmo007@gmail.com";
   }
 
+  function knownYagoParcel(order){
+    if (clean(order && order.order_code).toUpperCase() !== "O260901502091") return null;
+    return {
+      id:"P260907637637",
+      submitted_at:"2026-09-06",
+      shipping:"BJ-EUB · 0–2 KG",
+      shipping_price:"¥ 148,10",
+      total_price:"¥ 167,39",
+      insured_amount:"¥ 278,17",
+      declaration:"Tênis unissex · branco · tamanho 45 · borracha · US$ 7,00"
+    };
+  }
+
   function yagoPreviewOrder(){
     return {
       id:"kicknity-yago-preview",
@@ -154,12 +171,12 @@
       image_url:"qc/orders/o260901502091/qc-01.webp",
       quantity:1,
       status:"warehouse",
-      carrier:"ZTO Express",
+      carrier:"BJ-EUB",
       tracking_code:"79029858827389",
       total_amount:null,
       currency:"BRL",
       ordered_at:"2026-09-01T06:06:15+00:00",
-      updated_at:"2026-09-04T13:19:33+00:00",
+      updated_at:"2026-09-06",
       deleted_at:null,
       order_events:[
         {
@@ -186,6 +203,11 @@
           status:"warehouse",
           description:"Seu produto chegou ao armazém da CSSBuy e está passando pela inspeção de qualidade.",
           occurred_at:"2026-09-04T13:19:33+00:00"
+        },
+        {
+          status:"warehouse",
+          description:"Pacote P260907637637 criado para envio internacional via BJ-EUB (0–2 kg).",
+          occurred_at:"2026-09-06"
         }
       ]
     };
@@ -193,12 +215,22 @@
 
   function sortedEvents(order){
     var events = (order.order_events || []).slice();
-    if (clean(order && order.order_code).toUpperCase() === "O260901502091" && !events.some(function(event){ return event.status === "warehouse"; })){
-      events.push({
-        status:"warehouse",
-        description:"Seu produto chegou ao armazém da CSSBuy e está passando pela inspeção de qualidade.",
-        occurred_at:"2026-09-04T13:19:33+00:00"
-      });
+    var parcel = knownYagoParcel(order);
+    if (parcel){
+      if (!events.some(function(event){ return event.status === "warehouse"; })){
+        events.push({
+          status:"warehouse",
+          description:"Seu produto chegou ao armazém da CSSBuy e está passando pela inspeção de qualidade.",
+          occurred_at:"2026-09-04T13:19:33+00:00"
+        });
+      }
+      if (!events.some(function(event){ return clean(event.description).indexOf(parcel.id) >= 0; })){
+        events.push({
+          status:"warehouse",
+          description:"Pacote " + parcel.id + " criado para envio internacional via BJ-EUB (0–2 kg).",
+          occurred_at:parcel.submitted_at
+        });
+      }
     }
     return events.sort(function(a,b){ return new Date(b.occurred_at) - new Date(a.occurred_at); });
   }
@@ -252,6 +284,21 @@
         return "<button type=\"button\" data-order-qc=\"" + escapeHtml(order.id) + "\" data-qc-index=\"" + index + "\" aria-label=\"Ampliar foto real " + (index + 1) + "\"><img src=\"" + escapeHtml(photo) + "\" alt=\"Foto real " + (index + 1) + " de " + escapeHtml(order.product_name) + "\" loading=\"lazy\"></button>";
       }).join("") + "</div><p class=\"account-order-qc-note\">Clique em uma foto para ampliar e conferir os detalhes do produto.</p></section>";
   }
+  function orderParcelDetails(order){
+    var parcel = knownYagoParcel(order);
+    if (!parcel) return "";
+    return "<section class=\"account-parcel\">" +
+      "<div class=\"account-parcel-head\"><div><span>ENVIO INTERNACIONAL</span><strong>Pacote preparado</strong></div><small>Solicitado em " + escapeHtml(formatDate(parcel.submitted_at)) + "</small></div>" +
+      "<div class=\"account-parcel-grid\">" +
+        "<div><span>Pacote</span><strong>" + escapeHtml(parcel.id) + "</strong></div>" +
+        "<div><span>Modalidade</span><strong>" + escapeHtml(parcel.shipping) + "</strong></div>" +
+        "<div><span>Frete</span><strong>" + escapeHtml(parcel.shipping_price) + "</strong></div>" +
+        "<div><span>Total</span><strong>" + escapeHtml(parcel.total_price) + "</strong></div>" +
+        "<div><span>Seguro declarado</span><strong>" + escapeHtml(parcel.insured_amount) + "</strong></div>" +
+      "</div>" +
+      "<div class=\"account-declaration\"><span>DECLARAÇÃO ADUANEIRA</span><strong>" + escapeHtml(parcel.declaration) + "</strong></div>" +
+    "</section>";
+  }
   function orderTrackingCard(order){
     var events = sortedEvents(order);
     var status = effectiveStatus(order);
@@ -266,7 +313,8 @@
         "<div class=\"tracking-product\">" + productVisual + "<div><h3>" + escapeHtml(order.product_name) + "</h3><p class=\"tracking-model\">Modelo " + escapeHtml(order.model_code || "não informado") + "</p></div></div>" +
         "<div class=\"tracking-order\">" +
           "<div class=\"tracking-order-head\"><div><span class=\"tracking-code-label\">Código do pedido</span><strong class=\"tracking-code\">" + escapeHtml(order.order_code) + "</strong></div><span class=\"tracking-badge\">" + escapeHtml(STATUS_LABELS[status] || status) + "</span></div>" +
-          "<div class=\"tracking-current\"><h4>" + escapeHtml(latest.description || STATUS_DESCRIPTIONS[status] || "Atualização registrada.") + "</h4><time class=\"tracking-time\">Última atualização: " + escapeHtml(formatDate(latest.occurred_at)) + "</time>" + (order.tracking_code ? "<span class=\"account-tracking-code\">Rastreio: " + escapeHtml(order.tracking_code) + "</span>" : "") + "</div>" +
+          "<div class=\"tracking-current\"><h4>" + escapeHtml(latest.description || STATUS_DESCRIPTIONS[status] || "Atualização registrada.") + "</h4><time class=\"tracking-time\">Última atualização: " + escapeHtml(formatDate(latest.occurred_at)) + "</time>" + (!knownYagoParcel(order) && order.tracking_code ? "<span class=\"account-tracking-code\">Rastreio: " + escapeHtml(order.tracking_code) + "</span>" : "") + "</div>" +
+          orderParcelDetails(order) +
           "<section class=\"tracking-history-wrap\"><h5>Histórico do pedido</h5><div class=\"tracking-history\">" + accountHistory(order) + "</div></section>" +
           "<div class=\"tracking-timeline account-tracking-timeline\" aria-label=\"Etapas do pedido\">" + accountTimeline(order) + "</div>" +
           orderQcGallery(order) +
@@ -291,7 +339,7 @@
     return "<article class=\"account-order-card" + (archived ? " archived" : "") + "\" data-order-id=\"" + order.id + "\">" +
       "<div class=\"account-order-top\"><div><span class=\"account-order-code\">" + escapeHtml(order.order_code) + "</span><h4>" + escapeHtml(order.product_name) + "</h4></div><span class=\"account-status\">" + escapeHtml(archived ? "Arquivado" : (STATUS_LABELS[status] || status)) + "</span></div>" +
       customer +
-      "<div class=\"account-order-meta\"><span>Modelo: " + escapeHtml(order.model_code || "—") + "</span><span>Qtd.: " + escapeHtml(order.quantity) + "</span><span>" + escapeHtml(formatMoney(order.total_amount,order.currency)) + "</span>" + (order.tracking_code ? "<span>Rastreio: " + escapeHtml(order.tracking_code) + "</span>" : "") + "</div>" +
+      "<div class=\"account-order-meta\"><span>Modelo: " + escapeHtml(order.model_code || "—") + "</span><span>Qtd.: " + escapeHtml(order.quantity) + "</span><span>" + escapeHtml(formatMoney(order.total_amount,order.currency)) + "</span>" + (!knownYagoParcel(order) && order.tracking_code ? "<span>Rastreio: " + escapeHtml(order.tracking_code) + "</span>" : "") + "</div>" +
       (latest ? "<div class=\"account-order-event\">" + escapeHtml(latest.description) + "<time>" + escapeHtml(formatDate(latest.occurred_at)) + "</time></div>" : "") + editor +
     "</article>";
   }
