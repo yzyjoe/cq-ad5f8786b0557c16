@@ -141,7 +141,7 @@
   }
 
   function isYagoPreviewAccount(){
-    return clean(currentProfile && currentProfile.email).toLowerCase() === "kicknity@gmail.com";
+    return clean(currentProfile && currentProfile.email).toLowerCase() === "lucaseumesmo007@gmail.com";
   }
 
   function yagoPreviewOrder(){

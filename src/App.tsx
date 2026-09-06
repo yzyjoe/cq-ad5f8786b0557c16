@@ -304,7 +304,7 @@ export default function Home() {
   useEffect(() => {
     if (document.querySelector('script[data-kicknity-account="true"]')) return;
     const script = document.createElement("script");
-    script.src = `./account.js?v=20260906-yago1`;
+    script.src = `./account.js?v=20260906-yago2`;
     script.dataset.kicknityAccount = "true";
     document.body.appendChild(script);
   }, []);
