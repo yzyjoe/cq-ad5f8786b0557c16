@@ -190,3 +190,62 @@ body.site-redesign.route-conta{background:radial-gradient(circle at 86% 7%,rgba(
   .account-order-qc-head{align-items:start;flex-direction:column;gap:7px}
   .account-order-qc-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
 }
+
+/* Conta editorial: mesma linguagem visual do novo site KICKNITY. */
+body.site-redesign.route-conta{padding:0;background:#060607;background-image:radial-gradient(circle at 82% 5%,rgba(255,255,255,.07),transparent 30rem)}
+.production-account-route{min-height:calc(100vh - 114px);padding:72px 3.2vw 110px;background:transparent}
+
+@media(min-width:701px){
+  body.route-conta #accountArea.account-area{grid-template-columns:250px minmax(0,1fr);gap:55px;min-height:0}
+  .account-desktop-sidebar{display:flex;padding:0 30px 0 0;border-right:1px solid rgba(255,255,255,.14);background:transparent}
+  .account-desktop-user{padding:0 0 26px;border-bottom:0}
+  .account-desktop-avatar{width:48px;height:48px;border:0;border-radius:50%;background:#fff;color:#080809;box-shadow:none;font-size:13px}
+  .account-desktop-user strong{font-size:13px}.account-desktop-user small{margin-top:4px;color:#8f8f93;font-size:9px}
+  .account-desktop-nav{gap:0;margin-top:30px;border-top:1px solid rgba(255,255,255,.14)}
+  .account-desktop-nav:before{display:none}
+  .account-desktop-nav button{grid-template-columns:28px minmax(0,1fr);gap:11px;min-height:57px;padding:0 8px;border:0;border-bottom:1px solid rgba(255,255,255,.14);border-radius:0;color:#8f8f93;transform:none}
+  .account-desktop-nav button span{width:28px;height:28px;border:0;border-radius:0;background:transparent;color:#fff}
+  .account-desktop-nav button b{font-size:10px;letter-spacing:.055em}
+  .account-desktop-nav button:hover,.account-desktop-nav button:focus-visible{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.035);color:#fff;transform:none}
+  .account-desktop-nav button.active{padding-left:14px;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.045);box-shadow:inset 3px 0 #fff;color:#fff}
+  .account-desktop-nav button.active span{border:0;background:transparent;color:#fff}
+  .account-desktop-new-order{margin:30px 0 10px;padding:15px 12px;border:0;border-radius:0;background:#fff;color:#080809}
+  .account-desktop-logout{margin:auto 0 0;padding:14px 10px;border:1px solid rgba(255,255,255,.16);border-radius:0;color:#999;background:transparent}
+  .account-desktop-main{padding:0}
+  .account-hero{min-height:96px;margin:0 0 42px}
+  .account-kicker{color:#a3a3a6}.account-kicker:before{background:#fff}
+  .account-desktop-title{margin-top:15px!important;font:900 clamp(52px,6vw,88px)/.88 Arial,sans-serif!important;letter-spacing:-.07em!important}
+  .account-verified-badge{border-color:rgba(255,255,255,.24);border-radius:0;background:rgba(255,255,255,.04);color:#fff}
+  .account-desktop-metrics{grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid rgba(255,255,255,.14)}
+  .account-desktop-metrics article,.account-desktop-metrics article.highlight{min-height:160px;padding:23px;border:0;border-right:1px solid rgba(255,255,255,.14);border-radius:0;background:#0c0c0e;box-shadow:none}
+  .account-desktop-metrics article:last-child{border-right:0}
+  .account-desktop-metrics article.highlight strong,.account-desktop-metrics strong{margin-top:34px;color:#fff;font:900 40px/1 Arial,sans-serif}
+  .account-desktop-content-grid{grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:18px}
+  .account-desktop-card{padding:25px;border:1px solid rgba(255,255,255,.14);border-radius:0;background:#0c0c0e}
+  .account-desktop-order{padding:13px;border:1px solid rgba(255,255,255,.13);border-radius:0;background:#080809}
+  .account-desktop-order:hover{border-color:#fff;background:#0d0d0f}
+  .account-desktop-order-thumb{border-radius:0;background:#070708}
+  .account-panel{border-color:rgba(255,255,255,.14);border-radius:0;background:#0c0c0e}
+  .account-panel-head{padding:22px 24px}
+  .account-tracking-card{border-radius:0}
+}
+
+@media(max-width:700px){
+  .production-account-route{min-height:calc(100vh - 134px);padding:46px 16px 86px}
+  .account-area{gap:18px}
+  .account-hero{min-height:auto;margin:0 0 8px;padding:0 0 28px;border:0;border-bottom:1px solid rgba(255,255,255,.14);border-radius:0;background:transparent;box-shadow:none}
+  .account-hero:after{display:none}
+  .account-hero h2{margin-top:14px;font:900 48px/.92 Arial,sans-serif;letter-spacing:-.065em}
+  .account-kicker{color:#aaa}
+  .account-logout{border-radius:0;background:transparent}
+  .account-tabs{gap:0;padding:0;overflow-x:auto;border:1px solid rgba(255,255,255,.14);border-radius:0;background:#09090a}
+  .account-tabs button{min-width:125px;border:0;border-right:1px solid rgba(255,255,255,.14);border-radius:0}
+  .account-tabs button.active{background:#fff;color:#080809}
+  .account-mobile-new-order{border:0;border-radius:0;background:#fff}
+  .account-metrics{gap:0;border:1px solid rgba(255,255,255,.14)}
+  .account-metrics article{border:0;border-bottom:1px solid rgba(255,255,255,.14);border-radius:0;background:#0c0c0e}
+  .account-metrics article:last-child{border-bottom:0}
+  .account-panel,.account-order-card,.account-tracking-card{border-radius:0}
+  .account-panel{background:#0c0c0e}
+  .account-order-card{background:#080809}
+}
