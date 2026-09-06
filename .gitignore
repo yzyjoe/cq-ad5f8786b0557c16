@@ -1,2 +1,4 @@
 artifacts/
 supabase/.temp/
+node_modules/
+dist/
