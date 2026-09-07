@@ -54,7 +54,9 @@
   var STATUS_LABELS = {
     submitted:"Recebido", accepted:"Em atendimento", purchased:"Comprado",
     logistics:"Em transporte", warehouse:"Armazém / QC", shipped:"Enviado",
-    delivered:"Entregue", cancelled:"Cancelado"
+    delivered:"Entregue", cancelled:"Cancelado", parcel_submitted:"Pacote registrado",
+    parcel_paid:"Pagamento confirmado", parcel_packaged:"Pacote embalado",
+    tracking_registered:"Rastreio gerado"
   };
   var STATUS_DESCRIPTIONS = {
     submitted:"Pedido recebido. Aguardando atendimento.",
@@ -157,7 +159,9 @@
       shipping_price:"¥ 148,10",
       total_price:"¥ 167,39",
       insured_amount:"¥ 278,17",
-      declaration:"Tênis unissex · branco · tamanho 45 · borracha · US$ 7,00"
+      declaration:"Tênis unissex · branco · tamanho 45 · borracha · US$ 7,00",
+      tracking_code:"LZ458955736CN",
+      tracking_note:"O código foi gerado, mas ainda não consta nos registros dos Correios. Em breve ele entrará na base de dados."
     };
   }
 
@@ -170,9 +174,9 @@
       model_code:"HQ6316",
       image_url:"qc/orders/o260901502091/qc-01.webp",
       quantity:1,
-      status:"warehouse",
+      status:"shipped",
       carrier:"BJ-EUB",
-      tracking_code:"79029858827389",
+      tracking_code:"LZ458955736CN",
       total_amount:null,
       currency:"BRL",
       ordered_at:"2026-09-01T06:06:15+00:00",
@@ -208,6 +212,31 @@
           status:"warehouse",
           description:"Pacote P260907637637 criado para envio internacional via BJ-EUB (0–2 kg).",
           occurred_at:"2026-09-06"
+        },
+        {
+          status:"parcel_submitted",
+          description:"Pacote enviado para processamento.",
+          occurred_at:"2026-09-07T07:04:16-03:00"
+        },
+        {
+          status:"parcel_paid",
+          description:"Pagamento do pacote confirmado.",
+          occurred_at:"2026-09-07T07:04:32-03:00"
+        },
+        {
+          status:"parcel_packaged",
+          description:"Pacote embalado e preparado para envio.",
+          occurred_at:"2026-09-07T11:57:14-03:00"
+        },
+        {
+          status:"tracking_registered",
+          description:"As informações eletrônicas da remessa foram recebidas.",
+          occurred_at:"2026-09-07T11:57:17-03:00"
+        },
+        {
+          status:"shipped",
+          description:"O pacote saiu do armazém da CSSBuy.",
+          occurred_at:"2026-09-07T17:55:26-03:00"
         }
       ]
     };
@@ -231,11 +260,20 @@
           occurred_at:parcel.submitted_at
         });
       }
+      [
+        {status:"parcel_submitted",description:"Pacote enviado para processamento.",occurred_at:"2026-09-07T07:04:16-03:00"},
+        {status:"parcel_paid",description:"Pagamento do pacote confirmado.",occurred_at:"2026-09-07T07:04:32-03:00"},
+        {status:"parcel_packaged",description:"Pacote embalado e preparado para envio.",occurred_at:"2026-09-07T11:57:14-03:00"},
+        {status:"tracking_registered",description:"As informações eletrônicas da remessa foram recebidas.",occurred_at:"2026-09-07T11:57:17-03:00"},
+        {status:"shipped",description:"O pacote saiu do armazém da CSSBuy.",occurred_at:"2026-09-07T17:55:26-03:00"}
+      ].forEach(function(shipmentEvent){
+        if (!events.some(function(event){ return event.occurred_at === shipmentEvent.occurred_at; })) events.push(shipmentEvent);
+      });
     }
     return events.sort(function(a,b){ return new Date(b.occurred_at) - new Date(a.occurred_at); });
   }
   function effectiveStatus(order){
-    return clean(order && order.order_code).toUpperCase() === "O260901502091" ? "warehouse" : order.status;
+    return clean(order && order.order_code).toUpperCase() === "O260901502091" ? "shipped" : order.status;
   }
   function trackingStepIndex(status){
     var index = ACCOUNT_TRACKING_STEPS.findIndex(function(step){ return step.key === status; });
@@ -288,7 +326,7 @@
     var parcel = knownYagoParcel(order);
     if (!parcel) return "";
     return "<section class=\"account-parcel\">" +
-      "<div class=\"account-parcel-head\"><div><span>ENVIO INTERNACIONAL</span><strong>Pacote preparado</strong></div><small>Solicitado em " + escapeHtml(formatDate(parcel.submitted_at)) + "</small></div>" +
+      "<div class=\"account-parcel-head\"><div><span>ENVIO INTERNACIONAL</span><strong>Pacote em trânsito</strong></div><small>Solicitado em " + escapeHtml(formatDate(parcel.submitted_at)) + "</small></div>" +
       "<div class=\"account-parcel-grid\">" +
         "<div><span>Pacote</span><strong>" + escapeHtml(parcel.id) + "</strong></div>" +
         "<div><span>Modalidade</span><strong>" + escapeHtml(parcel.shipping) + "</strong></div>" +
@@ -296,6 +334,8 @@
         "<div><span>Total</span><strong>" + escapeHtml(parcel.total_price) + "</strong></div>" +
         "<div><span>Seguro declarado</span><strong>" + escapeHtml(parcel.insured_amount) + "</strong></div>" +
       "</div>" +
+      "<button type=\"button\" class=\"tracking-copy-button\" data-copy-tracking=\"" + escapeHtml(parcel.tracking_code) + "\" aria-label=\"Copiar código de rastreio " + escapeHtml(parcel.tracking_code) + "\"><span>CÓDIGO DE RASTREIO</span><strong>" + escapeHtml(parcel.tracking_code) + "</strong><small>CLIQUE PARA COPIAR</small></button>" +
+      "<p class=\"tracking-postal-note\">" + escapeHtml(parcel.tracking_note) + "</p>" +
       "<div class=\"account-declaration\"><span>DECLARAÇÃO ADUANEIRA</span><strong>" + escapeHtml(parcel.declaration) + "</strong></div>" +
     "</section>";
   }
@@ -820,6 +860,35 @@
     document.body.style.overflow = "";
   }
 
+  async function copyTrackingCode(button){
+    var code = clean(button.getAttribute("data-copy-tracking"));
+    if (!code) return;
+    try{
+      if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(code);
+      else{
+        var helper = document.createElement("textarea");
+        helper.value = code;
+        helper.setAttribute("readonly","");
+        helper.style.position = "fixed";
+        helper.style.opacity = "0";
+        document.body.appendChild(helper);
+        helper.select();
+        document.execCommand("copy");
+        helper.remove();
+      }
+      button.classList.add("copied");
+      var label = button.querySelector("small");
+      if (label) label.textContent = "COPIADO ✓";
+      setTimeout(function(){
+        button.classList.remove("copied");
+        if (label) label.textContent = "CLIQUE PARA COPIAR";
+      },1800);
+    }catch(error){
+      var failedLabel = button.querySelector("small");
+      if (failedLabel) failedLabel.textContent = "NÃO FOI POSSÍVEL COPIAR";
+    }
+  }
+
   function stepOrderQc(direction){
     if (currentQcPhotos.length) showOrderQc(currentQcIndex + direction);
   }
@@ -837,6 +906,8 @@
     all("[data-account-tab]").forEach(function(button){ button.addEventListener("click",function(){ selectAccountTab(button.getAttribute("data-account-tab")); }); });
     all("[data-open-account-orders]").forEach(function(button){ button.addEventListener("click",function(){ selectAccountTab("orders"); }); });
     byId("accountOrderList").addEventListener("click",function(event){
+      var copyButton = event.target.closest("[data-copy-tracking]");
+      if (copyButton){ copyTrackingCode(copyButton); return; }
       var button = event.target.closest("[data-order-qc]");
       if (button) openOrderQc(button.getAttribute("data-order-qc"),button.getAttribute("data-qc-index"));
     });

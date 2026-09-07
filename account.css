@@ -444,6 +444,7 @@ body.site-redesign.route-conta{padding:0;background:#060607;background-image:rad
 .account-parcel-grid strong{display:block;margin-top:7px;overflow-wrap:anywhere;color:#f2f2f3;font:700 11px/1.35 "Space Grotesk",sans-serif}
 .account-declaration{display:grid;gap:8px;padding:17px 18px;background:linear-gradient(105deg,rgba(255,255,255,.065),rgba(255,255,255,.012))}
 .account-declaration strong{color:#fff;font:700 13px/1.5 "Space Grotesk",sans-serif}
+.account-parcel .tracking-copy-button{margin:16px 18px 0}.account-parcel .tracking-postal-note{margin:11px 18px 17px}
 
 @media(max-width:700px){
   .account-parcel-head{align-items:flex-start;flex-direction:column;gap:8px;padding:15px}
@@ -452,4 +453,5 @@ body.site-redesign.route-conta{padding:0;background:#060607;background-image:rad
   .account-parcel-grid>div:nth-child(2n){border-right:0}
   .account-parcel-grid>div:last-child{grid-column:1/-1;border-right:0}
   .account-declaration{padding:15px}
+  .account-parcel .tracking-copy-button{width:calc(100% - 30px);margin:15px 15px 0}.account-parcel .tracking-postal-note{margin:11px 15px 15px}
 }

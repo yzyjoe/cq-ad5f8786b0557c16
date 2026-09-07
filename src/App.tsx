@@ -28,6 +28,8 @@ type TrackingOrder = {
   product: string;
   model: string;
   image: string | null;
+  shippingCode?: string;
+  trackingNote?: string;
   statusKey: string;
   statusPt: string;
   statusAt: string;
@@ -79,11 +81,24 @@ const trackingStatusLabels: Record<string, string> = {
   shipped: "Pedido enviado",
   delivered: "Pedido entregue",
   cancelled: "Pedido cancelado",
+  parcel_submitted: "Pacote registrado",
+  parcel_paid: "Pagamento confirmado",
+  parcel_packaged: "Pacote embalado",
+  tracking_registered: "Rastreio gerado",
 };
 
 function shortTrackingDate(value: string) {
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "—" : new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short" }).format(date).replace(".", "").toUpperCase();
+  return Number.isNaN(date.getTime())
+    ? "—"
+    : new Intl.DateTimeFormat("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+        .format(date)
+        .replace(",", "");
 }
 
 function applyKnownTrackingUpdate(order: TrackingOrder): TrackingOrder {
@@ -98,10 +113,53 @@ function applyKnownTrackingUpdate(order: TrackingOrder): TrackingOrder {
     statusPt: "Pacote P260907637637 criado para envio internacional via BJ-EUB (0–2 kg).",
     statusAt: "2026-09-06T12:00:00-03:00",
   };
+  const shippingEvents: TrackingEvent[] = [
+    { statusKey: "parcel_submitted", statusPt: "Pacote enviado para processamento.", statusAt: "2026-09-07T07:04:16-03:00" },
+    { statusKey: "parcel_paid", statusPt: "Pagamento do pacote confirmado.", statusAt: "2026-09-07T07:04:32-03:00" },
+    { statusKey: "parcel_packaged", statusPt: "Pacote embalado e preparado para envio.", statusAt: "2026-09-07T11:57:14-03:00" },
+    { statusKey: "tracking_registered", statusPt: "As informações eletrônicas da remessa foram recebidas.", statusAt: "2026-09-07T11:57:17-03:00" },
+    { statusKey: "shipped", statusPt: "O pacote saiu do armazém da CSSBuy.", statusAt: "2026-09-07T17:55:26-03:00" },
+  ];
   let history = order.history || [];
   if (!history.some((event) => event.statusKey === "warehouse")) history = [...history, warehouseEvent];
   if (!history.some((event) => event.statusPt.includes("P260907637637"))) history = [...history, parcelEvent];
-  return { ...order, statusKey: "warehouse", statusPt: parcelEvent.statusPt, statusAt: parcelEvent.statusAt, history };
+  shippingEvents.forEach((shipmentEvent) => {
+    if (!history.some((event) => event.statusAt === shipmentEvent.statusAt)) history = [...history, shipmentEvent];
+  });
+  const latest = shippingEvents[shippingEvents.length - 1];
+  return {
+    ...order,
+    shippingCode: "LZ458955736CN",
+    trackingNote: "O código foi gerado, mas ainda não consta nos registros dos Correios. Em breve ele entrará na base de dados.",
+    statusKey: latest.statusKey,
+    statusPt: latest.statusPt,
+    statusAt: latest.statusAt,
+    history,
+  };
+}
+
+function CopyTrackingCode({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      const helper = document.createElement("textarea");
+      helper.value = code;
+      helper.setAttribute("readonly", "");
+      helper.style.position = "fixed";
+      helper.style.opacity = "0";
+      document.body.appendChild(helper);
+      helper.select();
+      document.execCommand("copy");
+      helper.remove();
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
+  };
+
+  return <button type="button" className={`tracking-copy-button${copied ? " copied" : ""}`} onClick={copy} aria-label={`Copiar código de rastreio ${code}`}><span>CÓDIGO DE RASTREIO</span><strong>{code}</strong><small>{copied ? "COPIADO ✓" : "CLIQUE PARA COPIAR"}</small></button>;
 }
 
 function OrderTimeline({ history }: { history: TrackingEvent[] }) {
@@ -311,7 +369,7 @@ export default function Home() {
   useEffect(() => {
     if (document.querySelector('script[data-kicknity-account="true"]')) return;
     const script = document.createElement("script");
-    script.src = `./account.js?v=20260906-parcel1`;
+    script.src = `./account.js?v=20260907-shipped1`;
     script.dataset.kicknityAccount = "true";
     document.body.appendChild(script);
   }, []);
@@ -493,7 +551,7 @@ export default function Home() {
             <section className="tracking-result">
               <div className="tracked-product">
                 <img src={trackingOrder.image || products.find((product) => product.sku === trackingOrder.model)?.image || "./catalog/hq6316-bone.png"} alt={trackingOrder.product} />
-                <div><p className="eyebrow dark">PEDIDO {trackingOrder.code}</p><h2>{trackingOrder.product}</h2><span className="status-pill">{trackingStatusLabels[trackingOrder.statusKey] || "ATUALIZAÇÃO"}</span></div>
+                <div><p className="eyebrow dark">PEDIDO {trackingOrder.code}</p><h2>{trackingOrder.product}</h2><span className="status-pill">{trackingStatusLabels[trackingOrder.statusKey] || "ATUALIZAÇÃO"}</span>{trackingOrder.shippingCode && <CopyTrackingCode code={trackingOrder.shippingCode} />}{trackingOrder.trackingNote && <p className="tracking-postal-note">{trackingOrder.trackingNote}</p>}</div>
               </div>
               <OrderTimeline history={trackingOrder.history?.length ? trackingOrder.history : [{ statusKey: trackingOrder.statusKey, statusPt: trackingOrder.statusPt, statusAt: trackingOrder.statusAt }]} />
             </section>
