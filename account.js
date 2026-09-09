@@ -56,7 +56,7 @@
     logistics:"Em transporte", warehouse:"Armazém / QC", shipped:"Enviado",
     delivered:"Entregue", cancelled:"Cancelado", parcel_submitted:"Pacote registrado",
     parcel_paid:"Pagamento confirmado", parcel_packaged:"Pacote embalado",
-    tracking_registered:"Rastreio gerado"
+    tracking_registered:"Rastreio gerado", carrier_pending:"Aguardando transportadora"
   };
   var STATUS_DESCRIPTIONS = {
     submitted:"Pedido recebido. Aguardando atendimento.",
@@ -237,6 +237,11 @@
           status:"shipped",
           description:"O pacote saiu do armazém da CSSBuy.",
           occurred_at:"2026-09-07T17:55:26-03:00"
+        },
+        {
+          status:"carrier_pending",
+          description:"Este é o seu código de rastreio: LZ458955736CN. As informações serão atualizadas quando o pacote chegar à transportadora, o que normalmente leva de 3 a 5 dias. Agradecemos a sua paciência.",
+          occurred_at:"2026-09-09"
         }
       ]
     };
@@ -265,7 +270,8 @@
         {status:"parcel_paid",description:"Pagamento do pacote confirmado.",occurred_at:"2026-09-07T07:04:32-03:00"},
         {status:"parcel_packaged",description:"Pacote embalado e preparado para envio.",occurred_at:"2026-09-07T11:57:14-03:00"},
         {status:"tracking_registered",description:"As informações eletrônicas da remessa foram recebidas.",occurred_at:"2026-09-07T11:57:17-03:00"},
-        {status:"shipped",description:"O pacote saiu do armazém da CSSBuy.",occurred_at:"2026-09-07T17:55:26-03:00"}
+        {status:"shipped",description:"O pacote saiu do armazém da CSSBuy.",occurred_at:"2026-09-07T17:55:26-03:00"},
+        {status:"carrier_pending",description:"Este é o seu código de rastreio: LZ458955736CN. As informações serão atualizadas quando o pacote chegar à transportadora, o que normalmente leva de 3 a 5 dias. Agradecemos a sua paciência.",occurred_at:"2026-09-09"}
       ].forEach(function(shipmentEvent){
         if (!events.some(function(event){ return event.occurred_at === shipmentEvent.occurred_at; })) events.push(shipmentEvent);
       });

@@ -85,9 +85,14 @@ const trackingStatusLabels: Record<string, string> = {
   parcel_paid: "Pagamento confirmado",
   parcel_packaged: "Pacote embalado",
   tracking_registered: "Rastreio gerado",
+  carrier_pending: "Aguardando transportadora",
 };
 
 function shortTrackingDate(value: string) {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [, month, day] = value.split("-");
+    return `${day}/${month}`;
+  }
   const date = new Date(value);
   return Number.isNaN(date.getTime())
     ? "—"
@@ -119,6 +124,7 @@ function applyKnownTrackingUpdate(order: TrackingOrder): TrackingOrder {
     { statusKey: "parcel_packaged", statusPt: "Pacote embalado e preparado para envio.", statusAt: "2026-09-07T11:57:14-03:00" },
     { statusKey: "tracking_registered", statusPt: "As informações eletrônicas da remessa foram recebidas.", statusAt: "2026-09-07T11:57:17-03:00" },
     { statusKey: "shipped", statusPt: "O pacote saiu do armazém da CSSBuy.", statusAt: "2026-09-07T17:55:26-03:00" },
+    { statusKey: "carrier_pending", statusPt: "Este é o seu código de rastreio: LZ458955736CN. As informações serão atualizadas quando o pacote chegar à transportadora, o que normalmente leva de 3 a 5 dias. Agradecemos a sua paciência.", statusAt: "2026-09-09" },
   ];
   let history = order.history || [];
   if (!history.some((event) => event.statusKey === "warehouse")) history = [...history, warehouseEvent];
@@ -369,7 +375,7 @@ export default function Home() {
   useEffect(() => {
     if (document.querySelector('script[data-kicknity-account="true"]')) return;
     const script = document.createElement("script");
-    script.src = `./account.js?v=20260907-shipped1`;
+    script.src = `./account.js?v=20260909-carrier1`;
     script.dataset.kicknityAccount = "true";
     document.body.appendChild(script);
   }, []);
