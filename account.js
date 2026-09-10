@@ -279,7 +279,7 @@
     return events.sort(function(a,b){ return new Date(b.occurred_at) - new Date(a.occurred_at); });
   }
   function effectiveStatus(order){
-    return clean(order && order.order_code).toUpperCase() === "O260901502091" ? "shipped" : order.status;
+    return clean(order && order.order_code).toUpperCase() === "O260901502091" ? "carrier_pending" : order.status;
   }
   function trackingStepIndex(status){
     var index = ACCOUNT_TRACKING_STEPS.findIndex(function(step){ return step.key === status; });
@@ -298,12 +298,18 @@
     if (!events.length){
       events = [{status:order.status,description:STATUS_DESCRIPTIONS[order.status] || "Atualização do pedido registrada.",occurred_at:order.updated_at || order.ordered_at}];
     }
-    return events.map(function(item,index){
+    function renderItem(item,index){
+      var description = item.status === "carrier_pending"
+        ? "Atualização prevista em aproximadamente 3–5 dias."
+        : (item.description || STATUS_DESCRIPTIONS[item.status] || "Atualização do pedido registrada.");
       return "<article class=\"tracking-history-item" + (index === 0 ? " current" : "") + "\">" +
         "<div class=\"tracking-history-top\"><span class=\"tracking-history-state\">" + escapeHtml(STATUS_LABELS[item.status] || item.status) + "</span><time>" + escapeHtml(formatDate(item.occurred_at)) + "</time></div>" +
-        "<p>" + escapeHtml(item.description || STATUS_DESCRIPTIONS[item.status] || "Atualização do pedido registrada.") + "</p>" +
+        "<p>" + escapeHtml(description) + "</p>" +
       "</article>";
-    }).join("");
+    }
+    var recent = events.slice(0,3).map(renderItem).join("");
+    var older = events.slice(3).map(function(item,index){ return renderItem(item,index + 3); }).join("");
+    return recent + (older ? "<details class=\"tracking-history-more\"><summary>VER HISTÓRICO COMPLETO <span>+</span></summary><div>" + older + "</div></details>" : "");
   }
   function productPhoto(model){
     var normalized = clean(model).toUpperCase();
@@ -331,8 +337,9 @@
   function orderParcelDetails(order){
     var parcel = knownYagoParcel(order);
     if (!parcel) return "";
-    return "<section class=\"account-parcel\">" +
-      "<div class=\"account-parcel-head\"><div><span>ENVIO INTERNACIONAL</span><strong>Pacote em trânsito</strong></div><small>Solicitado em " + escapeHtml(formatDate(parcel.submitted_at)) + "</small></div>" +
+    return "<div class=\"tracking-code-block\"><span class=\"tracking-code-label\">CÓDIGO DE RASTREIO</span>" +
+      "<button type=\"button\" class=\"tracking-copy-button\" data-copy-tracking=\"" + escapeHtml(parcel.tracking_code) + "\" aria-label=\"Copiar código de rastreio " + escapeHtml(parcel.tracking_code) + "\"><strong>" + escapeHtml(parcel.tracking_code) + "</strong><span class=\"copy-glyph\" aria-hidden=\"true\"></span></button></div>" +
+      "<details class=\"account-parcel tracking-shipping-details\"><summary>DETALHES DO ENVIO <span>+</span></summary><div class=\"account-parcel-content\">" +
       "<div class=\"account-parcel-grid\">" +
         "<div><span>Pacote</span><strong>" + escapeHtml(parcel.id) + "</strong></div>" +
         "<div><span>Modalidade</span><strong>" + escapeHtml(parcel.shipping) + "</strong></div>" +
@@ -340,10 +347,9 @@
         "<div><span>Total</span><strong>" + escapeHtml(parcel.total_price) + "</strong></div>" +
         "<div><span>Seguro declarado</span><strong>" + escapeHtml(parcel.insured_amount) + "</strong></div>" +
       "</div>" +
-      "<button type=\"button\" class=\"tracking-copy-button\" data-copy-tracking=\"" + escapeHtml(parcel.tracking_code) + "\" aria-label=\"Copiar código de rastreio " + escapeHtml(parcel.tracking_code) + "\"><span>CÓDIGO DE RASTREIO</span><strong>" + escapeHtml(parcel.tracking_code) + "</strong><small>CLIQUE PARA COPIAR</small></button>" +
       "<p class=\"tracking-postal-note\">" + escapeHtml(parcel.tracking_note) + "</p>" +
       "<div class=\"account-declaration\"><span>DECLARAÇÃO ADUANEIRA</span><strong>" + escapeHtml(parcel.declaration) + "</strong></div>" +
-    "</section>";
+      "</div></details>";
   }
   function orderTrackingCard(order){
     var events = sortedEvents(order);
@@ -359,10 +365,9 @@
         "<div class=\"tracking-product\">" + productVisual + "<div><h3>" + escapeHtml(order.product_name) + "</h3><p class=\"tracking-model\">Modelo " + escapeHtml(order.model_code || "não informado") + "</p></div></div>" +
         "<div class=\"tracking-order\">" +
           "<div class=\"tracking-order-head\"><div><span class=\"tracking-code-label\">Código do pedido</span><strong class=\"tracking-code\">" + escapeHtml(order.order_code) + "</strong></div><span class=\"tracking-badge\">" + escapeHtml(STATUS_LABELS[status] || status) + "</span></div>" +
-          "<div class=\"tracking-current\"><h4>" + escapeHtml(latest.description || STATUS_DESCRIPTIONS[status] || "Atualização registrada.") + "</h4><time class=\"tracking-time\">Última atualização: " + escapeHtml(formatDate(latest.occurred_at)) + "</time>" + (!knownYagoParcel(order) && order.tracking_code ? "<span class=\"account-tracking-code\">Rastreio: " + escapeHtml(order.tracking_code) + "</span>" : "") + "</div>" +
           orderParcelDetails(order) +
+          "<section class=\"tracking-current\"><span class=\"tracking-current-kicker\">ETAPA ATUAL</span><div><h4>" + escapeHtml(STATUS_LABELS[status] || status) + "</h4><time class=\"tracking-time\">" + escapeHtml(formatDate(latest.occurred_at)) + "</time></div><p>" + escapeHtml(status === "carrier_pending" ? "Atualização prevista em aproximadamente 3–5 dias." : (latest.description || STATUS_DESCRIPTIONS[status] || "Atualização registrada.")) + "</p>" + (!knownYagoParcel(order) && order.tracking_code ? "<span class=\"account-tracking-code\">Rastreio: " + escapeHtml(order.tracking_code) + "</span>" : "") + "</section>" +
           "<section class=\"tracking-history-wrap\"><h5>Histórico do pedido</h5><div class=\"tracking-history\">" + accountHistory(order) + "</div></section>" +
-          "<div class=\"tracking-timeline account-tracking-timeline\" aria-label=\"Etapas do pedido\">" + accountTimeline(order) + "</div>" +
           orderQcGallery(order) +
         "</div>" +
       "</div>" +
@@ -883,15 +888,13 @@
         helper.remove();
       }
       button.classList.add("copied");
-      var label = button.querySelector("small");
-      if (label) label.textContent = "COPIADO ✓";
+      button.setAttribute("aria-label","Código copiado");
       setTimeout(function(){
         button.classList.remove("copied");
-        if (label) label.textContent = "CLIQUE PARA COPIAR";
+        button.setAttribute("aria-label","Copiar código de rastreio " + code);
       },1800);
     }catch(error){
-      var failedLabel = button.querySelector("small");
-      if (failedLabel) failedLabel.textContent = "NÃO FOI POSSÍVEL COPIAR";
+      button.setAttribute("aria-label","Não foi possível copiar o código");
     }
   }
 

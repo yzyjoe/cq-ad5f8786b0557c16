@@ -34,6 +34,14 @@ type TrackingOrder = {
   statusPt: string;
   statusAt: string;
   history: TrackingEvent[];
+  shippingDetails?: {
+    parcel: string;
+    method: string;
+    shippingPrice: string;
+    totalPrice: string;
+    insuredAmount: string;
+    declaration: string;
+  };
 };
 
 const EXCHANGE_RATE = 1.19;
@@ -141,6 +149,14 @@ function applyKnownTrackingUpdate(order: TrackingOrder): TrackingOrder {
     statusPt: latest.statusPt,
     statusAt: latest.statusAt,
     history,
+    shippingDetails: {
+      parcel: "P260907637637",
+      method: "BJ-EUB (0–2 kg)",
+      shippingPrice: "¥148,10",
+      totalPrice: "¥167,39",
+      insuredAmount: "¥278,17",
+      declaration: "Tênis unissex branco, tamanho 45, material: borracha — US$ 7,00",
+    },
   };
 }
 
@@ -165,19 +181,53 @@ function CopyTrackingCode({ code }: { code: string }) {
     window.setTimeout(() => setCopied(false), 1800);
   };
 
-  return <button type="button" className={`tracking-copy-button${copied ? " copied" : ""}`} onClick={copy} aria-label={`Copiar código de rastreio ${code}`}><span>CÓDIGO DE RASTREIO</span><strong>{code}</strong><small>{copied ? "COPIADO ✓" : "CLIQUE PARA COPIAR"}</small></button>;
+  return (
+    <div className="tracking-code-block">
+      <span className="tracking-code-label">CÓDIGO DE RASTREIO</span>
+      <button type="button" className={`tracking-copy-button${copied ? " copied" : ""}`} onClick={copy} aria-label={copied ? "Código copiado" : `Copiar código de rastreio ${code}`}>
+        <strong>{code}</strong><span className="copy-glyph" aria-hidden="true" />
+      </button>
+      <span className="sr-only" aria-live="polite">{copied ? "Código copiado" : ""}</span>
+    </div>
+  );
 }
 
 function OrderTimeline({ history }: { history: TrackingEvent[] }) {
+  const [expanded, setExpanded] = useState(false);
   const ordered = [...history].sort((a, b) => new Date(b.statusAt).getTime() - new Date(a.statusAt).getTime());
+  const visible = expanded ? ordered : ordered.slice(0, 3);
   return (
-    <div className="timeline">
-      {ordered.map((event, index) => (
-        <div className={`timeline-row ${index === 0 ? "current" : ""}`} key={`${event.statusKey}-${event.statusAt}`}>
-          <span className="timeline-date">{shortTrackingDate(event.statusAt)}</span><span className="timeline-dot"/><div><h3>{trackingStatusLabels[event.statusKey] || "Atualização"}</h3><p>{event.statusPt}</p></div>
-        </div>
-      ))}
-    </div>
+    <section className="tracking-history-panel">
+      <h3>HISTÓRICO DO PEDIDO</h3>
+      <div className="timeline">
+        {visible.map((event, index) => (
+          <div className={`timeline-row ${index === 0 ? "current" : ""}`} key={`${event.statusKey}-${event.statusAt}`}>
+            <span className="timeline-dot"/><div><div className="timeline-heading"><h4>{trackingStatusLabels[event.statusKey] || "Atualização"}</h4><time>{shortTrackingDate(event.statusAt)}</time></div><p>{event.statusKey === "carrier_pending" ? "Atualização prevista em aproximadamente 3–5 dias." : event.statusPt}</p></div>
+          </div>
+        ))}
+      </div>
+      {ordered.length > 3 && <button type="button" className="tracking-history-toggle" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>{expanded ? "MOSTRAR MENOS" : "VER HISTÓRICO COMPLETO"}<span aria-hidden="true">{expanded ? "−" : "+"}</span></button>}
+    </section>
+  );
+}
+
+function ShippingDetails({ order }: { order: TrackingOrder }) {
+  if (!order.shippingDetails && !order.trackingNote) return null;
+  return (
+    <details className="tracking-shipping-details">
+      <summary>DETALHES DO ENVIO <span aria-hidden="true">+</span></summary>
+      <div className="tracking-detail-grid">
+        {order.shippingDetails && <>
+          <div><span>Pacote</span><strong>{order.shippingDetails.parcel}</strong></div>
+          <div><span>Modalidade</span><strong>{order.shippingDetails.method}</strong></div>
+          <div><span>Frete</span><strong>{order.shippingDetails.shippingPrice}</strong></div>
+          <div><span>Total</span><strong>{order.shippingDetails.totalPrice}</strong></div>
+          <div><span>Seguro declarado</span><strong>{order.shippingDetails.insuredAmount}</strong></div>
+          <div className="wide"><span>Declaração aduaneira</span><strong>{order.shippingDetails.declaration}</strong></div>
+        </>}
+        {order.trackingNote && <p className="tracking-detail-note">{order.trackingNote}</p>}
+      </div>
+    </details>
   );
 }
 
@@ -375,7 +425,7 @@ export default function Home() {
   useEffect(() => {
     if (document.querySelector('script[data-kicknity-account="true"]')) return;
     const script = document.createElement("script");
-    script.src = `./account.js?v=20260909-carrier1`;
+    script.src = `./account.js?v=20260910-tracking1`;
     script.dataset.kicknityAccount = "true";
     document.body.appendChild(script);
   }, []);
@@ -554,12 +604,20 @@ export default function Home() {
             <p className={`tracking-hint${trackingError ? " error" : ""}`}>{trackingError || "Digite o código exatamente como foi enviado pela Kicknity."}</p>
           </section>
           {trackingVisible && trackingOrder && (
-            <section className="tracking-result">
-              <div className="tracked-product">
+            <section className="tracking-result tracking-shell">
+              <header className="tracking-product-summary">
                 <img src={trackingOrder.image || products.find((product) => product.sku === trackingOrder.model)?.image || "./catalog/hq6316-bone.png"} alt={trackingOrder.product} />
-                <div><p className="eyebrow dark">PEDIDO {trackingOrder.code}</p><h2>{trackingOrder.product}</h2><span className="status-pill">{trackingStatusLabels[trackingOrder.statusKey] || "ATUALIZAÇÃO"}</span>{trackingOrder.shippingCode && <CopyTrackingCode code={trackingOrder.shippingCode} />}{trackingOrder.trackingNote && <p className="tracking-postal-note">{trackingOrder.trackingNote}</p>}</div>
-              </div>
+                <div><p>PEDIDO {trackingOrder.code}</p><h2>{trackingOrder.product}</h2></div>
+                <span className="status-pill">{trackingStatusLabels[trackingOrder.statusKey] || "ATUALIZAÇÃO"}</span>
+              </header>
+              {trackingOrder.shippingCode && <CopyTrackingCode code={trackingOrder.shippingCode} />}
+              <section className="tracking-current-card">
+                <span>ETAPA ATUAL</span>
+                <div><h3>{trackingStatusLabels[trackingOrder.statusKey] || "Atualização"}</h3><time>{shortTrackingDate(trackingOrder.statusAt)}</time></div>
+                <p>{trackingOrder.statusKey === "carrier_pending" ? "Atualização prevista em aproximadamente 3–5 dias." : trackingOrder.statusPt}</p>
+              </section>
               <OrderTimeline history={trackingOrder.history?.length ? trackingOrder.history : [{ statusKey: trackingOrder.statusKey, statusPt: trackingOrder.statusPt, statusAt: trackingOrder.statusAt }]} />
+              <ShippingDetails order={trackingOrder} />
             </section>
           )}
         </main>
