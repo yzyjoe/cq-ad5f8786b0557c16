@@ -114,6 +114,15 @@ function shortTrackingDate(value: string) {
         .replace(",", "");
 }
 
+function fullTrackingDate(value: string) {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [year, month, day] = value.split("-");
+    return `${day}/${month}/${year}`;
+  }
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "—" : new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(date);
+}
+
 function applyKnownTrackingUpdate(order: TrackingOrder): TrackingOrder {
   if (order.code.toUpperCase() !== "O260901502091") return order;
   const warehouseEvent: TrackingEvent = {
@@ -613,7 +622,7 @@ export default function Home() {
               {trackingOrder.shippingCode && <CopyTrackingCode code={trackingOrder.shippingCode} />}
               <section className="tracking-current-card">
                 <span>ETAPA ATUAL</span>
-                <div><h3>{trackingStatusLabels[trackingOrder.statusKey] || "Atualização"}</h3><time>{shortTrackingDate(trackingOrder.statusAt)}</time></div>
+                <div><h3>{trackingStatusLabels[trackingOrder.statusKey] || "Atualização"}</h3><time>{fullTrackingDate(trackingOrder.statusAt)}</time></div>
                 <p>{trackingOrder.statusKey === "carrier_pending" ? "Atualização prevista em aproximadamente 3–5 dias." : trackingOrder.statusPt}</p>
               </section>
               <OrderTimeline history={trackingOrder.history?.length ? trackingOrder.history : [{ statusKey: trackingOrder.statusKey, statusPt: trackingOrder.statusPt, statusAt: trackingOrder.statusAt }]} />
