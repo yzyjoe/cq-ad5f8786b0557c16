@@ -434,7 +434,7 @@ export default function Home() {
   useEffect(() => {
     if (document.querySelector('script[data-kicknity-account="true"]')) return;
     const script = document.createElement("script");
-    script.src = `./account.js?v=20260910-tracking1`;
+    script.src = `./account.js?v=20260910-admin1`;
     script.dataset.kicknityAccount = "true";
     document.body.appendChild(script);
   }, []);

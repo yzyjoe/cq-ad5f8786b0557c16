@@ -150,6 +150,10 @@
     return clean(currentProfile && currentProfile.email).toLowerCase() === "lucaseumesmo007@gmail.com";
   }
 
+  function isKicknityAdminAccount(){
+    return clean(currentProfile && currentProfile.email).toLowerCase() === "kicknity@gmail.com";
+  }
+
   function knownYagoParcel(order){
     if (clean(order && order.order_code).toUpperCase() !== "O260901502091") return null;
     return {
@@ -504,7 +508,16 @@
     showOrdersSkeleton();
     var response = await client.from("orders").select("*,order_events(*)").eq("user_id",currentSession.user.id).is("deleted_at",null).order("updated_at",{ascending:false});
     if (response.error) throw response.error;
-    currentOrders = isYagoPreviewAccount() ? [yagoPreviewOrder()] : (response.data || []);
+    var savedOrders = response.data || [];
+    if (isYagoPreviewAccount()){
+      currentOrders = [yagoPreviewOrder()];
+    }else if (isKicknityAdminAccount()){
+      currentOrders = savedOrders.some(function(order){ return clean(order.order_code).toUpperCase() === "O260901502091"; })
+        ? savedOrders
+        : [yagoPreviewOrder()].concat(savedOrders);
+    }else{
+      currentOrders = savedOrders;
+    }
     renderCustomerOrders();
   }
 
