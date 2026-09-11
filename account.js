@@ -56,7 +56,9 @@
     logistics:"Em transporte", warehouse:"Armazém / QC", shipped:"Enviado",
     delivered:"Entregue", cancelled:"Cancelado", parcel_submitted:"Pacote registrado",
     parcel_paid:"Pagamento confirmado", parcel_packaged:"Pacote embalado",
-    tracking_registered:"Rastreio gerado", carrier_pending:"Aguardando transportadora"
+    tracking_registered:"Rastreio gerado", carrier_pending:"Aguardando transportadora",
+    cpf_linked:"CPF vinculado", china_post_received:"Recebido pela China Post",
+    posted_correios:"Objeto postado"
   };
   var STATUS_DESCRIPTIONS = {
     submitted:"Pedido recebido. Aguardando atendimento.",
@@ -165,7 +167,7 @@
       insured_amount:"¥ 278,17",
       declaration:"Tênis unissex · branco · tamanho 45 · borracha · US$ 7,00",
       tracking_code:"LZ458955736CN",
-      tracking_note:"O código foi gerado, mas ainda não consta nos registros dos Correios. Em breve ele entrará na base de dados."
+      tracking_note:"O código está ativo no aplicativo dos Correios e o CPF do destinatário foi vinculado ao pacote com sucesso."
     };
   }
 
@@ -178,13 +180,13 @@
       model_code:"HQ6316",
       image_url:"qc/orders/o260901502091/qc-01.webp",
       quantity:1,
-      status:"shipped",
+      status:"posted_correios",
       carrier:"BJ-EUB",
       tracking_code:"LZ458955736CN",
       total_amount:null,
       currency:"BRL",
       ordered_at:"2026-09-01T06:06:15+00:00",
-      updated_at:"2026-09-06",
+      updated_at:"2026-09-11",
       deleted_at:null,
       order_events:[
         {
@@ -246,6 +248,21 @@
           status:"carrier_pending",
           description:"Este é o seu código de rastreio: LZ458955736CN. As informações serão atualizadas quando o pacote chegar à transportadora, o que normalmente leva de 3 a 5 dias. Agradecemos a sua paciência.",
           occurred_at:"2026-09-09"
+        },
+        {
+          status:"posted_correios",
+          description:"O objeto foi postado e já aparece no aplicativo dos Correios.",
+          occurred_at:"2026-09-11"
+        },
+        {
+          status:"china_post_received",
+          description:"Pequim, China — a China Post recebeu o objeto.",
+          occurred_at:"2026-09-11"
+        },
+        {
+          status:"cpf_linked",
+          description:"O CPF do destinatário foi vinculado ao pacote com sucesso.",
+          occurred_at:"2026-09-11"
         }
       ]
     };
@@ -275,15 +292,18 @@
         {status:"parcel_packaged",description:"Pacote embalado e preparado para envio.",occurred_at:"2026-09-07T11:57:14-03:00"},
         {status:"tracking_registered",description:"As informações eletrônicas da remessa foram recebidas.",occurred_at:"2026-09-07T11:57:17-03:00"},
         {status:"shipped",description:"O pacote saiu do armazém da CSSBuy.",occurred_at:"2026-09-07T17:55:26-03:00"},
-        {status:"carrier_pending",description:"Este é o seu código de rastreio: LZ458955736CN. As informações serão atualizadas quando o pacote chegar à transportadora, o que normalmente leva de 3 a 5 dias. Agradecemos a sua paciência.",occurred_at:"2026-09-09"}
+        {status:"carrier_pending",description:"Este é o seu código de rastreio: LZ458955736CN. As informações serão atualizadas quando o pacote chegar à transportadora, o que normalmente leva de 3 a 5 dias. Agradecemos a sua paciência.",occurred_at:"2026-09-09"},
+        {status:"posted_correios",description:"O objeto foi postado e já aparece no aplicativo dos Correios.",occurred_at:"2026-09-11"},
+        {status:"china_post_received",description:"Pequim, China — a China Post recebeu o objeto.",occurred_at:"2026-09-11"},
+        {status:"cpf_linked",description:"O CPF do destinatário foi vinculado ao pacote com sucesso.",occurred_at:"2026-09-11"}
       ].forEach(function(shipmentEvent){
-        if (!events.some(function(event){ return event.occurred_at === shipmentEvent.occurred_at; })) events.push(shipmentEvent);
+        if (!events.some(function(event){ return event.status === shipmentEvent.status; })) events.push(shipmentEvent);
       });
     }
     return events.sort(function(a,b){ return new Date(b.occurred_at) - new Date(a.occurred_at); });
   }
   function effectiveStatus(order){
-    return clean(order && order.order_code).toUpperCase() === "O260901502091" ? "carrier_pending" : order.status;
+    return clean(order && order.order_code).toUpperCase() === "O260901502091" ? "posted_correios" : order.status;
   }
   function trackingStepIndex(status){
     var index = ACCOUNT_TRACKING_STEPS.findIndex(function(step){ return step.key === status; });

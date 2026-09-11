@@ -94,6 +94,9 @@ const trackingStatusLabels: Record<string, string> = {
   parcel_packaged: "Pacote embalado",
   tracking_registered: "Rastreio gerado",
   carrier_pending: "Aguardando transportadora",
+  cpf_linked: "CPF vinculado",
+  china_post_received: "Recebido pela China Post",
+  posted_correios: "Objeto postado",
 };
 
 function shortTrackingDate(value: string) {
@@ -142,18 +145,21 @@ function applyKnownTrackingUpdate(order: TrackingOrder): TrackingOrder {
     { statusKey: "tracking_registered", statusPt: "As informações eletrônicas da remessa foram recebidas.", statusAt: "2026-09-07T11:57:17-03:00" },
     { statusKey: "shipped", statusPt: "O pacote saiu do armazém da CSSBuy.", statusAt: "2026-09-07T17:55:26-03:00" },
     { statusKey: "carrier_pending", statusPt: "Este é o seu código de rastreio: LZ458955736CN. As informações serão atualizadas quando o pacote chegar à transportadora, o que normalmente leva de 3 a 5 dias. Agradecemos a sua paciência.", statusAt: "2026-09-09" },
+    { statusKey: "posted_correios", statusPt: "O objeto foi postado e já aparece no aplicativo dos Correios.", statusAt: "2026-09-11" },
+    { statusKey: "china_post_received", statusPt: "Pequim, China — a China Post recebeu o objeto.", statusAt: "2026-09-11" },
+    { statusKey: "cpf_linked", statusPt: "O CPF do destinatário foi vinculado ao pacote com sucesso.", statusAt: "2026-09-11" },
   ];
   let history = order.history || [];
   if (!history.some((event) => event.statusKey === "warehouse")) history = [...history, warehouseEvent];
   if (!history.some((event) => event.statusPt.includes("P260907637637"))) history = [...history, parcelEvent];
   shippingEvents.forEach((shipmentEvent) => {
-    if (!history.some((event) => event.statusAt === shipmentEvent.statusAt)) history = [...history, shipmentEvent];
+    if (!history.some((event) => event.statusKey === shipmentEvent.statusKey)) history = [...history, shipmentEvent];
   });
-  const latest = shippingEvents[shippingEvents.length - 1];
+  const latest = shippingEvents.find((event) => event.statusKey === "posted_correios")!;
   return {
     ...order,
     shippingCode: "LZ458955736CN",
-    trackingNote: "O código foi gerado, mas ainda não consta nos registros dos Correios. Em breve ele entrará na base de dados.",
+    trackingNote: "O código está ativo no aplicativo dos Correios e o CPF do destinatário foi vinculado ao pacote com sucesso.",
     statusKey: latest.statusKey,
     statusPt: latest.statusPt,
     statusAt: latest.statusAt,
@@ -434,7 +440,7 @@ export default function Home() {
   useEffect(() => {
     if (document.querySelector('script[data-kicknity-account="true"]')) return;
     const script = document.createElement("script");
-    script.src = `./account.js?v=20260910-admin1`;
+    script.src = `./account.js?v=20260911-tracking1`;
     script.dataset.kicknityAccount = "true";
     document.body.appendChild(script);
   }, []);
