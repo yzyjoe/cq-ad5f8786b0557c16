@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { calculateQuote, EXCHANGE_RATE, MAX_CART_WEIGHT_GRAMS } from "./pricing";
 
 type Route = "home" | "shop" | "how" | "tracking" | "account";
 
@@ -13,6 +14,10 @@ type Product = {
   image: string;
   tone: string;
   qc: string[];
+  category: "apparel" | "sneakers";
+  weightGrams: number;
+  description: string;
+  editorial?: string[];
 };
 
 type PurchaseStep = "select" | "review" | "payment";
@@ -44,19 +49,20 @@ type TrackingOrder = {
   };
 };
 
-const EXCHANGE_RATE = 1.19;
 const UNIT_CNY = 143;
 const UNIT_BRL = UNIT_CNY / EXCHANGE_RATE;
 
 const qcPhotos = (sku: string, count: number) => Array.from({ length: count }, (_, index) => `./qc/${sku.toLowerCase()}-${index + 1}.webp`);
 
 const products: Product[] = [
-  { id: "bone", name: "Yeezy Boost 350 V2 Bone", sku: "HQ6316", price: UNIT_BRL, cny: UNIT_CNY, image: "./catalog/hq6316-bone.png", tone: "CREAM", qc: qcPhotos("HQ6316", 6) },
-  { id: "mx-oat", name: "Yeezy Boost 350 V2 MX Oat", sku: "GW3773", price: UNIT_BRL, cny: UNIT_CNY, image: "./catalog/gw3773-mx-oat.png", tone: "MULTI", qc: qcPhotos("GW3773", 6) },
-  { id: "butter", name: "Yeezy Boost 350 V2 Butter", sku: "F36980", price: UNIT_BRL, cny: UNIT_CNY, image: "./catalog/f36980-butter.png", tone: "YELLOW", qc: qcPhotos("F36980", 6) },
-  { id: "onyx", name: "Yeezy Boost 350 V2 Onyx", sku: "HQ4540", price: UNIT_BRL, cny: UNIT_CNY, image: "./catalog/hq4540-onyx.png", tone: "ONYX", qc: qcPhotos("HQ4540", 6) },
-  { id: "mx-rock", name: "Yeezy Boost 350 V2 MX Rock", sku: "GW3774", price: UNIT_BRL, cny: UNIT_CNY, image: "./catalog/gw3774-mx-rock.png", tone: "DARK", qc: qcPhotos("GW3774", 6) },
-  { id: "yecheil", name: "Yeezy Boost 350 V2 Yecheil", sku: "FW5190", price: UNIT_BRL, cny: UNIT_CNY, image: "./catalog/fw5190-yecheil.png", tone: "MULTI", qc: qcPhotos("FW5190", 7) },
+  { id: "tech-jacket", name: "Nike Tech Fleece 2025 · Jaqueta Windrunner Color-Block", sku: "IF1325-010", price: 255 / EXCHANGE_RATE, cny: 255, image: "./catalog/nike-tech-jacket-front.jpg", tone: "PRETO / ANTRACITE", qc: [], category: "apparel", weightGrams: 650, description: "Jaqueta com zíper completo em preto e antracite. Tamanho e disponibilidade confirmados antes do pagamento.", editorial: ["./catalog/nike-tech-jacket-back.jpg", "./catalog/nike-tech-jacket-angle.jpg", "./catalog/nike-tech-look-motion.jpg"] },
+  { id: "tech-pants", name: "Nike Tech Fleece 2025 · Calça Open-Hem Color-Block", sku: "IF1323-010", price: 245 / EXCHANGE_RATE, cny: 245, image: "./catalog/nike-tech-pants-detail.jpg", tone: "PRETO / ANTRACITE", qc: [], category: "apparel", weightGrams: 550, description: "Calça de bainha aberta com ajuste na barra. Tamanho e disponibilidade confirmados antes do pagamento.", editorial: ["./catalog/nike-tech-look-front.jpg", "./catalog/nike-tech-look-motion.jpg"] },
+  { id: "bone", name: "Yeezy Boost 350 V2 Bone", sku: "HQ6316", price: UNIT_BRL, cny: UNIT_CNY, image: "./catalog/hq6316-bone.png", tone: "CREAM", qc: qcPhotos("HQ6316", 6), category: "sneakers", weightGrams: 704, description: "Seleção de tênis com fotos de QC disponíveis na galeria." },
+  { id: "mx-oat", name: "Yeezy Boost 350 V2 MX Oat", sku: "GW3773", price: UNIT_BRL, cny: UNIT_CNY, image: "./catalog/gw3773-mx-oat.png", tone: "MULTI", qc: qcPhotos("GW3773", 6), category: "sneakers", weightGrams: 704, description: "Seleção de tênis com fotos de QC disponíveis na galeria." },
+  { id: "butter", name: "Yeezy Boost 350 V2 Butter", sku: "F36980", price: UNIT_BRL, cny: UNIT_CNY, image: "./catalog/f36980-butter.png", tone: "YELLOW", qc: qcPhotos("F36980", 6), category: "sneakers", weightGrams: 704, description: "Seleção de tênis com fotos de QC disponíveis na galeria." },
+  { id: "onyx", name: "Yeezy Boost 350 V2 Onyx", sku: "HQ4540", price: UNIT_BRL, cny: UNIT_CNY, image: "./catalog/hq4540-onyx.png", tone: "ONYX", qc: qcPhotos("HQ4540", 6), category: "sneakers", weightGrams: 704, description: "Seleção de tênis com fotos de QC disponíveis na galeria." },
+  { id: "mx-rock", name: "Yeezy Boost 350 V2 MX Rock", sku: "GW3774", price: UNIT_BRL, cny: UNIT_CNY, image: "./catalog/gw3774-mx-rock.png", tone: "DARK", qc: qcPhotos("GW3774", 6), category: "sneakers", weightGrams: 704, description: "Seleção de tênis com fotos de QC disponíveis na galeria." },
+  { id: "yecheil", name: "Yeezy Boost 350 V2 Yecheil", sku: "FW5190", price: UNIT_BRL, cny: UNIT_CNY, image: "./catalog/fw5190-yecheil.png", tone: "MULTI", qc: qcPhotos("FW5190", 7), category: "sneakers", weightGrams: 704, description: "Seleção de tênis com fotos de QC disponíveis na galeria." },
 ];
 
 const routeLabels: Record<Route, string> = {
@@ -360,7 +366,7 @@ function AccountExperience({ active }: { active: boolean }) {
       <div className="image-lightbox account-qc-lightbox" id="accountQcLightbox" role="dialog" aria-modal="true" aria-label="Foto real ampliada do pedido" hidden>
         <div className="lightbox-top"><span id="accountQcLabel">FOTO REAL DE QC</span><strong id="accountQcCount">1 / 9</strong><button id="accountQcClose" type="button">FECHAR ×</button></div>
         <button className="lightbox-arrow prev" id="accountQcPrev" type="button" aria-label="Foto anterior">‹</button>
-        <img id="accountQcImage" src="" alt="Foto real de QC do pedido" />
+        <img id="accountQcImage" alt="Foto real de QC do pedido" />
         <button className="lightbox-arrow next" id="accountQcNext" type="button" aria-label="Próxima foto">›</button>
         <p>Use as setas ou deslize para navegar</p>
       </div>
@@ -380,6 +386,9 @@ export default function Home() {
   const [activeImage, setActiveImage] = useState("");
   const [zoomedImageIndex, setZoomedImageIndex] = useState<number | null>(null);
   const [purchaseStep, setPurchaseStep] = useState<PurchaseStep>("select");
+  const [catalogFilter, setCatalogFilter] = useState<"all" | "apparel" | "sneakers">("all");
+  const [sizeNotes, setSizeNotes] = useState<Record<string, string>>({});
+  const [cartWarning, setCartWarning] = useState("");
 
   const openProduct = (product: Product) => {
     setSelectedProduct(product);
@@ -471,90 +480,142 @@ export default function Home() {
     return () => document.removeEventListener("click", handleRoute);
   }, []);
 
-  const changeQuantity = (productId: string, change: number) => setCart((current) => {
-    const next = Math.max(0, (current[productId] || 0) + change);
-    const updated = { ...current, [productId]: next };
-    if (!next) delete updated[productId];
-    return updated;
-  });
+  const quote = calculateQuote(cart, products);
+  const { itemCount: totalItems, weightGrams: weight } = quote;
+  const subtotal = quote.productBrl;
+  const shipping = quote.shippingBrl;
+  const insurance = quote.insuranceBrl;
+  const service = quote.serviceBrl;
+  const total = quote.totalBrl;
+  const visibleProducts = catalogFilter === "all" ? products : products.filter((product) => product.category === catalogFilter);
+  const galleryImages = selectedProduct ? [selectedProduct.image, ...(selectedProduct.editorial || selectedProduct.qc)] : [];
 
-  const totalItems = Object.values(cart).reduce((sum, value) => sum + value, 0);
-  const productCny = products.reduce((sum, product) => sum + product.cny * (cart[product.id] || 0), 0);
-  const subtotal = productCny / EXCHANGE_RATE;
-  const weight = totalItems * 704;
-  const shippingCny = totalItems === 0 ? 0 : totalItems <= 2
-    ? 33.46 + (weight / 1000) * 142.75
-    : weight <= 3000 ? 328 : weight <= 4000 ? 392 : weight <= 5000 ? 456 : weight <= 6000 ? 520 : 584;
-  const shipping = shippingCny / EXCHANGE_RATE;
-  const insurance = (productCny + shippingCny) * .03 / EXCHANGE_RATE;
-  const service = totalItems === 0 ? 0 : totalItems === 1 ? 20 : totalItems === 2 ? 35 : 45 + (totalItems - 3) * 10;
-  const total = subtotal + shipping + insurance + service;
-  const galleryImages = selectedProduct ? [selectedProduct.image, ...selectedProduct.qc] : [];
+  useEffect(() => {
+    if (totalItems === 0 && purchaseStep !== "select") setPurchaseStep("select");
+  }, [totalItems, purchaseStep]);
+
+  const changeQuantity = (productId: string, change: number): boolean => {
+    const product = products.find((entry) => entry.id === productId);
+    if (!product) return false;
+    if (change > 0 && weight + product.weightGrams > MAX_CART_WEIGHT_GRAMS) {
+      setCartWarning("Limite de 6 kg por pedido. Remova um item para continuar.");
+      return false;
+    }
+    setCartWarning("");
+    setCart((current) => {
+      const next = Math.max(0, (current[productId] || 0) + change);
+      const updated = { ...current, [productId]: next };
+      if (!next) delete updated[productId];
+      if (calculateQuote(updated, products).overLimit) return current;
+      return updated;
+    });
+    return true;
+  };
+
+  const addTechSet = () => {
+    const missingJacket = cart["tech-jacket"] ? 0 : 650;
+    const missingPants = cart["tech-pants"] ? 0 : 550;
+    if (weight + missingJacket + missingPants > MAX_CART_WEIGHT_GRAMS) {
+      setCartWarning("Limite de 6 kg por pedido. Remova um item para continuar.");
+      return;
+    }
+    setCartWarning("");
+    setCart((current) => {
+      const updated = { ...current, "tech-jacket": Math.max(1, current["tech-jacket"] || 0), "tech-pants": Math.max(1, current["tech-pants"] || 0) };
+      return calculateQuote(updated, products).overLimit ? current : updated;
+    });
+    setCatalogFilter("apparel");
+    setPurchaseStep("select");
+    window.location.hash = "shop";
+  };
+
+  const orderEmailBody = [
+    "Olá! Quero confirmar este pedido Kicknity:",
+    ...products.filter((product) => cart[product.id]).map((product) => `• ${cart[product.id]} × ${product.name} (${product.sku}) — tamanho: ${sizeNotes[product.id]?.trim() || "a confirmar"}`),
+    `Peso estimado: ${weight} g · frete: ${quote.shippingMethod || "a confirmar"}`,
+    `Produtos: R$ ${subtotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} · frete: R$ ${shipping.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} · seguro 6%: R$ ${insurance.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
+    ...(quote.isConfirmedTechSetExample ? ["Conjunto: cotação de referência ¥761 / R$ 625, incluindo demais custos do pedido."] : []),
+    `Serviço Kicknity: R$ ${service.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
+    `Total estimado: R$ ${total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
+    "Por favor, confirme tamanho, disponibilidade, peso, cotação e condições finais antes do pagamento.",
+  ].join("\n");
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        if (zoomedImageIndex !== null) setZoomedImageIndex(null);
+        else if (selectedProduct) setSelectedProduct(null);
+        return;
+      }
       if (zoomedImageIndex === null || !galleryImages.length) return;
-      if (event.key === "Escape") setZoomedImageIndex(null);
       if (event.key === "ArrowRight") setZoomedImageIndex((zoomedImageIndex + 1) % galleryImages.length);
       if (event.key === "ArrowLeft") setZoomedImageIndex((zoomedImageIndex - 1 + galleryImages.length) % galleryImages.length);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [zoomedImageIndex, galleryImages]);
+  }, [zoomedImageIndex, galleryImages, selectedProduct]);
 
-  const routeContent = useMemo(() => {
+  const routeContent = (() => {
     if (route === "shop") {
       return (
         <main className="route-page shop-page">
           <section className="page-intro">
-            <p className="eyebrow dark">SELEÇÃO KICKNITY / QC REAL</p>
-            <h1>Escolha o seu próximo par.</h1>
-            <p>O valor exibido no produto é unitário. Frete, seguro e serviço são calculados separadamente no resumo.</p>
+            <p className="eyebrow dark">KICKNITY / TÊNIS & VESTUÁRIO</p>
+            <h1>Peças que fazem o look.</h1>
+            <p>Escolha seus produtos. Frete por peso, seguro e serviço aparecem separadamente antes de você pedir a confirmação.</p>
           </section>
           <nav className="purchase-steps" aria-label="Etapas do pedido">
             <button className={purchaseStep === "select" ? "active" : ""} onClick={() => setPurchaseStep("select")}><span>01</span><strong>SELECIONAR</strong></button>
             <button className={purchaseStep === "review" ? "active" : ""} onClick={() => totalItems && setPurchaseStep("review")} disabled={!totalItems}><span>02</span><strong>REVISAR</strong></button>
-            <button className={purchaseStep === "payment" ? "active" : ""} onClick={() => totalItems && setPurchaseStep("payment")} disabled={!totalItems}><span>03</span><strong>PAGAMENTO</strong></button>
+            <button className={purchaseStep === "payment" ? "active" : ""} onClick={() => totalItems && setPurchaseStep("payment")} disabled={!totalItems}><span>03</span><strong>CONFIRMAR</strong></button>
           </nav>
           {purchaseStep === "select" && (
             <div className="shop-layout">
               <section>
-                <div className="filter-row"><span className="catalog-label">CATÁLOGO</span><button className="filter active">Todos</button></div>
+                <div className="shop-set-feature">
+                  <img src="./catalog/nike-tech-look-front.jpg" alt="Conjunto Nike Tech Fleece preto e antracite vestido em modelo" />
+                  <div><span>DROP 01 / TECH FLEECE 2025</span><h2>O conjunto completo.</h2><p>Jaqueta Windrunner + calça Open-Hem. Cotação de referência: R$ 625 em custos e R$ 35 de serviço; valor final confirmado no atendimento.</p><strong>R$ 660 estimados</strong><button type="button" onClick={addTechSet}>MONTAR CONJUNTO <Arrow /></button></div>
+                </div>
+                <div className="filter-row"><span className="catalog-label">CATÁLOGO / {visibleProducts.length} PEÇAS</span><div className="catalog-filters" role="group" aria-label="Filtrar catálogo">{([['all','Tudo'],['apparel','Roupas'],['sneakers','Tênis']] as const).map(([value,label]) => <button type="button" key={value} className={`filter ${catalogFilter === value ? 'active' : ''}`} onClick={() => setCatalogFilter(value)} aria-pressed={catalogFilter === value}>{label}</button>)}</div></div>
                 <div className="catalog-grid">
-                  {products.map((product, index) => (
-                    <article className="product-card" key={product.id}>
+                  {visibleProducts.map((product, index) => (
+                    <article className={`product-card product-card--${product.category}`} key={product.id}>
                       <button className="product-image" onClick={() => openProduct(product)} aria-label={`Ver detalhes de ${product.name}`}>
-                        <span className="product-index">0{index + 1}</span><span className="product-tone">{product.tone}</span><img src={product.image} alt={product.name} />
+                        <span className="product-index">{String(index + 1).padStart(2,'0')}</span><span className="product-tone">{product.category === 'apparel' ? 'VESTUÁRIO' : product.tone}</span><img src={product.image} alt={product.name} loading="lazy" decoding="async" />
                       </button>
                       <button className="product-copy" onClick={() => openProduct(product)}>
-                        <div><p className="sku">{product.sku} · PRODUTO UNITÁRIO</p><h2>{product.name}</h2></div>
+                        <div><p className="sku">{product.sku} · {product.category === 'apparel' ? 'NIKE TECH' : 'TÊNIS'}</p><h2>{product.name}</h2></div>
                         <p className="price">R$ {product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<small>¥ {product.cny}</small></p>
                       </button>
                       {cart[product.id] ? (
                         <div className="quantity-control" aria-label={`Quantidade de ${product.name}`}>
                           <button onClick={() => changeQuantity(product.id, -1)} aria-label="Diminuir quantidade">−</button>
                           <span><strong>{cart[product.id]}</strong><small>NO PEDIDO</small></span>
-                          <button onClick={() => changeQuantity(product.id, 1)} aria-label="Aumentar quantidade">＋</button>
+                          <button onClick={() => changeQuantity(product.id, 1)} aria-label="Aumentar quantidade" disabled={weight + product.weightGrams > MAX_CART_WEIGHT_GRAMS}>＋</button>
                         </div>
-                      ) : <button className="add-button" onClick={() => changeQuantity(product.id, 1)}>ADICIONAR AO PEDIDO <span>＋</span></button>}
+                      ) : <button className="add-button" onClick={() => changeQuantity(product.id, 1)} disabled={weight + product.weightGrams > MAX_CART_WEIGHT_GRAMS}>ADICIONAR AO PEDIDO <span>＋</span></button>}
                     </article>
                   ))}
                 </div>
               </section>
-              <aside className="order-summary">
+              <aside className="order-summary" aria-live="polite">
                 <div className="summary-head"><p className="eyebrow dark">RESUMO EM TEMPO REAL</p><span>{String(totalItems).padStart(2, "0")}</span></div>
-                {totalItems === 0 ? <div className="empty-cart"><span>＋</span><p>Selecione um modelo. O cálculo será atualizado automaticamente.</p></div> : (
+                {totalItems === 0 ? <div className="empty-cart"><span>＋</span><p>Adicione uma peça para ver frete, seguro e total.</p></div> : (
                   <div className="summary-lines">
                     <div><span>Produtos</span><strong>R$ {subtotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div>
-                    <div><span>Frete</span><strong>R$ {shipping.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div>
-                    <div><span>Seguro (3%)</span><strong>R$ {insurance.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div>
-                    <div><span>Serviço</span><strong>R$ {service.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div>
-                    <small>{totalItems <= 2 ? "BJ EUB · 1–2 pares" : "SH SAL · 3+ pares"} · {weight.toLocaleString("pt-BR")} g</small>
+                    <div><span>Frete internacional</span><strong>R$ {shipping.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div>
+                    <div><span>Seguro (6%)</span><strong>R$ {insurance.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div>
+                    {quote.additionalCny > 0 && <div><span>Demais custos da cotação</span><strong>R$ {quote.additionalBrl.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div>}
+                    {quote.roundingBrl !== 0 && <div><span>Ajuste da cotação</span><strong>R$ {quote.roundingBrl.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div>}
+                    <div className="service-line"><span>Serviço Kicknity</span><strong>R$ {service.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div>
+                    <small>{quote.shippingMethod} · {weight.toLocaleString("pt-BR")} g de 6.000 g</small>
+                    <div className="weight-track" role="meter" aria-label="Peso do pedido" aria-valuemin={0} aria-valuemax={6000} aria-valuenow={weight}><span style={{ width: `${Math.min(100, weight / 60)}%` }} /></div>
                   </div>
                 )}
-                <div className="summary-total"><span>Total aproximado</span><strong>R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div>
-                <button className="primary full" disabled={!totalItems} onClick={() => setPurchaseStep("review")}>REVISAR PEDIDO <Arrow /></button>
-                <p className="summary-note">Cotação: ¥ 1,19 por R$ 1 · valores aproximados.</p>
+                {cartWarning && <p className="cart-warning" role="alert">{cartWarning}</p>}
+                <div className="summary-total"><span>{quote.isConfirmedTechSetExample ? "Conjunto + serviço" : "Total estimado"}</span><strong>R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div>
+                <button className="primary full" disabled={!totalItems || quote.overLimit} onClick={() => setPurchaseStep("review")}>REVISAR PEDIDO <Arrow /></button>
+                <p className="summary-note">Cotação usada: ¥ 1,22 por R$ 1. Pesos estimados; valor e disponibilidade confirmados no atendimento. Tributos no Brasil não inclusos.</p>
               </aside>
             </div>
           )}
@@ -562,12 +623,16 @@ export default function Home() {
             <section className="checkout-stage review-stage">
               <div className="checkout-title"><p className="eyebrow dark">02 / REVISÃO</p><h2>Confira antes de continuar.</h2></div>
               <div className="review-layout"><div className="review-products">
-                {products.filter((product) => cart[product.id]).map((product) => <article key={product.id}><img src={product.image} alt=""/><div><span>{product.sku}</span><strong>{product.name}</strong><small>{cart[product.id]} × R$ {product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</small></div><div className="review-qty"><button onClick={() => changeQuantity(product.id, -1)}>−</button><strong>{cart[product.id]}</strong><button onClick={() => changeQuantity(product.id, 1)}>＋</button></div></article>)}
-              </div><aside className="review-total"><p><span>Produtos</span><strong>R$ {subtotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p><p><span>Frete + seguro</span><strong>R$ {(shipping + insurance).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p><p><span>Serviço</span><strong>R$ {service.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p><div><span>TOTAL</span><strong>R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div><button className="primary full" onClick={() => setPurchaseStep("payment")}>IR PARA PAGAMENTO <Arrow /></button><button className="back-button" onClick={() => setPurchaseStep("select")}>← VOLTAR À SELEÇÃO</button></aside></div>
+                {products.filter((product) => cart[product.id]).map((product) => <article key={product.id}>
+                  <img src={product.image} alt="" />
+                  <div className="review-product-info"><span>{product.sku}</span><strong>{product.name}</strong><small>{cart[product.id]} × R$ {product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</small><label>Tamanho desejado (confirmaremos antes de cobrar)<input value={sizeNotes[product.id] || ""} onChange={(event) => setSizeNotes((current) => ({ ...current, [product.id]: event.target.value }))} placeholder={product.category === "apparel" ? "Ex.: M ou M, G" : "Ex.: 42 ou 42, 43"} maxLength={70} /></label></div>
+                  <div className="review-qty"><button onClick={() => changeQuantity(product.id, -1)} aria-label={`Diminuir ${product.name}`}>−</button><strong>{cart[product.id]}</strong><button onClick={() => changeQuantity(product.id, 1)} disabled={weight + product.weightGrams > MAX_CART_WEIGHT_GRAMS} aria-label={`Aumentar ${product.name}`}>＋</button></div>
+                </article>)}
+              </div><aside className="review-total"><p><span>Produtos</span><strong>R$ {subtotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p><p><span>Frete internacional</span><strong>R$ {shipping.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p><p><span>Seguro (6%)</span><strong>R$ {insurance.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p>{quote.additionalCny > 0 && <p><span>Demais custos da cotação</span><strong>R$ {quote.additionalBrl.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p>}{quote.isConfirmedTechSetExample && <p><span>Ajuste para R$ 625</span><strong>R$ {quote.roundingBrl.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p>}<p><span>Serviço Kicknity</span><strong>R$ {service.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p><div><span>TOTAL</span><strong>R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div><small>Frete {quote.shippingMethod} · {weight.toLocaleString("pt-BR")} g estimados</small><button className="primary full" onClick={() => setPurchaseStep("payment")}>CONTINUAR <Arrow /></button><button className="back-button" onClick={() => setPurchaseStep("select")}>← VOLTAR À SELEÇÃO</button></aside></div>
             </section>
           )}
           {purchaseStep === "payment" && (
-            <section className="checkout-stage payment-stage"><div><p className="eyebrow dark">03 / PAGAMENTO</p><h2>Finalização clara e segura.</h2><p>Envie o resumo para a Kicknity. Nosso atendimento confirma estoque, cotação, dados do pedido e pagamento antes da finalização.</p><a className="primary payment-contact" href={`mailto:kicknity@gmail.com?subject=${encodeURIComponent("Pedido Kicknity")}&body=${encodeURIComponent(`Olá! Quero finalizar meu pedido com ${totalItems} ${totalItems === 1 ? "par" : "pares"}. Total estimado: R$ ${total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}.`)}`}>FINALIZAR COM A KICKNITY</a><button className="back-button" onClick={() => setPurchaseStep("review")}>← VOLTAR E REVISAR</button></div><aside><span>TOTAL DO PEDIDO</span><strong>R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong><small>{totalItems} {totalItems === 1 ? "par" : "pares"} · {totalItems <= 2 ? "BJ EUB" : "SH SAL"}</small><div className="preview-lock">CONFIRMAÇÃO MANUAL PELO ATENDIMENTO</div></aside></section>
+            <section className="checkout-stage payment-stage"><div><p className="eyebrow dark">03 / CONFIRMAÇÃO</p><h2>Seu pedido, sem surpresa.</h2><p>Envie o resumo para a Kicknity. Confirmaremos tamanho, disponibilidade, peso, cotação e condições finais antes de qualquer pagamento.</p><a className="primary payment-contact" href={`mailto:kicknity@gmail.com?subject=${encodeURIComponent("Pedido Kicknity")}&body=${encodeURIComponent(orderEmailBody)}`}>ENVIAR PEDIDO À KICKNITY <Arrow /></a><button className="back-button" onClick={() => setPurchaseStep("review")}>← VOLTAR E REVISAR</button></div><aside><span>TOTAL ESTIMADO</span><strong>R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong><small>{totalItems} {totalItems === 1 ? "peça" : "peças"} · {quote.shippingMethod} · {weight.toLocaleString("pt-BR")} g</small><div className="preview-lock">PAGAMENTO CONFIRMADO PELO ATENDIMENTO</div></aside></section>
           )}
         </main>
       );
@@ -577,30 +642,34 @@ export default function Home() {
       return (
         <main className="route-page how-page">
           <section className="page-intro split-intro">
-            <div><p className="eyebrow dark">DO PEDIDO À ENTREGA</p><h1>Importar pode ser simples.</h1></div>
-            <p>A Kicknity organiza modelo, cotação, frete, QC e rastreio em uma experiência clara do começo ao fim.</p>
+            <div><p className="eyebrow dark">DA ESCOLHA À ENTREGA</p><h1>Importar com clareza.</h1></div>
+            <p>Tênis e roupas em um pedido acompanhado: seleção, estimativa de custos, fotos de QC no armazém e rastreio em português.</p>
           </section>
           <section className="steps-grid">
             {[
-              ["01", "ESCOLHA", "Selecione o modelo, a quantidade e confira as fotos reais de qualidade."],
-              ["02", "CONFIRA", "Veja produtos, frete estimado e total antes de seguir com o pedido."],
-              ["03", "ACOMPANHE", "Receba cada atualização da compra até a chegada ao destino."],
+              ["01", "ESCOLHA", "Selecione tênis e roupas. Informe o tamanho desejado na revisão."],
+              ["02", "CONFIRA", "Veja o peso estimado, frete, seguro de 6% e serviço em linhas separadas."],
+              ["03", "ACOMPANHE", "Após a confirmação, receba fotos de QC e atualizações do pedido."],
             ].map(([number, title, copy]) => (
               <article className="step-card" key={number}><span>{number}</span><h2>{title}</h2><p>{copy}</p></article>
             ))}
           </section>
           <section className="service-panel">
-            <div><p className="eyebrow">SERVIÇO ASSISTIDO</p><h2>Você escolhe o par.<br/>A gente organiza o caminho.</h2></div>
+            <div><p className="eyebrow">SERVIÇO ASSISTIDO</p><h2>Você escolhe as peças.<br/>A gente acompanha o caminho.</h2></div>
             <div className="service-list">
-              <p><span>01</span> Cotação completa e transparente</p>
-              <p><span>02</span> Fotos reais de QC no armazém</p>
-              <p><span>03</span> Escolha de frete por quantidade</p>
+              <p><span>01</span> Cotação separada por produto, frete, seguro e serviço</p>
+              <p><span>02</span> Fotos de QC após a chegada ao armazém</p>
+              <p><span>03</span> BJ EUB até 2 kg; SH SAL acima disso, até 6 kg</p>
               <p><span>04</span> Histórico de rastreio em português</p>
             </div>
           </section>
           <section className="faq-preview">
-            <p className="eyebrow dark">DÚVIDAS FREQUENTES</p>
-            {["O preço mostrado já inclui o frete?", "Qual é a diferença entre BJ EUB e SH SAL?", "Como recebo as fotos de QC?", "Onde acompanho meu pedido?"].map((question) => <button key={question}><span>{question}</span><span>＋</span></button>)}
+            <p className="eyebrow dark">DÚVIDAS FREQUENTES</p><h2>Antes de fechar o pedido.</h2>
+            <details><summary>O valor do card já é o total final?</summary><p>Não. O card mostra o produto. O carrinho soma frete internacional, seguro e serviço. A cotação final é confirmada antes do pagamento.</p></details>
+            <details><summary>Como o frete é calculado?</summary><p>Por peso estimado: BJ EUB até 2 kg e SH SAL acima de 2 kg, até o limite de 6 kg por pedido. Peso e valor final podem mudar após conferência no armazém.</p></details>
+            <details><summary>O que são as fotos de QC?</summary><p>São fotos tiradas após o produto chegar ao armazém. As imagens de catálogo mostram o modelo; não são as fotos de QC do seu pedido.</p></details>
+            <details><summary>Como escolho o tamanho?</summary><p>Informe o tamanho desejado ao revisar o pedido. A disponibilidade será confirmada pelo atendimento antes do pagamento.</p></details>
+            <details><summary>Onde acompanho o pedido?</summary><p>Use a área Rastrear com o código fornecido pela Kicknity, ou entre em Minha conta para ver pedidos vinculados.</p></details>
           </section>
         </main>
       );
@@ -647,30 +716,34 @@ export default function Home() {
       <main>
         <section className="hero">
           <div className="hero-copy">
-            <p className="eyebrow">IMPORTAÇÃO ASSISTIDA / CURADORIA KICKNITY</p>
-            <h1>Seu próximo par.<br/><em>Sem complicação.</em></h1>
-            <p className="hero-lead">Escolha o modelo, confira o custo completo e acompanhe cada etapa em um só lugar.</p>
+            <p className="eyebrow">KICKNITY / TÊNIS & VESTUÁRIO</p>
+            <h1>O próximo look<br/><em>começa aqui.</em></h1>
+            <p className="hero-lead">Peças escolhidas com cuidado, custos claros e um pedido acompanhado do primeiro clique à entrega.</p>
             <div className="hero-actions">
-              <button className="primary" data-route="shop">MONTAR PEDIDO <Arrow /></button>
-              <button className="secondary" data-route="tracking">RASTREAR PEDIDO</button>
+              <button className="primary" data-route="shop">EXPLORAR A SELEÇÃO <Arrow /></button>
+              <button className="secondary" data-route="how">COMO FUNCIONA</button>
             </div>
-            <div className="hero-proof"><span>✓ QC REAL</span><span>✓ CUSTO COMPLETO</span><span>✓ ACOMPANHAMENTO</span></div>
+            <div className="hero-proof"><span>✓ FRETE POR PESO</span><span>✓ SERVIÇO CLARO</span><span>✓ RASTREIO</span></div>
           </div>
-          <div className="hero-visual">
-            <div className="hero-number">01</div>
-            <img src="./catalog/hq6316-bone.png" alt="Yeezy 350 V2 Bone em destaque" />
-            <div className="hero-product"><span>EDITOR&apos;S PICK</span><strong>YEEZY 350 V2 BONE</strong><small>HQ6316 · CREAM</small></div>
-            <div className="qc-badge"><strong>QC</strong><span>FOTOS REAIS</span></div>
+          <div className="hero-visual hero-visual--fashion">
+            <div className="hero-number">01 / 25</div>
+            <img src="./catalog/nike-tech-look-front.jpg" alt="Look Nike Tech Fleece preto e antracite" fetchPriority="high" />
+            <div className="hero-product"><span>NEW IN / APPAREL</span><strong>NIKE TECH FLEECE</strong><small>WINDRUNNER + OPEN-HEM PANTS</small></div>
+            <div className="hero-side-note">KICKNITY EDIT / 2025</div>
           </div>
         </section>
-        <div className="marquee" aria-label="Benefícios Kicknity"><div><span>COTAÇÃO TRANSPARENTE</span><b>✦</b><span>FOTOS REAIS DE QC</span><b>✦</b><span>RASTREIO EM PORTUGUÊS</span><b>✦</b><span>COMPRA ACOMPANHADA</span></div></div>
+        <div className="marquee" aria-label="Benefícios Kicknity"><div><span>ROUPAS & TÊNIS</span><b>✦</b><span>COTAÇÃO TRANSPARENTE</span><b>✦</b><span>FOTOS DE QC APÓS A COMPRA</span><b>✦</b><span>RASTREIO EM PORTUGUÊS</span></div></div>
+        <section className="home-categories" aria-label="Categorias da loja">
+          <button type="button" className="category-tile category-tile--apparel" onClick={() => { setCatalogFilter('apparel'); window.location.hash = 'shop'; }}><img src="./catalog/nike-tech-jacket-angle.jpg" alt="Jaqueta Nike Tech Fleece preta" loading="lazy" /><span>01 / VESTUÁRIO</span><strong>Roupas para o look inteiro.</strong><em>EXPLORAR ROUPAS ↗</em></button>
+          <button type="button" className="category-tile category-tile--sneakers" onClick={() => { setCatalogFilter('sneakers'); window.location.hash = 'shop'; }}><img src="./catalog/hq6316-bone.png" alt="Tênis Yeezy Boost 350 V2 Bone" loading="lazy" /><span>02 / FOOTWEAR</span><strong>O par que fecha tudo.</strong><em>EXPLORAR TÊNIS ↗</em></button>
+        </section>
         <section className="home-section featured">
-          <div className="section-head large"><div><p className="eyebrow dark">SELEÇÃO DA SEMANA</p><h2>Modelos em destaque.</h2></div><button data-route="shop">VER TODOS <Arrow /></button></div>
+          <div className="section-head large"><div><p className="eyebrow dark">CURADORIA KICKNITY</p><h2>Agora na seleção.</h2></div><button data-route="shop">VER CATÁLOGO <Arrow /></button></div>
           <div className="featured-grid">
             {products.slice(0, 3).map((product, index) => (
               <button className="feature-card" onClick={() => openProduct(product)} key={product.id}>
-                <div className="feature-image"><span>0{index + 1}</span><img src={product.image} alt={product.name}/></div>
-                <div><span>{product.sku} · VALOR UNITÁRIO DO PRODUTO</span><strong>{product.name}</strong><p>R$ {product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p></div>
+                <div className={`feature-image feature-image--${product.category}`}><span>0{index + 1}</span><img src={product.image} alt={product.name} loading="lazy"/></div>
+                <div><span>{product.sku} · {product.category === 'apparel' ? 'VESTUÁRIO' : 'TÊNIS'}</span><strong>{product.name}</strong><p>R$ {product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <small>+ frete e serviço</small></p></div>
               </button>
             ))}
           </div>
@@ -678,9 +751,9 @@ export default function Home() {
         <section className="home-process">
           <div><p className="eyebrow">COMO FUNCIONA</p><h2>Três passos.<br/>Um pedido claro.</h2><button className="text-link" data-route="how">CONHECER O PROCESSO <Arrow /></button></div>
           <div className="process-list">
-            <article><span>01</span><div><h3>Escolha o modelo</h3><p>Encontre o par e defina a quantidade.</p></div></article>
-            <article><span>02</span><div><h3>Confira tudo</h3><p>Produto, frete e total antes de pagar.</p></div></article>
-            <article><span>03</span><div><h3>Acompanhe</h3><p>Histórico em português até a entrega.</p></div></article>
+            <article><span>01</span><div><h3>Escolha suas peças</h3><p>Combine roupas e tênis no mesmo pedido.</p></div></article>
+            <article><span>02</span><div><h3>Veja a conta inteira</h3><p>Produto, frete, seguro e serviço em detalhes.</p></div></article>
+            <article><span>03</span><div><h3>Acompanhe cada etapa</h3><p>QC no armazém e rastreio em português.</p></div></article>
           </div>
         </section>
         <section className="home-section tracking-banner">
@@ -689,7 +762,7 @@ export default function Home() {
         </section>
       </main>
     );
-  }, [route, cart, subtotal, shipping, insurance, service, total, totalItems, weight, trackingCode, trackingVisible, purchaseStep]);
+  })();
 
   return (
     <div className="site-shell">
@@ -705,21 +778,21 @@ export default function Home() {
       <AccountExperience active={route === "account"} />
       <button id="homeAccountButton" type="button" hidden>Entrar</button>
       <footer className="site-footer">
-        <div className="footer-top"><Brand/><p>Curadoria, cotação e acompanhamento para o seu próximo par.</p></div>
+        <div className="footer-top"><Brand/><p>Curadoria de tênis e roupas, cotação clara e acompanhamento em cada etapa.</p></div>
         <div className="footer-links"><div><strong>NAVEGAR</strong><button data-route="shop">Comprar</button><button data-route="tracking">Rastrear</button><button data-route="how">Como funciona</button></div><div><strong>ATENDIMENTO</strong><a href="mailto:kicknity@gmail.com">kicknity@gmail.com</a><span>Segunda a sexta</span><span>09h às 18h</span></div><div><strong>INFORMAÇÕES</strong><button data-route="how">Sobre nós</button><button data-route="how">FAQ</button><span>Privacidade</span></div></div>
         <div className="footer-bottom"><span>© 2026 KICKNITY</span><span>VALORES APROXIMADOS · CONFIRMAÇÃO PELO ATENDIMENTO</span></div>
       </footer>
       {selectedProduct && (
         <div className="product-modal" role="dialog" aria-modal="true" aria-label={`Detalhes de ${selectedProduct.name}`} onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedProduct(null); }}>
           <div className="product-detail">
-            <button className="modal-close" onClick={() => setSelectedProduct(null)} aria-label="Fechar detalhes">FECHAR ×</button>
+            <button className="modal-close" onClick={() => setSelectedProduct(null)} aria-label="Fechar detalhes" autoFocus>FECHAR ×</button>
             <div className="detail-gallery">
               <button className="detail-main-image" onClick={() => setZoomedImageIndex(Math.max(0, galleryImages.indexOf(activeImage)))} aria-label="Expandir imagem atual"><img src={activeImage} alt={selectedProduct.name} /><span>EXPANDIR ↗</span></button>
               <div className="detail-thumbs" aria-label="Galeria do produto">
                 {galleryImages.map((image, index) => (
-                  <button key={image} className={activeImage === image ? "active" : ""} onClick={() => { setActiveImage(image); setZoomedImageIndex(index); }} aria-label={index === 0 ? "Expandir imagem principal de catálogo" : `Expandir foto real de QC ${index}`}>
+                  <button key={image} className={activeImage === image ? "active" : ""} onClick={() => setActiveImage(image)} aria-label={index === 0 ? "Ver imagem principal" : `Ver ${selectedProduct.category === 'apparel' ? 'foto de catálogo' : 'foto de QC'} ${index}`}>
                     <img src={image} alt="" />
-                    <span>{index === 0 ? "CATÁLOGO" : `QC ${String(index).padStart(2, "0")}`}</span>
+                    <span>{index === 0 ? "CAPA" : `${selectedProduct.category === 'apparel' ? 'LOOK' : 'QC'} ${String(index).padStart(2, "0")}`}</span>
                   </button>
                 ))}
               </div>
@@ -729,16 +802,17 @@ export default function Home() {
               <h2>{selectedProduct.name}</h2>
               <p className="detail-price">R$ {selectedProduct.price.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<small>produto unitário · frete calculado no pedido</small></p>
               <div className="detail-divider" />
-              <p className="detail-description">Imagem principal padronizada para apresentar o modelo. As fotos marcadas como QC mostram o produto real recebido no armazém.</p>
-              <div className="detail-flags"><span>✓ GALERIA DE QC REAL</span><span>✓ CUSTO TRANSPARENTE</span><span>✓ ACOMPANHAMENTO</span></div>
-              <button className="primary full" onClick={() => { setCart((current) => ({ ...current, [selectedProduct.id]: (current[selectedProduct.id] || 0) + 1 })); setSelectedProduct(null); setRoute("shop"); window.location.hash = "shop"; }}>ADICIONAR AO PEDIDO <Arrow /></button>
+              <p className="detail-description">{selectedProduct.description} {selectedProduct.category === 'apparel' ? 'Fotos de catálogo do modelo; as fotos de QC do pedido serão enviadas depois da chegada ao armazém.' : 'As fotos marcadas como QC são registros de inspeção no armazém.'}</p>
+              <div className="detail-flags"><span>✓ {selectedProduct.weightGrams} G ESTIMADOS</span><span>✓ CUSTO TRANSPARENTE</span><span>✓ TAMANHO A CONFIRMAR</span></div>
+              <button className="primary full" disabled={weight + selectedProduct.weightGrams > MAX_CART_WEIGHT_GRAMS} onClick={() => { if (changeQuantity(selectedProduct.id, 1)) { setSelectedProduct(null); setRoute("shop"); window.location.hash = "shop"; } }}>ADICIONAR AO PEDIDO <Arrow /></button>
+              {weight + selectedProduct.weightGrams > MAX_CART_WEIGHT_GRAMS && <p className="cart-warning">Este item ultrapassa o limite de 6 kg do pedido.</p>}
             </aside>
           </div>
         </div>
       )}
       {selectedProduct && zoomedImageIndex !== null && (
         <div className="image-lightbox" role="dialog" aria-modal="true" aria-label="Imagem ampliada do produto">
-          <div className="lightbox-top"><span>{zoomedImageIndex === 0 ? "IMAGEM DE CATÁLOGO" : `FOTO REAL DE QC ${String(zoomedImageIndex).padStart(2, "0")}`}</span><strong>{zoomedImageIndex + 1} / {galleryImages.length}</strong><button onClick={() => setZoomedImageIndex(null)}>FECHAR ×</button></div>
+          <div className="lightbox-top"><span>{selectedProduct.category === 'apparel' ? 'IMAGEM DE CATÁLOGO' : zoomedImageIndex === 0 ? 'IMAGEM DE CATÁLOGO' : `FOTO DE QC ${String(zoomedImageIndex).padStart(2, '0')}`}</span><strong>{zoomedImageIndex + 1} / {galleryImages.length}</strong><button onClick={() => setZoomedImageIndex(null)}>FECHAR ×</button></div>
           <button className="lightbox-arrow prev" onClick={() => setZoomedImageIndex((zoomedImageIndex - 1 + galleryImages.length) % galleryImages.length)} aria-label="Imagem anterior">‹</button>
           <img src={galleryImages[zoomedImageIndex]} alt={`${selectedProduct.name} — imagem ${zoomedImageIndex + 1}`} />
           <button className="lightbox-arrow next" onClick={() => setZoomedImageIndex((zoomedImageIndex + 1) % galleryImages.length)} aria-label="Próxima imagem">›</button>
