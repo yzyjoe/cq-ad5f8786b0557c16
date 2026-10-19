@@ -35,4 +35,9 @@ if (accountSource !== fs.readFileSync(path.join(root, "public", "account.js"), "
     accountSource !== fs.readFileSync(path.join(root, "dist", "account.js"), "utf8")) {
   throw new Error("Cópias de account.js divergentes; o deploy publicaria código antigo.");
 }
+const accountCss = fs.readFileSync(path.join(root, "account.css"), "utf8");
+if (accountCss !== fs.readFileSync(path.join(root, "public", "account.css"), "utf8") ||
+    accountCss !== fs.readFileSync(path.join(root, "dist", "account.css"), "utf8")) {
+  throw new Error("Cópias de account.css divergentes; o deploy publicaria estilo antigo.");
+}
 console.log(`Build válido: CSP, Referrer Policy e ${assetPaths.length} assets verificados.`);

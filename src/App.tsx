@@ -168,7 +168,7 @@ function fullTrackingDate(value: string) {
 function safeLocalImageUrl(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const path = value.replace(/^\.\//, "");
-  return /^(?:catalog|qc|img\/qc)\/[a-z0-9/_-]+\.(?:png|jpe?g|webp)$/i.test(path) && !path.includes("..") ? `./${path}` : null;
+  return /^(?:catalog|qc|img\/qc)\/(?!orders\/)[a-z0-9/_-]+\.(?:png|jpe?g|webp)$/i.test(path) && !path.includes("..") ? `./${path}` : null;
 }
 
 function CopyTrackingCode({ code }: { code: string }) {
@@ -403,8 +403,8 @@ export default function Home() {
     setTrackingError("");
     setTrackingVisible(false);
     setTrackingOrder(null);
-    if (!/^[A-Z0-9-]{6,32}$/.test(code)) {
-      setTrackingError("Digite o código completo enviado pela Kicknity.");
+    if (!/^[A-F0-9]{32}$/.test(code)) {
+      setTrackingError("Digite o código privado de consulta mostrado na sua conta.");
       return;
     }
     setTrackingLoading(true);
@@ -450,7 +450,7 @@ export default function Home() {
   useEffect(() => {
     if (document.querySelector('script[data-kicknity-account="true"]')) return;
     const script = document.createElement("script");
-    script.src = `./account.js?v=20260911-tracking1`;
+    script.src = `./account.js?v=20261019-security1`;
     script.dataset.kicknityAccount = "true";
     document.body.appendChild(script);
   }, []);
@@ -747,10 +747,10 @@ export default function Home() {
             <p className="eyebrow">RASTREIO KICKNITY</p>
             <h1>Saiba exatamente onde está o seu pedido.</h1>
             <div className="tracking-search">
-              <input value={trackingCode} onChange={(event) => setTrackingCode(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") searchTracking(); }} placeholder="Digite o código do pedido" aria-label="Código do pedido" />
+              <input value={trackingCode} maxLength={32} autoComplete="off" onChange={(event) => setTrackingCode(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") searchTracking(); }} placeholder="Código privado de consulta" aria-label="Código privado de consulta" />
               <button onClick={searchTracking} disabled={trackingLoading}>{trackingLoading ? "BUSCANDO…" : "RASTREAR"} <Arrow /></button>
             </div>
-            <p className={`tracking-hint${trackingError ? " error" : ""}`}>{trackingError || "Digite o código exatamente como foi enviado pela Kicknity."}</p>
+            <p className={`tracking-hint${trackingError ? " error" : ""}`}>{trackingError || "Encontre e copie este código em Minha conta > Pedidos. Não compartilhe publicamente."}</p>
           </section>
           {trackingVisible && trackingOrder && (
             <section className="tracking-result tracking-shell">

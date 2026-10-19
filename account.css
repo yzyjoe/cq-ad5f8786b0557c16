@@ -319,6 +319,12 @@ body.site-redesign.route-conta{padding:0;background:#060607;background-image:rad
 .account-tracking-card .tracking-order-head>div{display:grid;gap:7px;min-width:0}
 .account-tracking-card .tracking-code-label{color:#8e8e93;font:700 8px/1 "JetBrains Mono",monospace;letter-spacing:.11em;text-transform:uppercase}
 .account-tracking-card .tracking-code{overflow-wrap:anywhere;color:#fff;font:800 15px/1.2 "JetBrains Mono",monospace;letter-spacing:.035em}
+.account-private-tracking{display:flex;align-items:center;flex-wrap:wrap;gap:7px 10px;margin-top:16px;padding:12px;border:1px solid rgba(255,255,255,.13);border-radius:8px;background:rgba(255,255,255,.035)}
+.account-private-tracking span{width:100%;color:#aaaab1;font:700 9px/1.2 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase}
+.account-private-tracking code{max-width:100%;overflow-wrap:anywhere;color:#fff;font:600 12px/1.3 "JetBrains Mono",monospace}
+.account-private-tracking button{border:1px solid rgba(255,255,255,.28);border-radius:6px;background:#23252a;color:#fff;padding:7px 10px;font:700 10px/1 "JetBrains Mono",monospace;cursor:pointer}
+.account-private-tracking button:hover,.account-private-tracking button:focus-visible{background:#3b3e46;outline:2px solid #fff;outline-offset:2px}
+.account-private-tracking small{width:100%;color:#8e8e93;font-size:10px}
 .account-tracking-card .tracking-badge{
   flex:0 0 auto;
   padding:8px 10px;

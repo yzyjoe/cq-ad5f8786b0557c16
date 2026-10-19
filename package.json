@@ -10,7 +10,8 @@
     "validate:site": "node scripts/validate-site.mjs",
     "scan:security": "node scripts/security-scan.mjs",
     "test:pricing": "node --test scripts/test-pricing.mjs",
-    "test:pix": "node --test scripts/test-pix.mjs"
+    "test:pix": "node --test scripts/test-pix.mjs",
+    "test:tracking-security-live": "node scripts/test-public-tracking-live.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "6.0.2",

@@ -12,6 +12,7 @@
   var realtimeRefreshTimer = null;
   var currentMfaEnrollment = null;
   var currentQcPhotos = [];
+  var signedOrderQcPhotos = Object.create(null);
   var currentQcIndex = 0;
   var qcTouchStart = null;
   var LAST_ACCOUNT_TAB_KEY = "kicknity-last-account-tab";
@@ -193,15 +194,32 @@
   }
   function safeLocalImageUrl(value){
     var path = clean(value).replace(/^\.\//,"");
-    return /^(?:catalog|qc|img\/qc)\/[a-z0-9/_-]+\.(?:png|jpe?g|webp)$/i.test(path) && path.indexOf("..") < 0 ? path : "";
+    return /^(?:catalog|qc|img\/qc)\/(?!orders\/)[a-z0-9/_-]+\.(?:png|jpe?g|webp)$/i.test(path) && path.indexOf("..") < 0 ? path : "";
+  }
+  function orderQcPaths(order){
+    var image = clean(order && order.image_url).replace(/^\.\//,"").toLowerCase();
+    var match = image.match(/^qc\/orders\/([a-z0-9-]+)\/qc-\d{2}\.webp$/);
+    if (!match || match[1] !== clean(order && order.order_code).toLowerCase()) return [];
+    return Array.from({length:9},function(_,index){
+      return match[1] + "/qc-" + String(index + 1).padStart(2,"0") + ".webp";
+    });
   }
   function orderQcPhotos(order){
-    var image = safeLocalImageUrl(order && order.image_url);
-    var match = image.match(/^(qc\/orders\/[a-z0-9-]+\/)qc-\d{2}\.webp$/i);
-    if (!match) return [];
-    return Array.from({length:9},function(_,index){
-      return match[1] + "qc-" + String(index + 1).padStart(2,"0") + ".webp";
-    });
+    return signedOrderQcPhotos[order && order.id] || [];
+  }
+  async function loadSignedQcPhotos(orders){
+    signedOrderQcPhotos = Object.create(null);
+    await Promise.all(orders.map(async function(order){
+      var paths = orderQcPaths(order);
+      if (!paths.length) return;
+      var results = await Promise.all(paths.map(async function(path){
+        try{ return await client.storage.from("order-qc").createSignedUrl(path,3600); }
+        catch(error){ return {error:error}; }
+      }));
+      signedOrderQcPhotos[order.id] = results.map(function(result){
+        return result.error ? "" : clean(result.data && result.data.signedUrl);
+      }).filter(Boolean);
+    }));
   }
   function orderProductPhoto(order){
     var photos = orderQcPhotos(order);
@@ -229,6 +247,7 @@
         "<div class=\"tracking-product\">" + productVisual + "<div><h3>" + escapeHtml(order.product_name) + "</h3><p class=\"tracking-model\">Modelo " + escapeHtml(order.model_code || "não informado") + "</p></div></div>" +
         "<div class=\"tracking-order\">" +
           "<div class=\"tracking-order-head\"><div><span class=\"tracking-code-label\">Código do pedido</span><strong class=\"tracking-code\">" + escapeHtml(order.order_code) + "</strong></div><span class=\"tracking-badge\">" + escapeHtml(STATUS_LABELS[status] || status) + "</span></div>" +
+          (order.public_tracking_enabled && /^[A-F0-9]{32}$/.test(clean(order.public_tracking_token)) ? "<div class=\"account-private-tracking\"><span>Código privado de consulta</span><code>" + escapeHtml(order.public_tracking_token) + "</code><button type=\"button\" data-copy-tracking=\"" + escapeHtml(order.public_tracking_token) + "\" aria-label=\"Copiar código privado de consulta\">Copiar</button><small>Use em Rastreio. Não compartilhe publicamente.</small></div>" : "") +
           "<section class=\"tracking-current\"><span class=\"tracking-current-kicker\">ETAPA ATUAL</span><div><h4>" + escapeHtml(STATUS_LABELS[status] || status) + "</h4><time class=\"tracking-time\">" + escapeHtml(formatDate(latest.occurred_at)) + "</time></div><p>" + escapeHtml(status === "carrier_pending" ? "Atualização prevista em aproximadamente 3–5 dias." : (latest.description || STATUS_DESCRIPTIONS[status] || "Atualização registrada.")) + "</p>" + (order.tracking_code ? "<span class=\"account-tracking-code\">Rastreio: " + escapeHtml(order.tracking_code) + "</span>" : "") + "</section>" +
           "<section class=\"tracking-history-wrap\"><h5>Histórico do pedido</h5><div class=\"tracking-history\">" + accountHistory(order) + "</div></section>" +
           orderQcGallery(order) +
@@ -367,6 +386,7 @@
     var response = await client.from("orders").select("*,order_events(*)").eq("user_id",currentSession.user.id).is("deleted_at",null).order("updated_at",{ascending:false});
     if (response.error) throw response.error;
     currentOrders = response.data || [];
+    await loadSignedQcPhotos(currentOrders);
     renderCustomerOrders();
   }
 
@@ -412,16 +432,17 @@
     var verified = (results[0].data.totp || []).filter(function(factor){ return factor.status === "verified"; });
     var assurance = results[1].data || {};
     if (!verified.length){
-      setMfaState("Recomendado","warning","Ative um aplicativo autenticador. Depois disso, criar, alterar, arquivar ou restaurar pedidos exigirá o código de segurança.");
+      setMfaState("Obrigatório","warning","Configure um aplicativo autenticador para liberar os dados e as ações administrativas.");
       byId("adminMfaStart").hidden = false;
-      return;
+      return false;
     }
     if (assurance.currentLevel === "aal2"){
       setMfaState("Protegido","secure","Autenticação em duas etapas confirmada nesta sessão. As ações administrativas estão liberadas.");
-      return;
+      return true;
     }
     setMfaState("Código necessário","warning","Sua conta já possui autenticação em duas etapas. Confirme o código para liberar as ações administrativas desta sessão.");
     byId("adminMfaChallengeForm").hidden = false;
+    return false;
   }
 
   async function beginMfaEnrollment(){
@@ -494,6 +515,11 @@
 
   async function loadAdmin(){
     if (!client || !currentProfile || currentProfile.role !== "admin") return;
+    if (!(await loadMfaSecurity())){
+      byId("adminCustomer").innerHTML = "<option value=\"\">Confirme o autenticador</option>";
+      byId("adminOrderList").innerHTML = "<div class=\"account-empty\">Confirme a autenticação em duas etapas para acessar os pedidos.</div>";
+      return;
+    }
     var results = await Promise.all([
       client.from("profiles").select("id,email,full_name,role").order("created_at",{ascending:false}),
       client.from("orders").select("*,profiles:profiles!orders_user_id_fkey(email,full_name),order_events(*)").order("updated_at",{ascending:false})
@@ -504,7 +530,6 @@
     byId("adminCustomer").innerHTML = "<option value=\"\">Selecione</option>" + customers.map(function(profile){ return "<option value=\"" + escapeHtml(profile.id) + "\">" + escapeHtml(profile.full_name || profile.email) + " · " + escapeHtml(profile.email) + "</option>"; }).join("");
     var orders = results[1].data || [];
     byId("adminOrderList").innerHTML = orders.length ? orders.map(function(order){ return orderCard(order,true); }).join("") : "<div class=\"account-empty\">Nenhum pedido cadastrado.</div>";
-    await loadMfaSecurity();
   }
 
   async function loadAccount(){
@@ -553,6 +578,7 @@
     authReady = true;
     if (!currentSession){
       currentProfile = null; currentOrders = [];
+      signedOrderQcPhotos = Object.create(null);
       forgetAccountTab();
       if (accountChannel && client){ client.removeChannel(accountChannel); accountChannel = null; }
     }

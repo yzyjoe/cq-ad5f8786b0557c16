@@ -86,21 +86,37 @@ Deno.serve(async (request: Request) => {
     return jsonResponse({ error: "Origem não permitida." }, 403, origin);
   }
 
-  const contentLength = Number(request.headers.get("content-length") || "0");
-  if (contentLength > 2048) {
-    return jsonResponse({ error: "Solicitação inválida." }, 413, origin);
-  }
-
   let payload: { code?: unknown; captchaToken?: unknown };
   try {
-    payload = await request.json();
+    if (!request.body) throw new Error("empty body");
+    const reader = request.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let size = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > 2048) {
+        await reader.cancel();
+        return jsonResponse({ error: "Solicitação inválida." }, 413, origin);
+      }
+      chunks.push(value);
+    }
+    const body = new Uint8Array(size);
+    let offset = 0;
+    for (const chunk of chunks) {
+      body.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    payload = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(body));
+    if (!payload || typeof payload !== "object" || Array.isArray(payload)) throw new Error("invalid body");
   } catch {
     return jsonResponse({ error: "Solicitação inválida." }, 400, origin);
   }
 
   const code = String(payload.code || "").trim().toUpperCase();
   const captchaToken = String(payload.captchaToken || "").trim();
-  if (!/^[A-Z0-9-]{6,32}$/.test(code)) {
+  if (!/^[A-F0-9]{32}$/.test(code)) {
     return jsonResponse({ error: "Código inválido." }, 400, origin);
   }
 
@@ -121,7 +137,7 @@ Deno.serve(async (request: Request) => {
   });
 
   const ipHash = await sha256(`ip:${remoteIp}`);
-  const codeHash = await sha256(`code:${code}`);
+  const codeHash = await sha256(`token:${code}`);
   // Keep these calls sequential. A single client issuing concurrent privileged
   // RPCs occasionally receives a transient authorization failure at the edge.
   const ipLimit = await supabase.rpc("consume_tracking_rate_limit", {
@@ -150,7 +166,7 @@ Deno.serve(async (request: Request) => {
   const orderResult = await supabase
     .from("orders")
     .select("id,order_code,product_name,model_code,image_url,status,updated_at")
-    .ilike("order_code", code)
+    .eq("public_tracking_token", code)
     .eq("public_tracking_enabled", true)
     .is("deleted_at", null)
     .maybeSingle();
@@ -166,7 +182,7 @@ Deno.serve(async (request: Request) => {
 
   const eventsResult = await supabase
     .from("order_events")
-    .select("status,description,occurred_at")
+    .select("status,occurred_at")
     .eq("order_id", orderResult.data.id)
     .order("occurred_at", { ascending: true });
 
@@ -178,23 +194,26 @@ Deno.serve(async (request: Request) => {
   const events = eventsResult.data || [];
   const latest = events.length ? events[events.length - 1] : null;
   const status = String(latest?.status || orderResult.data.status);
-  const description = String(
-    latest?.description || statusDescriptions[status] || "Atualização registrada.",
-  );
+  const description = statusDescriptions[status] || "Atualização registrada.";
   const occurredAt = String(latest?.occurred_at || orderResult.data.updated_at);
+  // Order-specific QC images are private. Only catalog photos may be public.
+  const image = String(orderResult.data.image_url || "");
+  const publicImage = /^(?:\.\/)?(?:catalog|qc|img\/qc)\/(?!orders\/)[a-z0-9/_-]+\.(?:png|jpe?g|webp)$/i.test(image)
+    ? image
+    : null;
 
   return jsonResponse({
     order: {
       code: orderResult.data.order_code,
       product: orderResult.data.product_name,
       model: orderResult.data.model_code || "Não informado",
-      image: orderResult.data.image_url || null,
+      image: publicImage,
       statusKey: status,
       statusPt: description,
       statusAt: occurredAt,
       history: events.map((event) => ({
         statusKey: event.status,
-        statusPt: event.description,
+        statusPt: statusDescriptions[event.status] || "Atualização registrada.",
         statusAt: event.occurred_at,
       })),
     },

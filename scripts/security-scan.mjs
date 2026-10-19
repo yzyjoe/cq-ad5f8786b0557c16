@@ -32,10 +32,11 @@ if (fs.existsSync(distRoot)) {
 }
 for (const relative of [...new Set([...tracked, ...published])]) {
   const normalized = relative.replaceAll("\\", "/");
-  if (sensitivePaths.test(normalized)) failures.push(`${normalized}: arquivo sensível versionado`);
-  if (!textExtensions.has(path.extname(normalized).toLowerCase())) continue;
   const absolute = path.join(root, relative);
   if (!fs.existsSync(absolute)) continue;
+  if (sensitivePaths.test(normalized)) failures.push(`${normalized}: arquivo sensível versionado`);
+  if (/(^|\/)qc\/orders\//i.test(normalized)) failures.push(`${normalized}: foto de pedido em área pública`);
+  if (!textExtensions.has(path.extname(normalized).toLowerCase())) continue;
   const content = fs.readFileSync(absolute, "utf8");
   if (secretPatterns.some((pattern) => pattern.test(content))) failures.push(`${normalized}: possível segredo privado`);
   if (personalFixturePatterns.some((pattern) => pattern.test(content))) failures.push(`${normalized}: dados reais de pedido embutidos`);
