@@ -2,6 +2,8 @@ artifacts/
 supabase/.temp/
 node_modules/
 dist/
+/qc/orders/
+/public/qc/orders/
 .env
 .env.*
 !.env.example
