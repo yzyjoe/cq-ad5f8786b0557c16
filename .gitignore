@@ -2,3 +2,12 @@ artifacts/
 supabase/.temp/
 node_modules/
 dist/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.sqlite
+*.db

@@ -103,6 +103,13 @@ body.site-redesign button:disabled { opacity: .42; cursor: not-allowed; transfor
 .site-redesign .product-copy { min-height: 132px; padding: 21px; align-items: start; }
 .site-redesign .product-copy h2 { max-width: 370px; font: 800 clamp(16px,1.4vw,23px)/1.12 Rubik,sans-serif; }
 .site-redesign .product-copy .price { font-size: 17px; }
+.site-redesign .product-estimate { display: grid; gap: 3px; margin: 0 21px 15px; padding-top: 12px; border-top: 1px solid var(--kick-line); }
+.site-redesign .product-estimate span { color: #abb9b2; font: 700 9px/1.35 "JetBrains Mono",monospace; letter-spacing: .02em; }
+.site-redesign .product-estimate strong { color: var(--kick-accent); font: 800 18px/1.2 Rubik,sans-serif; }
+.site-redesign .product-estimate small { color: #9ba8a2; font-size: 10px; }
+.site-redesign .detail-estimate { display: grid; gap: 4px; margin: 12px 0 0; color: #c5d0c9; font-size: 12px; line-height: 1.45; }
+.site-redesign .detail-estimate strong { color: var(--kick-accent); font: 800 20px/1.2 Rubik,sans-serif; }
+.site-redesign .detail-estimate small { color: #9ba8a2; font-size: 10px; }
 .site-redesign .add-button { width: calc(100% - 28px); height: 46px; margin: 0 14px 14px; padding: 0 15px; border: 1px solid rgba(217,251,105,.45); background: #1e2827; color: var(--kick-accent); }
 .site-redesign .add-button:hover:not(:disabled) { background: var(--kick-accent); color: #10150d; }
 .site-redesign .quantity-control { margin: 0 14px 14px; border: 1px solid var(--kick-line); border-radius: 10px; overflow: hidden; }

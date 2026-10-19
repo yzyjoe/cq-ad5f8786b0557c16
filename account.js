@@ -148,162 +148,13 @@
     else location.hash = "conta";
   }
 
-  function isYagoPreviewAccount(){
-    return clean(currentProfile && currentProfile.email).toLowerCase() === "lucaseumesmo007@gmail.com";
-  }
-
-  function isKicknityAdminAccount(){
-    return clean(currentProfile && currentProfile.email).toLowerCase() === "kicknity@gmail.com";
-  }
-
-  function knownYagoParcel(order){
-    if (clean(order && order.order_code).toUpperCase() !== "O260901502091") return null;
-    return {
-      id:"P260907637637",
-      submitted_at:"2026-09-06",
-      shipping:"BJ-EUB · 0–2 KG",
-      shipping_price:"¥ 148,10",
-      total_price:"¥ 167,39",
-      insured_amount:"¥ 278,17",
-      declaration:"Tênis unissex · branco · tamanho 45 · borracha · US$ 7,00",
-      tracking_code:"LZ458955736CN",
-      tracking_note:"O código está ativo no aplicativo dos Correios e o CPF do destinatário foi vinculado ao pacote com sucesso."
-    };
-  }
-
-  function yagoPreviewOrder(){
-    return {
-      id:"kicknity-yago-preview",
-      user_id:currentSession && currentSession.user ? currentSession.user.id : null,
-      order_code:"O260901502091",
-      product_name:"Yeezy 350 V2 Bone",
-      model_code:"HQ6316",
-      image_url:"qc/orders/o260901502091/qc-01.webp",
-      quantity:1,
-      status:"posted_correios",
-      carrier:"BJ-EUB",
-      tracking_code:"LZ458955736CN",
-      total_amount:null,
-      currency:"BRL",
-      ordered_at:"2026-09-01T06:06:15+00:00",
-      updated_at:"2026-09-11",
-      deleted_at:null,
-      order_events:[
-        {
-          status:"submitted",
-          description:"Pedido enviado. Aguardando o agente assumir o atendimento.",
-          occurred_at:"2026-09-01T06:06:15+00:00"
-        },
-        {
-          status:"accepted",
-          description:"O agente assumiu o pedido e está se comunicando com o vendedor.",
-          occurred_at:"2026-09-01T06:06:16+00:00"
-        },
-        {
-          status:"purchased",
-          description:"Seu produto foi comprado. Número da transação: 854836543275865.",
-          occurred_at:"2026-09-01T06:06:18+00:00"
-        },
-        {
-          status:"logistics",
-          description:"Transportadora identificada: ZTO Express. Código de rastreio: 79029858827389.",
-          occurred_at:"2026-09-03T06:06:15+00:00"
-        },
-        {
-          status:"warehouse",
-          description:"Seu produto chegou ao armazém da CSSBuy e está passando pela inspeção de qualidade.",
-          occurred_at:"2026-09-04T13:19:33+00:00"
-        },
-        {
-          status:"warehouse",
-          description:"Pacote P260907637637 criado para envio internacional via BJ-EUB (0–2 kg).",
-          occurred_at:"2026-09-06"
-        },
-        {
-          status:"parcel_submitted",
-          description:"Pacote enviado para processamento.",
-          occurred_at:"2026-09-07T07:04:16-03:00"
-        },
-        {
-          status:"parcel_paid",
-          description:"Pagamento do pacote confirmado.",
-          occurred_at:"2026-09-07T07:04:32-03:00"
-        },
-        {
-          status:"parcel_packaged",
-          description:"Pacote embalado e preparado para envio.",
-          occurred_at:"2026-09-07T11:57:14-03:00"
-        },
-        {
-          status:"tracking_registered",
-          description:"As informações eletrônicas da remessa foram recebidas.",
-          occurred_at:"2026-09-07T11:57:17-03:00"
-        },
-        {
-          status:"shipped",
-          description:"O pacote saiu do armazém da CSSBuy.",
-          occurred_at:"2026-09-07T17:55:26-03:00"
-        },
-        {
-          status:"carrier_pending",
-          description:"Este é o seu código de rastreio: LZ458955736CN. As informações serão atualizadas quando o pacote chegar à transportadora, o que normalmente leva de 3 a 5 dias. Agradecemos a sua paciência.",
-          occurred_at:"2026-09-09"
-        },
-        {
-          status:"posted_correios",
-          description:"O objeto foi postado e já aparece no aplicativo dos Correios.",
-          occurred_at:"2026-09-11"
-        },
-        {
-          status:"china_post_received",
-          description:"Pequim, China — a China Post recebeu o objeto.",
-          occurred_at:"2026-09-11"
-        },
-        {
-          status:"cpf_linked",
-          description:"O CPF do destinatário foi vinculado ao pacote com sucesso.",
-          occurred_at:"2026-09-11"
-        }
-      ]
-    };
-  }
-
   function sortedEvents(order){
-    var events = (order.order_events || []).slice();
-    var parcel = knownYagoParcel(order);
-    if (parcel){
-      if (!events.some(function(event){ return event.status === "warehouse"; })){
-        events.push({
-          status:"warehouse",
-          description:"Seu produto chegou ao armazém da CSSBuy e está passando pela inspeção de qualidade.",
-          occurred_at:"2026-09-04T13:19:33+00:00"
-        });
-      }
-      if (!events.some(function(event){ return clean(event.description).indexOf(parcel.id) >= 0; })){
-        events.push({
-          status:"warehouse",
-          description:"Pacote " + parcel.id + " criado para envio internacional via BJ-EUB (0–2 kg).",
-          occurred_at:parcel.submitted_at
-        });
-      }
-      [
-        {status:"parcel_submitted",description:"Pacote enviado para processamento.",occurred_at:"2026-09-07T07:04:16-03:00"},
-        {status:"parcel_paid",description:"Pagamento do pacote confirmado.",occurred_at:"2026-09-07T07:04:32-03:00"},
-        {status:"parcel_packaged",description:"Pacote embalado e preparado para envio.",occurred_at:"2026-09-07T11:57:14-03:00"},
-        {status:"tracking_registered",description:"As informações eletrônicas da remessa foram recebidas.",occurred_at:"2026-09-07T11:57:17-03:00"},
-        {status:"shipped",description:"O pacote saiu do armazém da CSSBuy.",occurred_at:"2026-09-07T17:55:26-03:00"},
-        {status:"carrier_pending",description:"Este é o seu código de rastreio: LZ458955736CN. As informações serão atualizadas quando o pacote chegar à transportadora, o que normalmente leva de 3 a 5 dias. Agradecemos a sua paciência.",occurred_at:"2026-09-09"},
-        {status:"posted_correios",description:"O objeto foi postado e já aparece no aplicativo dos Correios.",occurred_at:"2026-09-11"},
-        {status:"china_post_received",description:"Pequim, China — a China Post recebeu o objeto.",occurred_at:"2026-09-11"},
-        {status:"cpf_linked",description:"O CPF do destinatário foi vinculado ao pacote com sucesso.",occurred_at:"2026-09-11"}
-      ].forEach(function(shipmentEvent){
-        if (!events.some(function(event){ return event.status === shipmentEvent.status; })) events.push(shipmentEvent);
-      });
-    }
-    return events.sort(function(a,b){ return new Date(b.occurred_at) - new Date(a.occurred_at); });
+    return (order.order_events || []).slice().sort(function(a,b){
+      return new Date(b.occurred_at) - new Date(a.occurred_at);
+    });
   }
   function effectiveStatus(order){
-    return clean(order && order.order_code).toUpperCase() === "O260901502091" ? "posted_correios" : order.status;
+    return order.status;
   }
   function trackingStepIndex(status){
     var index = ACCOUNT_TRACKING_STEPS.findIndex(function(step){ return step.key === status; });
@@ -340,15 +191,21 @@
     var available = ["GW3773","GW3774","HQ6316","F36980","FW5190","HQ4540"];
     return available.indexOf(normalized) >= 0 ? "img/qc/" + normalized.toLowerCase() + "-1.webp" : "";
   }
+  function safeLocalImageUrl(value){
+    var path = clean(value).replace(/^\.\//,"");
+    return /^(?:catalog|qc|img\/qc)\/[a-z0-9/_-]+\.(?:png|jpe?g|webp)$/i.test(path) && path.indexOf("..") < 0 ? path : "";
+  }
   function orderQcPhotos(order){
-    if (clean(order && order.order_code).toUpperCase() !== "O260901502091") return [];
+    var image = safeLocalImageUrl(order && order.image_url);
+    var match = image.match(/^(qc\/orders\/[a-z0-9-]+\/)qc-\d{2}\.webp$/i);
+    if (!match) return [];
     return Array.from({length:9},function(_,index){
-      return "qc/orders/o260901502091/qc-" + String(index + 1).padStart(2,"0") + ".webp";
+      return match[1] + "qc-" + String(index + 1).padStart(2,"0") + ".webp";
     });
   }
   function orderProductPhoto(order){
     var photos = orderQcPhotos(order);
-    return photos[0] || clean(order && order.image_url) || productPhoto(order && order.model_code);
+    return photos[0] || safeLocalImageUrl(order && order.image_url) || productPhoto(order && order.model_code);
   }
   function orderQcGallery(order){
     var photos = orderQcPhotos(order);
@@ -358,23 +215,6 @@
         return "<button type=\"button\" data-order-qc=\"" + escapeHtml(order.id) + "\" data-qc-index=\"" + index + "\" aria-label=\"Ampliar foto real " + (index + 1) + "\"><img src=\"" + escapeHtml(photo) + "\" alt=\"Foto real " + (index + 1) + " de " + escapeHtml(order.product_name) + "\" loading=\"lazy\"></button>";
       }).join("") + "</div><p class=\"account-order-qc-note\">Clique em uma foto para ampliar e conferir os detalhes do produto.</p></section>";
   }
-  function orderParcelDetails(order){
-    var parcel = knownYagoParcel(order);
-    if (!parcel) return "";
-    return "<div class=\"tracking-code-block\"><span class=\"tracking-code-label\">CÓDIGO DE RASTREIO</span>" +
-      "<button type=\"button\" class=\"tracking-copy-button\" data-copy-tracking=\"" + escapeHtml(parcel.tracking_code) + "\" aria-label=\"Copiar código de rastreio " + escapeHtml(parcel.tracking_code) + "\"><strong>" + escapeHtml(parcel.tracking_code) + "</strong><span class=\"copy-glyph\" aria-hidden=\"true\"></span></button></div>" +
-      "<details class=\"account-parcel tracking-shipping-details\"><summary>DETALHES DO ENVIO <span>+</span></summary><div class=\"account-parcel-content\">" +
-      "<div class=\"account-parcel-grid\">" +
-        "<div><span>Pacote</span><strong>" + escapeHtml(parcel.id) + "</strong></div>" +
-        "<div><span>Modalidade</span><strong>" + escapeHtml(parcel.shipping) + "</strong></div>" +
-        "<div><span>Frete</span><strong>" + escapeHtml(parcel.shipping_price) + "</strong></div>" +
-        "<div><span>Total</span><strong>" + escapeHtml(parcel.total_price) + "</strong></div>" +
-        "<div><span>Seguro declarado</span><strong>" + escapeHtml(parcel.insured_amount) + "</strong></div>" +
-      "</div>" +
-      "<p class=\"tracking-postal-note\">" + escapeHtml(parcel.tracking_note) + "</p>" +
-      "<div class=\"account-declaration\"><span>DECLARAÇÃO ADUANEIRA</span><strong>" + escapeHtml(parcel.declaration) + "</strong></div>" +
-      "</div></details>";
-  }
   function orderTrackingCard(order){
     var events = sortedEvents(order);
     var status = effectiveStatus(order);
@@ -383,14 +223,13 @@
     var productVisual = image
       ? "<div class=\"tracking-photo\"><img src=\"" + escapeHtml(image) + "\" alt=\"Foto de " + escapeHtml(order.product_name) + "\"></div>"
       : "<div class=\"tracking-photo account-tracking-placeholder\" aria-hidden=\"true\"><span>K</span></div>";
-    return "<article class=\"account-tracking-card tracking-animate" + (status === "cancelled" ? " cancelled" : "") + "\" data-order-id=\"" + order.id + "\" data-status=\"" + escapeHtml(status) + "\" data-updated-at=\"" + escapeHtml(latest.occurred_at || "") + "\">" +
+    return "<article class=\"account-tracking-card tracking-animate" + (status === "cancelled" ? " cancelled" : "") + "\" data-order-id=\"" + escapeHtml(order.id) + "\" data-status=\"" + escapeHtml(status) + "\" data-updated-at=\"" + escapeHtml(latest.occurred_at || "") + "\">" +
       "<div class=\"account-tracking-label\"><span>ACOMPANHAMENTO AUTOMÁTICO</span><small>Atualiza sem pesquisar o código</small></div>" +
       "<div class=\"tracking-result account-tracking-result\">" +
         "<div class=\"tracking-product\">" + productVisual + "<div><h3>" + escapeHtml(order.product_name) + "</h3><p class=\"tracking-model\">Modelo " + escapeHtml(order.model_code || "não informado") + "</p></div></div>" +
         "<div class=\"tracking-order\">" +
           "<div class=\"tracking-order-head\"><div><span class=\"tracking-code-label\">Código do pedido</span><strong class=\"tracking-code\">" + escapeHtml(order.order_code) + "</strong></div><span class=\"tracking-badge\">" + escapeHtml(STATUS_LABELS[status] || status) + "</span></div>" +
-          orderParcelDetails(order) +
-          "<section class=\"tracking-current\"><span class=\"tracking-current-kicker\">ETAPA ATUAL</span><div><h4>" + escapeHtml(STATUS_LABELS[status] || status) + "</h4><time class=\"tracking-time\">" + escapeHtml(formatDate(latest.occurred_at)) + "</time></div><p>" + escapeHtml(status === "carrier_pending" ? "Atualização prevista em aproximadamente 3–5 dias." : (latest.description || STATUS_DESCRIPTIONS[status] || "Atualização registrada.")) + "</p>" + (!knownYagoParcel(order) && order.tracking_code ? "<span class=\"account-tracking-code\">Rastreio: " + escapeHtml(order.tracking_code) + "</span>" : "") + "</section>" +
+          "<section class=\"tracking-current\"><span class=\"tracking-current-kicker\">ETAPA ATUAL</span><div><h4>" + escapeHtml(STATUS_LABELS[status] || status) + "</h4><time class=\"tracking-time\">" + escapeHtml(formatDate(latest.occurred_at)) + "</time></div><p>" + escapeHtml(status === "carrier_pending" ? "Atualização prevista em aproximadamente 3–5 dias." : (latest.description || STATUS_DESCRIPTIONS[status] || "Atualização registrada.")) + "</p>" + (order.tracking_code ? "<span class=\"account-tracking-code\">Rastreio: " + escapeHtml(order.tracking_code) + "</span>" : "") + "</section>" +
           "<section class=\"tracking-history-wrap\"><h5>Histórico do pedido</h5><div class=\"tracking-history\">" + accountHistory(order) + "</div></section>" +
           orderQcGallery(order) +
         "</div>" +
@@ -407,14 +246,14 @@
       "<div class=\"admin-order-editor\">" +
         "<select data-admin-field=\"status\" aria-label=\"Status do pedido\">" + Object.keys(STATUS_LABELS).map(function(status){ return "<option value=\"" + status + "\"" + (order.status === status ? " selected" : "") + ">" + STATUS_LABELS[status] + "</option>"; }).join("") + "</select>" +
         "<input data-admin-field=\"tracking\" value=\"" + escapeHtml(order.tracking_code || "") + "\" placeholder=\"Código de rastreio\" aria-label=\"Código de rastreio\">" +
-        "<button type=\"button\" data-admin-update=\"" + order.id + "\">Salvar</button>" +
-        "<button class=\"admin-delete-order\" type=\"button\" data-admin-delete=\"" + order.id + "\">Arquivar</button>" +
+        "<button type=\"button\" data-admin-update=\"" + escapeHtml(order.id) + "\">Salvar</button>" +
+        "<button class=\"admin-delete-order\" type=\"button\" data-admin-delete=\"" + escapeHtml(order.id) + "\">Arquivar</button>" +
       "</div>"
-    ) : (admin && archived ? "<div class=\"admin-order-editor\"><button class=\"admin-restore-order\" type=\"button\" data-admin-restore=\"" + order.id + "\">Restaurar pedido</button></div>" : "");
-    return "<article class=\"account-order-card" + (archived ? " archived" : "") + "\" data-order-id=\"" + order.id + "\">" +
+    ) : (admin && archived ? "<div class=\"admin-order-editor\"><button class=\"admin-restore-order\" type=\"button\" data-admin-restore=\"" + escapeHtml(order.id) + "\">Restaurar pedido</button></div>" : "");
+    return "<article class=\"account-order-card" + (archived ? " archived" : "") + "\" data-order-id=\"" + escapeHtml(order.id) + "\">" +
       "<div class=\"account-order-top\"><div><span class=\"account-order-code\">" + escapeHtml(order.order_code) + "</span><h4>" + escapeHtml(order.product_name) + "</h4></div><span class=\"account-status\">" + escapeHtml(archived ? "Arquivado" : (STATUS_LABELS[status] || status)) + "</span></div>" +
       customer +
-      "<div class=\"account-order-meta\"><span>Modelo: " + escapeHtml(order.model_code || "—") + "</span><span>Qtd.: " + escapeHtml(order.quantity) + "</span><span>" + escapeHtml(formatMoney(order.total_amount,order.currency)) + "</span>" + (!knownYagoParcel(order) && order.tracking_code ? "<span>Rastreio: " + escapeHtml(order.tracking_code) + "</span>" : "") + "</div>" +
+      "<div class=\"account-order-meta\"><span>Modelo: " + escapeHtml(order.model_code || "—") + "</span><span>Qtd.: " + escapeHtml(order.quantity) + "</span><span>" + escapeHtml(formatMoney(order.total_amount,order.currency)) + "</span>" + (order.tracking_code ? "<span>Rastreio: " + escapeHtml(order.tracking_code) + "</span>" : "") + "</div>" +
       (latest ? "<div class=\"account-order-event\">" + escapeHtml(latest.description) + "<time>" + escapeHtml(formatDate(latest.occurred_at)) + "</time></div>" : "") + editor +
     "</article>";
   }
@@ -503,11 +342,10 @@
     var response = await client.from("profiles").select("id,email,full_name,role,created_at").eq("id",currentSession.user.id).single();
     if (response.error) throw response.error;
     currentProfile = response.data;
-    var yagoPreview = isYagoPreviewAccount();
-    byId("accountIdentity").textContent = yagoPreview ? "Yago Moraes · Cliente verificado" : (currentProfile.full_name || "Cliente") + " · " + currentProfile.email;
+    byId("accountIdentity").textContent = (currentProfile.full_name || "Cliente") + " · " + currentProfile.email;
     var isAdmin = currentProfile.role === "admin";
-    var fullName = yagoPreview ? "Yago Moraes" : (clean(currentProfile.full_name) || "Cliente KICKNITY");
-    var displayEmail = yagoPreview ? "Cliente · E-mail verificado" : currentProfile.email;
+    var fullName = clean(currentProfile.full_name) || "Cliente KICKNITY";
+    var displayEmail = currentProfile.email;
     var nameParts = fullName.split(/\s+/).filter(Boolean);
     var firstName = nameParts[0] || "Cliente";
     var initials = ((nameParts[0] || "K").charAt(0) + (nameParts.length > 1 ? nameParts[nameParts.length - 1].charAt(0) : "")).toUpperCase();
@@ -528,16 +366,7 @@
     showOrdersSkeleton();
     var response = await client.from("orders").select("*,order_events(*)").eq("user_id",currentSession.user.id).is("deleted_at",null).order("updated_at",{ascending:false});
     if (response.error) throw response.error;
-    var savedOrders = response.data || [];
-    if (isYagoPreviewAccount()){
-      currentOrders = [yagoPreviewOrder()];
-    }else if (isKicknityAdminAccount()){
-      currentOrders = savedOrders.some(function(order){ return clean(order.order_code).toUpperCase() === "O260901502091"; })
-        ? savedOrders
-        : [yagoPreviewOrder()].concat(savedOrders);
-    }else{
-      currentOrders = savedOrders;
-    }
+    currentOrders = response.data || [];
     renderCustomerOrders();
   }
 
@@ -672,7 +501,7 @@
     if (results[0].error) throw results[0].error;
     if (results[1].error) throw results[1].error;
     var customers = results[0].data || [];
-    byId("adminCustomer").innerHTML = "<option value=\"\">Selecione</option>" + customers.map(function(profile){ return "<option value=\"" + profile.id + "\">" + escapeHtml(profile.full_name || profile.email) + " · " + escapeHtml(profile.email) + "</option>"; }).join("");
+    byId("adminCustomer").innerHTML = "<option value=\"\">Selecione</option>" + customers.map(function(profile){ return "<option value=\"" + escapeHtml(profile.id) + "\">" + escapeHtml(profile.full_name || profile.email) + " · " + escapeHtml(profile.email) + "</option>"; }).join("");
     var orders = results[1].data || [];
     byId("adminOrderList").innerHTML = orders.length ? orders.map(function(order){ return orderCard(order,true); }).join("") : "<div class=\"account-empty\">Nenhum pedido cadastrado.</div>";
     await loadMfaSecurity();

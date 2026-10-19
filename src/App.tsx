@@ -165,53 +165,10 @@ function fullTrackingDate(value: string) {
   return Number.isNaN(date.getTime()) ? "—" : new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(date);
 }
 
-function applyKnownTrackingUpdate(order: TrackingOrder): TrackingOrder {
-  if (order.code.toUpperCase() !== "O260901502091") return order;
-  const warehouseEvent: TrackingEvent = {
-    statusKey: "warehouse",
-    statusPt: "Seu produto chegou ao armazém da CSSBuy e está passando pela inspeção de qualidade.",
-    statusAt: "2026-09-04T13:19:33+00:00",
-  };
-  const parcelEvent: TrackingEvent = {
-    statusKey: "warehouse",
-    statusPt: "Pacote P260907637637 criado para envio internacional via BJ-EUB (0–2 kg).",
-    statusAt: "2026-09-06T12:00:00-03:00",
-  };
-  const shippingEvents: TrackingEvent[] = [
-    { statusKey: "parcel_submitted", statusPt: "Pacote enviado para processamento.", statusAt: "2026-09-07T07:04:16-03:00" },
-    { statusKey: "parcel_paid", statusPt: "Pagamento do pacote confirmado.", statusAt: "2026-09-07T07:04:32-03:00" },
-    { statusKey: "parcel_packaged", statusPt: "Pacote embalado e preparado para envio.", statusAt: "2026-09-07T11:57:14-03:00" },
-    { statusKey: "tracking_registered", statusPt: "As informações eletrônicas da remessa foram recebidas.", statusAt: "2026-09-07T11:57:17-03:00" },
-    { statusKey: "shipped", statusPt: "O pacote saiu do armazém da CSSBuy.", statusAt: "2026-09-07T17:55:26-03:00" },
-    { statusKey: "carrier_pending", statusPt: "Este é o seu código de rastreio: LZ458955736CN. As informações serão atualizadas quando o pacote chegar à transportadora, o que normalmente leva de 3 a 5 dias. Agradecemos a sua paciência.", statusAt: "2026-09-09" },
-    { statusKey: "posted_correios", statusPt: "O objeto foi postado e já aparece no aplicativo dos Correios.", statusAt: "2026-09-11" },
-    { statusKey: "china_post_received", statusPt: "Pequim, China — a China Post recebeu o objeto.", statusAt: "2026-09-11" },
-    { statusKey: "cpf_linked", statusPt: "O CPF do destinatário foi vinculado ao pacote com sucesso.", statusAt: "2026-09-11" },
-  ];
-  let history = order.history || [];
-  if (!history.some((event) => event.statusKey === "warehouse")) history = [...history, warehouseEvent];
-  if (!history.some((event) => event.statusPt.includes("P260907637637"))) history = [...history, parcelEvent];
-  shippingEvents.forEach((shipmentEvent) => {
-    if (!history.some((event) => event.statusKey === shipmentEvent.statusKey)) history = [...history, shipmentEvent];
-  });
-  const latest = shippingEvents.find((event) => event.statusKey === "posted_correios")!;
-  return {
-    ...order,
-    shippingCode: "LZ458955736CN",
-    trackingNote: "O código está ativo no aplicativo dos Correios e o CPF do destinatário foi vinculado ao pacote com sucesso.",
-    statusKey: latest.statusKey,
-    statusPt: latest.statusPt,
-    statusAt: latest.statusAt,
-    history,
-    shippingDetails: {
-      parcel: "P260907637637",
-      method: "BJ-EUB (0–2 kg)",
-      shippingPrice: "¥148,10",
-      totalPrice: "¥167,39",
-      insuredAmount: "¥278,17",
-      declaration: "Tênis unissex branco, tamanho 45, material: borracha — US$ 7,00",
-    },
-  };
+function safeLocalImageUrl(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const path = value.replace(/^\.\//, "");
+  return /^(?:catalog|qc|img\/qc)\/[a-z0-9/_-]+\.(?:png|jpe?g|webp)$/i.test(path) && !path.includes("..") ? `./${path}` : null;
 }
 
 function CopyTrackingCode({ code }: { code: string }) {
@@ -462,7 +419,12 @@ export default function Home() {
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "Não foi possível consultar agora.");
-      setTrackingOrder(applyKnownTrackingUpdate(data.order as TrackingOrder));
+      if (!data.order || typeof data.order !== "object" || typeof data.order.code !== "string" ||
+          typeof data.order.product !== "string" || typeof data.order.statusPt !== "string" ||
+          !Array.isArray(data.order.history)) {
+        throw new Error("Resposta de rastreio inválida. Tente novamente.");
+      }
+      setTrackingOrder(data.order as TrackingOrder);
       setTrackingVisible(true);
     } catch (error) {
       setTrackingError(error instanceof Error ? error.message : "Não foi possível consultar agora.");
@@ -664,6 +626,7 @@ export default function Home() {
                         <div><p className="sku">{product.sku} · {product.category === 'apparel' ? 'NIKE TECH' : 'TÊNIS'}</p><h2>{product.name}</h2></div>
                         <p className="price">R$ {product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<small>¥ {product.cny}</small></p>
                       </button>
+                      <p className="product-estimate"><span>ESTIMATIVA COM FRETE, SEGURO E SERVIÇO · 1 PEÇA</span><strong>R$ {calculateQuote({ [product.id]: 1 }, products).totalBrl.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong><small>Tributos no Brasil não inclusos.</small></p>
                       {cart[product.id] ? (
                         <div className="quantity-control" aria-label={`Quantidade de ${product.name}`}>
                           <button onClick={() => changeQuantity(product.id, -1)} aria-label="Diminuir quantidade">−</button>
@@ -792,7 +755,7 @@ export default function Home() {
           {trackingVisible && trackingOrder && (
             <section className="tracking-result tracking-shell">
               <header className="tracking-product-summary">
-                <img src={trackingOrder.image || products.find((product) => product.sku === trackingOrder.model)?.image || "./catalog/hq6316-bone.png"} alt={trackingOrder.product} />
+                <img src={safeLocalImageUrl(trackingOrder.image) || products.find((product) => product.sku === trackingOrder.model)?.image || "./catalog/hq6316-bone.png"} alt={trackingOrder.product} />
                 <div><p>PEDIDO {trackingOrder.code}</p><h2>{trackingOrder.product}</h2></div>
                 <span className="status-pill">{trackingStatusLabels[trackingOrder.statusKey] || "ATUALIZAÇÃO"}</span>
               </header>
@@ -921,6 +884,7 @@ export default function Home() {
               <p className="eyebrow">KICKNITY SELECTION / {selectedProduct.sku}</p>
               <h2>{selectedProduct.name}</h2>
               <p className="detail-price">R$ {selectedProduct.price.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<small>produto unitário · frete calculado no pedido</small></p>
+              <p className="detail-estimate">Total estimado para 1 peça, com frete, seguro e serviço: <strong>R$ {calculateQuote({ [selectedProduct.id]: 1 }, products).totalBrl.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong><small>Tributos no Brasil não inclusos.</small></p>
               <div className="detail-divider" />
               <p className="detail-description">{selectedProduct.description} {selectedProduct.category === 'apparel' ? 'Foto principal aprimorada digitalmente a partir da imagem de catálogo; foto original disponível na galeria. As fotos de QC do seu pedido serão enviadas após a chegada ao armazém.' : 'As fotos marcadas como QC são registros de inspeção no armazém.'}</p>
               <div className="detail-flags"><span>✓ {selectedProduct.weightGrams} G ESTIMADOS</span><span>✓ CUSTO TRANSPARENTE</span><span>✓ TAMANHO A CONFIRMAR</span></div>
