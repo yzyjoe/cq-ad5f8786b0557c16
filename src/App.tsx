@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { calculateQuote, EXCHANGE_RATE, MAX_CART_WEIGHT_GRAMS } from "./pricing";
+import { createPaymentReference, createPixPayload, paymentLinkHash, readPaymentLink, type PaymentLinkData } from "./pix";
 
 type Route = "home" | "shop" | "how" | "tracking" | "account";
 
@@ -55,8 +56,8 @@ const UNIT_BRL = UNIT_CNY / EXCHANGE_RATE;
 const qcPhotos = (sku: string, count: number) => Array.from({ length: count }, (_, index) => `./qc/${sku.toLowerCase()}-${index + 1}.webp`);
 
 const products: Product[] = [
-  { id: "tech-jacket", name: "Nike Tech Fleece 2025 · Jaqueta Windrunner Color-Block", sku: "IF1325-010", price: 255 / EXCHANGE_RATE, cny: 255, image: "./catalog/nike-tech-jacket-front.jpg", tone: "PRETO / ANTRACITE", qc: [], category: "apparel", weightGrams: 650, description: "Jaqueta com zíper completo em preto e antracite. Tamanho e disponibilidade confirmados antes do pagamento.", editorial: ["./catalog/nike-tech-jacket-back.jpg", "./catalog/nike-tech-jacket-angle.jpg", "./catalog/nike-tech-look-motion.jpg"] },
-  { id: "tech-pants", name: "Nike Tech Fleece 2025 · Calça Open-Hem Color-Block", sku: "IF1323-010", price: 245 / EXCHANGE_RATE, cny: 245, image: "./catalog/nike-tech-pants-detail.jpg", tone: "PRETO / ANTRACITE", qc: [], category: "apparel", weightGrams: 550, description: "Calça de bainha aberta com ajuste na barra. Tamanho e disponibilidade confirmados antes do pagamento.", editorial: ["./catalog/nike-tech-look-front.jpg", "./catalog/nike-tech-look-motion.jpg"] },
+  { id: "tech-jacket", name: "Nike Tech Fleece 2025 · Jaqueta Windrunner Color-Block", sku: "IF1325-010", price: 255 / EXCHANGE_RATE, cny: 255, image: "./catalog/nike-tech-jacket-front-enhanced.png", tone: "PRETO / ANTRACITE", qc: [], category: "apparel", weightGrams: 650, description: "Jaqueta com zíper completo em preto e antracite. Informe o tamanho antes de gerar o Pix.", editorial: ["./catalog/nike-tech-jacket-front.jpg", "./catalog/nike-tech-jacket-back.jpg", "./catalog/nike-tech-jacket-angle.jpg", "./catalog/nike-tech-look-motion.jpg"] },
+  { id: "tech-pants", name: "Nike Tech Fleece 2025 · Calça Open-Hem Color-Block", sku: "IF1323-010", price: 245 / EXCHANGE_RATE, cny: 245, image: "./catalog/nike-tech-pants-detail-enhanced.png", tone: "PRETO / ANTRACITE", qc: [], category: "apparel", weightGrams: 550, description: "Calça de bainha aberta com ajuste na barra. Informe o tamanho antes de gerar o Pix.", editorial: ["./catalog/nike-tech-pants-detail.jpg", "./catalog/nike-tech-look-front.jpg", "./catalog/nike-tech-look-motion.jpg"] },
   { id: "bone", name: "Yeezy Boost 350 V2 Bone", sku: "HQ6316", price: UNIT_BRL, cny: UNIT_CNY, image: "./catalog/hq6316-bone.png", tone: "CREAM", qc: qcPhotos("HQ6316", 6), category: "sneakers", weightGrams: 704, description: "Seleção de tênis com fotos de QC disponíveis na galeria." },
   { id: "mx-oat", name: "Yeezy Boost 350 V2 MX Oat", sku: "GW3773", price: UNIT_BRL, cny: UNIT_CNY, image: "./catalog/gw3773-mx-oat.png", tone: "MULTI", qc: qcPhotos("GW3773", 6), category: "sneakers", weightGrams: 704, description: "Seleção de tênis com fotos de QC disponíveis na galeria." },
   { id: "butter", name: "Yeezy Boost 350 V2 Butter", sku: "F36980", price: UNIT_BRL, cny: UNIT_CNY, image: "./catalog/f36980-butter.png", tone: "YELLOW", qc: qcPhotos("F36980", 6), category: "sneakers", weightGrams: 704, description: "Seleção de tênis com fotos de QC disponíveis na galeria." },
@@ -75,6 +76,38 @@ const routeLabels: Record<Route, string> = {
 
 function Arrow() {
   return <span aria-hidden="true">↗</span>;
+}
+
+async function copyToClipboard(value: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(value);
+    return true;
+  } catch {
+    const field = document.createElement("textarea");
+    field.value = value;
+    field.readOnly = true;
+    field.style.position = "fixed";
+    field.style.opacity = "0";
+    document.body.appendChild(field);
+    field.select();
+    const copied = document.execCommand("copy");
+    field.remove();
+    return copied;
+  }
+}
+
+function PixQr({ payload }: { payload: string }) {
+  const target = useRef<HTMLDivElement>(null);
+  const [available, setAvailable] = useState(true);
+  useEffect(() => {
+    if (!target.current || !payload) return;
+    const QrCode = (window as typeof window & { QRCode?: new (element: HTMLElement, options: { text: string; width: number; height: number; colorDark: string; colorLight: string }) => unknown }).QRCode;
+    target.current.replaceChildren();
+    if (!QrCode) { setAvailable(false); return; }
+    new QrCode(target.current, { text: payload, width: 226, height: 226, colorDark: "#071011", colorLight: "#ffffff" });
+    setAvailable(true);
+  }, [payload]);
+  return <div className="pix-qr-shell"><div className="pix-qr" ref={target} aria-label="QR Code Pix para pagar no aplicativo bancário" />{!available && <p>QR Code indisponível. Use o Pix Copia e Cola ao lado.</p>}</div>;
 }
 
 function Brand() {
@@ -375,8 +408,9 @@ function AccountExperience({ active }: { active: boolean }) {
 }
 
 export default function Home() {
-  const [route, setRoute] = useState<Route>("home");
-  const [cart, setCart] = useState<Record<string, number>>({});
+  const [sharedPayment, setSharedPayment] = useState<PaymentLinkData | null>(() => readPaymentLink(window.location.hash, products.map((product) => product.id)));
+  const [route, setRoute] = useState<Route>(() => window.location.hash.startsWith("#pay/") ? "shop" : "home");
+  const [cart, setCart] = useState<Record<string, number>>(() => sharedPayment?.cart || {});
   const [trackingCode, setTrackingCode] = useState("");
   const [trackingVisible, setTrackingVisible] = useState(false);
   const [trackingOrder, setTrackingOrder] = useState<TrackingOrder | null>(null);
@@ -385,10 +419,13 @@ export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [activeImage, setActiveImage] = useState("");
   const [zoomedImageIndex, setZoomedImageIndex] = useState<number | null>(null);
-  const [purchaseStep, setPurchaseStep] = useState<PurchaseStep>("select");
+  const [purchaseStep, setPurchaseStep] = useState<PurchaseStep>(() => sharedPayment ? "payment" : "select");
   const [catalogFilter, setCatalogFilter] = useState<"all" | "apparel" | "sneakers">("all");
-  const [sizeNotes, setSizeNotes] = useState<Record<string, string>>({});
+  const [sizeNotes, setSizeNotes] = useState<Record<string, string>>(() => sharedPayment?.sizes || {});
   const [cartWarning, setCartWarning] = useState("");
+  const [paymentReference, setPaymentReference] = useState(() => sharedPayment?.reference || createPaymentReference());
+  const [pixCopied, setPixCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const openProduct = (product: Product) => {
     setSelectedProduct(product);
@@ -458,7 +495,20 @@ export default function Home() {
     const readHash = () => {
       const hash = window.location.hash.replace("#", "");
       const [routeHash] = hash.split("/");
-      if (routeHash === "conta") setRoute("account");
+      if (routeHash === "pay") {
+        const linked = readPaymentLink(window.location.hash, products.map((product) => product.id));
+        setRoute("shop");
+        if (linked) {
+          setCart(linked.cart);
+          setSizeNotes(linked.sizes);
+          setPaymentReference(linked.reference);
+          setSharedPayment(linked);
+          setPurchaseStep("payment");
+        } else {
+          setCartWarning("Link de pagamento inválido. Monte seu pedido novamente.");
+          setPurchaseStep("select");
+        }
+      } else if (routeHash === "conta") setRoute("account");
       else if (routeHash in routeLabels) setRoute(routeHash as Route);
       else if (!routeHash) setRoute("home");
     };
@@ -487,6 +537,10 @@ export default function Home() {
   const insurance = quote.insuranceBrl;
   const service = quote.serviceBrl;
   const total = quote.totalBrl;
+  const missingSizes = products.filter((product) => cart[product.id] && !sizeNotes[product.id]?.trim());
+  const validPayment = totalItems > 0 && !quote.overLimit && missingSizes.length === 0 && (!sharedPayment || sharedPayment.amountBrl === total);
+  const pixPayload = validPayment ? createPixPayload(total, paymentReference) : "";
+  const paymentUrl = `${window.location.origin}${window.location.pathname}${paymentLinkHash({ reference: paymentReference, amountBrl: total, cart, sizes: sizeNotes })}`;
   const visibleProducts = catalogFilter === "all" ? products : products.filter((product) => product.category === catalogFilter);
   const galleryImages = selectedProduct ? [selectedProduct.image, ...(selectedProduct.editorial || selectedProduct.qc)] : [];
 
@@ -502,6 +556,8 @@ export default function Home() {
       return false;
     }
     setCartWarning("");
+    setSharedPayment(null);
+    if (window.location.hash.startsWith("#pay/")) window.history.replaceState(null, "", "#shop");
     setCart((current) => {
       const next = Math.max(0, (current[productId] || 0) + change);
       const updated = { ...current, [productId]: next };
@@ -520,6 +576,7 @@ export default function Home() {
       return;
     }
     setCartWarning("");
+    setSharedPayment(null);
     setCart((current) => {
       const updated = { ...current, "tech-jacket": Math.max(1, current["tech-jacket"] || 0), "tech-pants": Math.max(1, current["tech-pants"] || 0) };
       return calculateQuote(updated, products).overLimit ? current : updated;
@@ -530,15 +587,25 @@ export default function Home() {
   };
 
   const orderEmailBody = [
-    "Olá! Quero confirmar este pedido Kicknity:",
+    `Olá! Fiz ou pretendo fazer o Pix do pedido Kicknity ${paymentReference}:`,
     ...products.filter((product) => cart[product.id]).map((product) => `• ${cart[product.id]} × ${product.name} (${product.sku}) — tamanho: ${sizeNotes[product.id]?.trim() || "a confirmar"}`),
     `Peso estimado: ${weight} g · frete: ${quote.shippingMethod || "a confirmar"}`,
     `Produtos: R$ ${subtotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} · frete: R$ ${shipping.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} · seguro 6%: R$ ${insurance.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
     ...(quote.isConfirmedTechSetExample ? ["Conjunto: cotação de referência ¥761 / R$ 625, incluindo demais custos do pedido."] : []),
     `Serviço Kicknity: R$ ${service.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
     `Total estimado: R$ ${total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
-    "Por favor, confirme tamanho, disponibilidade, peso, cotação e condições finais antes do pagamento.",
+    "O Pix só será considerado pago após conferência da Kicknity no banco. Por favor, confirme meu pedido e a disponibilidade.",
   ].join("\n");
+
+  const startPayment = () => {
+    if (!validPayment || missingSizes.length) return;
+    setPaymentReference(createPaymentReference());
+    setSharedPayment(null);
+    setPixCopied(false);
+    setLinkCopied(false);
+    if (window.location.hash.startsWith("#pay/")) window.history.replaceState(null, "", "#shop");
+    setPurchaseStep("payment");
+  };
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -562,19 +629,19 @@ export default function Home() {
           <section className="page-intro">
             <p className="eyebrow dark">KICKNITY / TÊNIS & VESTUÁRIO</p>
             <h1>Peças que fazem o look.</h1>
-            <p>Escolha seus produtos. Frete por peso, seguro e serviço aparecem separadamente antes de você pedir a confirmação.</p>
+            <p>Escolha seus produtos. Frete por peso, seguro e serviço aparecem separadamente antes de gerar o Pix.</p>
           </section>
           <nav className="purchase-steps" aria-label="Etapas do pedido">
             <button className={purchaseStep === "select" ? "active" : ""} onClick={() => setPurchaseStep("select")}><span>01</span><strong>SELECIONAR</strong></button>
             <button className={purchaseStep === "review" ? "active" : ""} onClick={() => totalItems && setPurchaseStep("review")} disabled={!totalItems}><span>02</span><strong>REVISAR</strong></button>
-            <button className={purchaseStep === "payment" ? "active" : ""} onClick={() => totalItems && setPurchaseStep("payment")} disabled={!totalItems}><span>03</span><strong>CONFIRMAR</strong></button>
+            <button className={purchaseStep === "payment" ? "active" : ""} onClick={startPayment} disabled={!validPayment}><span>03</span><strong>PAGAR</strong></button>
           </nav>
           {purchaseStep === "select" && (
             <div className="shop-layout">
               <section>
                 <div className="shop-set-feature">
-                  <img src="./catalog/nike-tech-look-front.jpg" alt="Conjunto Nike Tech Fleece preto e antracite vestido em modelo" />
-                  <div><span>DROP 01 / TECH FLEECE 2025</span><h2>O conjunto completo.</h2><p>Jaqueta Windrunner + calça Open-Hem. Cotação de referência: R$ 625 em custos e R$ 35 de serviço; valor final confirmado no atendimento.</p><strong>R$ 660 estimados</strong><button type="button" onClick={addTechSet}>MONTAR CONJUNTO <Arrow /></button></div>
+                  <img src="./catalog/nike-tech-look-front-enhanced.png" alt="Conjunto Nike Tech Fleece preto e antracite vestido em modelo" />
+                  <div><span>DROP 01 / TECH FLEECE 2025</span><h2>O conjunto completo.</h2><p>Jaqueta Windrunner + calça Open-Hem. Referência: R$ 625 em custos e R$ 35 de serviço. Confira o total e pague por Pix.</p><strong>R$ 660 no conjunto</strong><button type="button" onClick={addTechSet}>MONTAR CONJUNTO <Arrow /></button></div>
                 </div>
                 <div className="filter-row"><span className="catalog-label">CATÁLOGO / {visibleProducts.length} PEÇAS</span><div className="catalog-filters" role="group" aria-label="Filtrar catálogo">{([['all','Tudo'],['apparel','Roupas'],['sneakers','Tênis']] as const).map(([value,label]) => <button type="button" key={value} className={`filter ${catalogFilter === value ? 'active' : ''}`} onClick={() => setCatalogFilter(value)} aria-pressed={catalogFilter === value}>{label}</button>)}</div></div>
                 <div className="catalog-grid">
@@ -615,7 +682,7 @@ export default function Home() {
                 {cartWarning && <p className="cart-warning" role="alert">{cartWarning}</p>}
                 <div className="summary-total"><span>{quote.isConfirmedTechSetExample ? "Conjunto + serviço" : "Total estimado"}</span><strong>R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div>
                 <button className="primary full" disabled={!totalItems || quote.overLimit} onClick={() => setPurchaseStep("review")}>REVISAR PEDIDO <Arrow /></button>
-                <p className="summary-note">Cotação usada: ¥ 1,22 por R$ 1. Pesos estimados; valor e disponibilidade confirmados no atendimento. Tributos no Brasil não inclusos.</p>
+                <p className="summary-note">Cotação usada: ¥ 1,22 por R$ 1. O Pix será gerado pelo total exibido. Pesos estimados; eventuais diferenças e disponibilidade serão tratadas pelo atendimento. Tributos no Brasil não inclusos.</p>
               </aside>
             </div>
           )}
@@ -625,14 +692,38 @@ export default function Home() {
               <div className="review-layout"><div className="review-products">
                 {products.filter((product) => cart[product.id]).map((product) => <article key={product.id}>
                   <img src={product.image} alt="" />
-                  <div className="review-product-info"><span>{product.sku}</span><strong>{product.name}</strong><small>{cart[product.id]} × R$ {product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</small><label>Tamanho desejado (confirmaremos antes de cobrar)<input value={sizeNotes[product.id] || ""} onChange={(event) => setSizeNotes((current) => ({ ...current, [product.id]: event.target.value }))} placeholder={product.category === "apparel" ? "Ex.: M ou M, G" : "Ex.: 42 ou 42, 43"} maxLength={70} /></label></div>
+                  <div className="review-product-info"><span>{product.sku}</span><strong>{product.name}</strong><small>{cart[product.id]} × R$ {product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</small><label>Tamanho desejado (obrigatório para o Pix)<input value={sizeNotes[product.id] || ""} onChange={(event) => { setSizeNotes((current) => ({ ...current, [product.id]: event.target.value })); setSharedPayment(null); }} placeholder={product.category === "apparel" ? "Ex.: M ou M, G" : "Ex.: 42 ou 42, 43"} maxLength={70} /></label></div>
                   <div className="review-qty"><button onClick={() => changeQuantity(product.id, -1)} aria-label={`Diminuir ${product.name}`}>−</button><strong>{cart[product.id]}</strong><button onClick={() => changeQuantity(product.id, 1)} disabled={weight + product.weightGrams > MAX_CART_WEIGHT_GRAMS} aria-label={`Aumentar ${product.name}`}>＋</button></div>
                 </article>)}
-              </div><aside className="review-total"><p><span>Produtos</span><strong>R$ {subtotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p><p><span>Frete internacional</span><strong>R$ {shipping.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p><p><span>Seguro (6%)</span><strong>R$ {insurance.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p>{quote.additionalCny > 0 && <p><span>Demais custos da cotação</span><strong>R$ {quote.additionalBrl.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p>}{quote.isConfirmedTechSetExample && <p><span>Ajuste para R$ 625</span><strong>R$ {quote.roundingBrl.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p>}<p><span>Serviço Kicknity</span><strong>R$ {service.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p><div><span>TOTAL</span><strong>R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div><small>Frete {quote.shippingMethod} · {weight.toLocaleString("pt-BR")} g estimados</small><button className="primary full" onClick={() => setPurchaseStep("payment")}>CONTINUAR <Arrow /></button><button className="back-button" onClick={() => setPurchaseStep("select")}>← VOLTAR À SELEÇÃO</button></aside></div>
+              </div><aside className="review-total"><p><span>Produtos</span><strong>R$ {subtotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p><p><span>Frete internacional</span><strong>R$ {shipping.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p><p><span>Seguro (6%)</span><strong>R$ {insurance.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p>{quote.additionalCny > 0 && <p><span>Demais custos da cotação</span><strong>R$ {quote.additionalBrl.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p>}{quote.isConfirmedTechSetExample && <p><span>Ajuste para R$ 625</span><strong>R$ {quote.roundingBrl.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p>}<p><span>Serviço Kicknity</span><strong>R$ {service.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></p><div><span>TOTAL</span><strong>R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div><small>Frete {quote.shippingMethod} · {weight.toLocaleString("pt-BR")} g estimados</small>{missingSizes.length > 0 && <small className="review-required">Informe o tamanho de cada peça para gerar o Pix.</small>}<button className="primary full" disabled={missingSizes.length > 0 || quote.overLimit} onClick={startPayment}>GERAR PIX <Arrow /></button><button className="back-button" onClick={() => setPurchaseStep("select")}>← VOLTAR À SELEÇÃO</button></aside></div>
             </section>
           )}
           {purchaseStep === "payment" && (
-            <section className="checkout-stage payment-stage"><div><p className="eyebrow dark">03 / CONFIRMAÇÃO</p><h2>Seu pedido, sem surpresa.</h2><p>Envie o resumo para a Kicknity. Confirmaremos tamanho, disponibilidade, peso, cotação e condições finais antes de qualquer pagamento.</p><a className="primary payment-contact" href={`mailto:kicknity@gmail.com?subject=${encodeURIComponent("Pedido Kicknity")}&body=${encodeURIComponent(orderEmailBody)}`}>ENVIAR PEDIDO À KICKNITY <Arrow /></a><button className="back-button" onClick={() => setPurchaseStep("review")}>← VOLTAR E REVISAR</button></div><aside><span>TOTAL ESTIMADO</span><strong>R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong><small>{totalItems} {totalItems === 1 ? "peça" : "peças"} · {quote.shippingMethod} · {weight.toLocaleString("pt-BR")} g</small><div className="preview-lock">PAGAMENTO CONFIRMADO PELO ATENDIMENTO</div></aside></section>
+            <section className="checkout-stage payment-stage pix-stage">
+              <div className="pix-main">
+                <p className="eyebrow dark">03 / PAGAMENTO PIX</p>
+                <h2>Pronto para pagar.</h2>
+                <p>Copie o código Pix e cole na opção “Pix Copia e Cola” do aplicativo do seu banco, ou escaneie o QR Code ao lado. Confira o destinatário e o valor antes de confirmar no banco.</p>
+                {validPayment ? <>
+                  <div className="pix-receiver"><span>REFERÊNCIA DO PEDIDO</span><strong>{paymentReference}</strong><small>{totalItems} {totalItems === 1 ? "peça" : "peças"} · guarde este número para a conferência</small></div>
+                  <span className="pix-code-label">PIX COPIA E COLA</span>
+                  <div className="pix-code" aria-label="Código Pix ocultado visualmente; use o botão Copiar Pix">{pixPayload.slice(0, 8)} ································ {pixPayload.slice(-4)}</div>
+                  <div className="pix-actions">
+                    <button type="button" className="primary" onClick={async () => setPixCopied(await copyToClipboard(pixPayload))}>{pixCopied ? "CÓDIGO COPIADO ✓" : "COPIAR PIX"} <Arrow /></button>
+                    <button type="button" className="secondary" onClick={async () => setLinkCopied(await copyToClipboard(paymentUrl))}>{linkCopied ? "LINK COPIADO ✓" : "COPIAR LINK DE PAGAMENTO"}</button>
+                  </div>
+                  <p className="pix-guidance">O link abre esta página de cobrança; o pagamento é concluído no aplicativo do banco. O site não recebe confirmação automática do Pix. Após pagar, envie o comprovante com o número do pedido.</p>
+                  <a className="pix-receipt-link" href={`mailto:kicknity@gmail.com?subject=${encodeURIComponent(`Comprovante Pix Kicknity ${paymentReference}`)}&body=${encodeURIComponent(orderEmailBody)}`}>AVISAR QUE PAGUEI <Arrow /></a>
+                </> : <p className="pix-error" role="alert">Este link não corresponde ao valor atual, faltam tamanhos ou o pedido excede 6 kg. Volte e revise o carrinho antes de gerar outro Pix.</p>}
+                <button className="back-button" onClick={() => setPurchaseStep("review")}>← VOLTAR E REVISAR</button>
+              </div>
+              <aside className="pix-aside">
+                <span>VALOR DA COBRANÇA</span><strong>R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong>
+                {validPayment && <PixQr payload={pixPayload} />}
+                <small>Pix com valor e identificador deste pedido. Peso estimado: {weight.toLocaleString("pt-BR")} g.</small>
+                <div className="pix-pending">AGUARDANDO CONFERÊNCIA DO PAGAMENTO</div>
+              </aside>
+            </section>
           )}
         </main>
       );
@@ -649,7 +740,7 @@ export default function Home() {
             {[
               ["01", "ESCOLHA", "Selecione tênis e roupas. Informe o tamanho desejado na revisão."],
               ["02", "CONFIRA", "Veja o peso estimado, frete, seguro de 6% e serviço em linhas separadas."],
-              ["03", "ACOMPANHE", "Após a confirmação, receba fotos de QC e atualizações do pedido."],
+              ["03", "PAGUE E ACOMPANHE", "Pague por Pix no aplicativo do banco. Após a conferência do pagamento, acompanhe o pedido e receba fotos de QC."],
             ].map(([number, title, copy]) => (
               <article className="step-card" key={number}><span>{number}</span><h2>{title}</h2><p>{copy}</p></article>
             ))}
@@ -665,10 +756,11 @@ export default function Home() {
           </section>
           <section className="faq-preview">
             <p className="eyebrow dark">DÚVIDAS FREQUENTES</p><h2>Antes de fechar o pedido.</h2>
-            <details><summary>O valor do card já é o total final?</summary><p>Não. O card mostra o produto. O carrinho soma frete internacional, seguro e serviço. A cotação final é confirmada antes do pagamento.</p></details>
+            <details><summary>O valor do card já é o total do Pix?</summary><p>Não. O card mostra apenas o produto. Na revisão, o carrinho soma frete internacional, seguro e serviço; o Pix é gerado pelo total exibido nessa etapa.</p></details>
             <details><summary>Como o frete é calculado?</summary><p>Por peso estimado: BJ EUB até 2 kg e SH SAL acima de 2 kg, até o limite de 6 kg por pedido. Peso e valor final podem mudar após conferência no armazém.</p></details>
-            <details><summary>O que são as fotos de QC?</summary><p>São fotos tiradas após o produto chegar ao armazém. As imagens de catálogo mostram o modelo; não são as fotos de QC do seu pedido.</p></details>
-            <details><summary>Como escolho o tamanho?</summary><p>Informe o tamanho desejado ao revisar o pedido. A disponibilidade será confirmada pelo atendimento antes do pagamento.</p></details>
+            <details><summary>O que são as fotos de QC?</summary><p>São fotos tiradas após o produto chegar ao armazém. As imagens de catálogo mostram o modelo; algumas foram aprimoradas digitalmente e os originais continuam na galeria. Nenhuma delas é QC do seu pedido.</p></details>
+            <details><summary>Como escolho o tamanho?</summary><p>Informe o tamanho desejado ao revisar o pedido, antes de gerar o Pix. A disponibilidade será verificada pela Kicknity após o pagamento.</p></details>
+            <details><summary>O Pix confirma o pedido automaticamente?</summary><p>Não. Confira o nome do destinatário e o valor no aplicativo do banco, pague e envie o comprovante com a referência do pedido. A Kicknity confere o recebimento antes de marcar o pedido como pago.</p></details>
             <details><summary>Onde acompanho o pedido?</summary><p>Use a área Rastrear com o código fornecido pela Kicknity, ou entre em Minha conta para ver pedidos vinculados.</p></details>
           </section>
         </main>
@@ -727,7 +819,7 @@ export default function Home() {
           </div>
           <div className="hero-visual hero-visual--fashion">
             <div className="hero-number">01 / 25</div>
-            <img src="./catalog/nike-tech-look-front.jpg" alt="Look Nike Tech Fleece preto e antracite" fetchPriority="high" />
+            <img src="./catalog/nike-tech-look-front-enhanced.png" alt="Look Nike Tech Fleece preto e antracite" fetchPriority="high" />
             <div className="hero-product"><span>NEW IN / APPAREL</span><strong>NIKE TECH FLEECE</strong><small>WINDRUNNER + OPEN-HEM PANTS</small></div>
             <div className="hero-side-note">KICKNITY EDIT / 2025</div>
           </div>
@@ -790,9 +882,9 @@ export default function Home() {
               <button className="detail-main-image" onClick={() => setZoomedImageIndex(Math.max(0, galleryImages.indexOf(activeImage)))} aria-label="Expandir imagem atual"><img src={activeImage} alt={selectedProduct.name} /><span>EXPANDIR ↗</span></button>
               <div className="detail-thumbs" aria-label="Galeria do produto">
                 {galleryImages.map((image, index) => (
-                  <button key={image} className={activeImage === image ? "active" : ""} onClick={() => setActiveImage(image)} aria-label={index === 0 ? "Ver imagem principal" : `Ver ${selectedProduct.category === 'apparel' ? 'foto de catálogo' : 'foto de QC'} ${index}`}>
+                  <button key={image} className={activeImage === image ? "active" : ""} onClick={() => setActiveImage(image)} aria-label={index === 0 ? "Ver imagem principal aprimorada" : `Ver ${selectedProduct.category === 'apparel' ? 'foto original de catálogo' : 'foto de QC'} ${index}`}>
                     <img src={image} alt="" />
-                    <span>{index === 0 ? "CAPA" : `${selectedProduct.category === 'apparel' ? 'LOOK' : 'QC'} ${String(index).padStart(2, "0")}`}</span>
+                    <span>{selectedProduct.category === "apparel" && index === 0 ? "APRIMORADA" : selectedProduct.category === "apparel" && index === 1 ? "ORIGINAL" : index === 0 ? "CAPA" : `${selectedProduct.category === 'apparel' ? 'LOOK' : 'QC'} ${String(index).padStart(2, "0")}`}</span>
                   </button>
                 ))}
               </div>
@@ -802,7 +894,7 @@ export default function Home() {
               <h2>{selectedProduct.name}</h2>
               <p className="detail-price">R$ {selectedProduct.price.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<small>produto unitário · frete calculado no pedido</small></p>
               <div className="detail-divider" />
-              <p className="detail-description">{selectedProduct.description} {selectedProduct.category === 'apparel' ? 'Fotos de catálogo do modelo; as fotos de QC do pedido serão enviadas depois da chegada ao armazém.' : 'As fotos marcadas como QC são registros de inspeção no armazém.'}</p>
+              <p className="detail-description">{selectedProduct.description} {selectedProduct.category === 'apparel' ? 'Foto principal aprimorada digitalmente a partir da imagem de catálogo; foto original disponível na galeria. As fotos de QC do seu pedido serão enviadas após a chegada ao armazém.' : 'As fotos marcadas como QC são registros de inspeção no armazém.'}</p>
               <div className="detail-flags"><span>✓ {selectedProduct.weightGrams} G ESTIMADOS</span><span>✓ CUSTO TRANSPARENTE</span><span>✓ TAMANHO A CONFIRMAR</span></div>
               <button className="primary full" disabled={weight + selectedProduct.weightGrams > MAX_CART_WEIGHT_GRAMS} onClick={() => { if (changeQuantity(selectedProduct.id, 1)) { setSelectedProduct(null); setRoute("shop"); window.location.hash = "shop"; } }}>ADICIONAR AO PEDIDO <Arrow /></button>
               {weight + selectedProduct.weightGrams > MAX_CART_WEIGHT_GRAMS && <p className="cart-warning">Este item ultrapassa o limite de 6 kg do pedido.</p>}
@@ -812,7 +904,7 @@ export default function Home() {
       )}
       {selectedProduct && zoomedImageIndex !== null && (
         <div className="image-lightbox" role="dialog" aria-modal="true" aria-label="Imagem ampliada do produto">
-          <div className="lightbox-top"><span>{selectedProduct.category === 'apparel' ? 'IMAGEM DE CATÁLOGO' : zoomedImageIndex === 0 ? 'IMAGEM DE CATÁLOGO' : `FOTO DE QC ${String(zoomedImageIndex).padStart(2, '0')}`}</span><strong>{zoomedImageIndex + 1} / {galleryImages.length}</strong><button onClick={() => setZoomedImageIndex(null)}>FECHAR ×</button></div>
+          <div className="lightbox-top"><span>{selectedProduct.category === 'apparel' ? zoomedImageIndex === 0 ? 'CATÁLOGO · IMAGEM APRIMORADA' : 'IMAGEM ORIGINAL DE CATÁLOGO' : zoomedImageIndex === 0 ? 'IMAGEM DE CATÁLOGO' : `FOTO DE QC ${String(zoomedImageIndex).padStart(2, '0')}`}</span><strong>{zoomedImageIndex + 1} / {galleryImages.length}</strong><button onClick={() => setZoomedImageIndex(null)}>FECHAR ×</button></div>
           <button className="lightbox-arrow prev" onClick={() => setZoomedImageIndex((zoomedImageIndex - 1 + galleryImages.length) % galleryImages.length)} aria-label="Imagem anterior">‹</button>
           <img src={galleryImages[zoomedImageIndex]} alt={`${selectedProduct.name} — imagem ${zoomedImageIndex + 1}`} />
           <button className="lightbox-arrow next" onClick={() => setZoomedImageIndex((zoomedImageIndex + 1) % galleryImages.length)} aria-label="Próxima imagem">›</button>
