@@ -426,6 +426,8 @@ export default function Home() {
   const [paymentReference, setPaymentReference] = useState(() => sharedPayment?.reference || createPaymentReference());
   const [pixCopied, setPixCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [mobileCartProductId, setMobileCartProductId] = useState<string | null>(null);
+  const [mobileCartDismissed, setMobileCartDismissed] = useState(false);
 
   const openProduct = (product: Product) => {
     setSelectedProduct(product);
@@ -543,6 +545,8 @@ export default function Home() {
   const paymentUrl = `${window.location.origin}${window.location.pathname}${paymentLinkHash({ reference: paymentReference, amountBrl: total, cart, sizes: sizeNotes })}`;
   const visibleProducts = catalogFilter === "all" ? products : products.filter((product) => product.category === catalogFilter);
   const galleryImages = selectedProduct ? [selectedProduct.image, ...(selectedProduct.editorial || selectedProduct.qc)] : [];
+  const mobileCartProduct = products.find((product) => product.id === mobileCartProductId && cart[product.id]) || products.find((product) => cart[product.id]);
+  const showMobileCart = route === "shop" && purchaseStep === "select" && totalItems > 0 && !mobileCartDismissed && !selectedProduct;
 
   useEffect(() => {
     if (totalItems === 0 && purchaseStep !== "select") setPurchaseStep("select");
@@ -557,6 +561,10 @@ export default function Home() {
     }
     setCartWarning("");
     setSharedPayment(null);
+    if (change > 0) {
+      setMobileCartProductId(productId);
+      setMobileCartDismissed(false);
+    }
     if (window.location.hash.startsWith("#pay/")) window.history.replaceState(null, "", "#shop");
     setCart((current) => {
       const next = Math.max(0, (current[productId] || 0) + change);
@@ -577,6 +585,8 @@ export default function Home() {
     }
     setCartWarning("");
     setSharedPayment(null);
+    setMobileCartProductId("tech-jacket");
+    setMobileCartDismissed(false);
     setCart((current) => {
       const updated = { ...current, "tech-jacket": Math.max(1, current["tech-jacket"] || 0), "tech-pants": Math.max(1, current["tech-pants"] || 0) };
       return calculateQuote(updated, products).overLimit ? current : updated;
@@ -625,7 +635,7 @@ export default function Home() {
   const routeContent = (() => {
     if (route === "shop") {
       return (
-        <main className="route-page shop-page">
+        <main className={`route-page shop-page${showMobileCart ? " shop-page--mobile-cart" : ""}`}>
           <section className="page-intro">
             <p className="eyebrow dark">KICKNITY / TÊNIS & VESTUÁRIO</p>
             <h1>Peças que fazem o look.</h1>
@@ -867,6 +877,24 @@ export default function Home() {
         <button id="navAccountButton" className={`account-link ${route === "account" ? "active" : ""}`}><span>MINHA CONTA</span><span className="account-circle">→</span></button>
       </header>
       {routeContent}
+      {showMobileCart && mobileCartProduct && (
+        <aside className="mobile-cart-bar" aria-label="Carrinho rápido">
+          <div className="mobile-cart-bar__product">
+            <img src={mobileCartProduct.image} alt="" />
+            <div className="mobile-cart-bar__name"><span>NO CARRINHO · {totalItems} {totalItems === 1 ? "ITEM" : "ITENS"}</span><strong>{mobileCartProduct.name}</strong></div>
+            <button type="button" className="mobile-cart-bar__close" onClick={() => setMobileCartDismissed(true)} aria-label="Fechar barra do carrinho">×</button>
+          </div>
+          <div className="mobile-cart-bar__bottom">
+            <div className="mobile-cart-bar__quantity" role="group" aria-label={`Quantidade de ${mobileCartProduct.name}`}>
+              <button type="button" onClick={() => changeQuantity(mobileCartProduct.id, -1)} aria-label={`Diminuir ${mobileCartProduct.name}`}>−</button>
+              <strong aria-live="polite">{cart[mobileCartProduct.id]}</strong>
+              <button type="button" onClick={() => changeQuantity(mobileCartProduct.id, 1)} disabled={weight + mobileCartProduct.weightGrams > MAX_CART_WEIGHT_GRAMS} aria-label={`Aumentar ${mobileCartProduct.name}`}>+</button>
+            </div>
+            <div className="mobile-cart-bar__total"><span>TOTAL ESTIMADO</span><strong>R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong></div>
+            <button type="button" className="mobile-cart-bar__checkout" onClick={() => { setPurchaseStep("review"); window.scrollTo({ top: 0, behavior: "smooth" }); }}>REVISAR E PAGAR <Arrow /></button>
+          </div>
+        </aside>
+      )}
       <AccountExperience active={route === "account"} />
       <button id="homeAccountButton" type="button" hidden>Entrar</button>
       <footer className="site-footer">
